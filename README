@@ -1,0 +1,125 @@
+                   █████   ▓██▓  █████░  ▓██▓ ███████  ▓███▒
+                   █   ▓█ ▒█  █▒ █   ▒█ ▒█  █▒   █    █▓  ░█
+                   █    █ █░  ░█ █    █ █░  ░█   █    █     
+                   █   ▒█ █    █ █   ▒█ █    █   █    █▓░   
+                   █████  █    █ █████░ █    █   █     ▓██▓ 
+                   █  ░█▒ █    █ █   ▒█ █    █   █        ▓█
+                   █   ░█ █░  ░█ █    █ █░  ░█   █         █
+                   █    █ ▒█  █▒ █   ▒█ ▒█  █▒   █    █░  ▓█
+                   █    ▒  ▓██▓  █████░  ▓██▓    █    ▒████░
+
+                  Programming-language-agnostic robot battles
+
+This framework is where people can write robots in their own programming
+language - whichever one they wish - and they'll be run and connected with a
+central server.
+
+Ideas borrowed from AT Robots 2, http://necrobones.com/atrobots/ and see the
+specification here: http://necrobones.com/pub/atrobots/docs/atr2.txt
+
+This framework runs in three parts:
+    1. A server that hosts the battles
+    2. A client API that connects to the server and runs the programs
+    3. A web page of some sort so a human can see the field and watch their
+       robots perform
+
+Basic outline of a match:
+- The person writes a robot in their progamming language of choice.
+- The robot, when ready, connects to a unique match URL on the server. This is
+    probably a unique, temporary URL with a special query parameter that only
+    that instance of the robot and the server should know. Probably something
+    like http://robotwars.com/socket_471f3e355b5f00bcc461a7bd2d8cc5b5 
+    The URL should should disappear after the match is over. This method should
+    easily do two things:
+
+    - Allow the user to intervene if they wish. (e.g. the web page shows a
+      button that says "Here is your unique URL, paste this into your code"
+      and then they'll do just that and their robot will connect. This is useful
+      if the user just wants to test out one simple robot without registering it
+      against their account.
+
+    - Or, allow the robot to do this in an automated fashion, for e.g.
+      tournaments and such. The user could assign a unique ID to their robot in
+      the source code, register that ID to their account, and then stick the
+      robot in tournaments or whatever. It would then contact to the match. If
+      it should go to a match right away; e.g. if another person "challenged"
+      the robot or if it's in a tournament, the server will report its "match
+      URL" and the client robot will connect. If not, it could tell the server
+      that it wants to fight and go on a "challenge list" or something.
+
+      Here's an example. A simple client where the user doesn't mind copying and
+      pasting the URL from the web page before every match could look like this:
+
+          url = raw_input("Copy+paste the URL on the web page: ")
+
+          robot = RoboLink.connect(url)
+          if robot is none:
+            sys.exit("Connection failed.")
+
+          robot.signal_ready()
+          while not robot.dead():
+            robot.shoot()
+
+
+      A persistent client would look more like this:
+
+          ID = md5sum("StormBot " + VERSION + external_ip)
+          while True:
+              if RoboLink.registered(ID):
+                  matches = RoboLink.get_pending_matches(ID)
+              else:
+                  matches = [raw_input("Copy+paste the URL on the web page: ")]
+
+              for match in matches:
+                  robot = RoboLink.connect(match)
+                  if robot is none:
+                    sys.exit("Connection failed.")
+
+                  robot.signal_ready()
+                  while not robot.dead():
+                    robot.shoot()
+                  if robot.is_winner():
+                    print "We won! Awright!"
+
+      Of course, the API could probably abstract this quite a bit into something
+      like:
+
+          def run_robot(robot):
+              robot.signal_ready()
+              while not robot.dead():
+                robot.shoot
+          ID = md5sum("StormBot " + VERSION + external_ip)
+          RoboLink.persistent_connection(ID, run_robot)
+
+      which could prompt the user for a key or just run indefinitely.
+
+      This allows users to have long-standing "client robot daemons" on their
+      computer, just waiting for a fight and connecting immediately when there
+      is one.
+
+- Once the robot is connected, it would optionally declare attributes about
+    itself and then signal that it's ready; say, something like this:
+
+        robot.set_type({'speed': 25,
+                        'armor': 30,
+                        'power': 90})
+        robot.signal_ready()
+
+        The robot.signal_ready() call blocks until ALL opponents call it.
+
+- Then the match begins. Robots could do stuff like
+
+    targets = robot.scan()
+    for bearing, position in targets:
+       print "Robot detected at %d degrees %m away" % (bearing, position)
+
+    In this example, robot.scan() would block for a bit -- scanning takes time
+    of course! -- and then prints all the robots that it found to the console.
+
+    If the robot uses a blocking call before it's called signal_ready(), that
+    call will be executed automatically to prevent n00bs from messing up the
+    game.
+
+- When all but one robot is dead, they could call stuff like robot.dead() to
+  find out if they're dead and robot.is_winner() to see if they are the winner,
+  etc.
