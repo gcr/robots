@@ -41,7 +41,7 @@ Basic outline of a match:
     - Or, allow the robot to do this in an automated fashion, for e.g.
       tournaments and such. The user could assign a unique ID to their robot in
       the source code, register that ID to their account, and then stick the
-      robot in tournaments or whatever. It would then contact to the match. If
+      robot in tournaments or whatever. It would then connect to the match. If
       it should go to a match right away; e.g. if another person "challenged"
       the robot or if it's in a tournament, the server will report its "match
       URL" and the client robot will connect. If not, it could tell the server
