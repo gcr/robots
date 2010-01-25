@@ -3,6 +3,7 @@
 import math
 import random
 import field
+import vector
 
 class Robot(field.FieldObject):
     def __init__(name, (x, y), scanner=5, weapon=2, armor=2, engine=2,
@@ -13,7 +14,7 @@ class Robot(field.FieldObject):
         self.steer = random.uniform(0, 2*math.pi) # Where we WANT to turn
         self.rotation = self.steer # Where we ARE turning
         self.turret_rot = 0 # Where our turret is pointing relative to self.steer
-        self.location = [x, y]
+        self.location = vector.Vector([x, y])
         self.scan_width = math.pi / 2
         self.heat = 0
 
@@ -34,20 +35,44 @@ class Robot(field.FieldObject):
           if necessary.
         - Reduces heat
         """
+        if not self.dead and self.heat < 350:
+            pass
+
+    def hit(self, damage):
+        """
+        We were hit!
+        """
+        if not self.dead:
+            self.armor -= damage
+                if self.dead:
+                    self.destruct()
+
+    def fire(self):
+        """
+        Fire a new shot; add it to the field.
+        """
+        if self.dead:
+            raise RobotError("%s is too dead to fire!" % self.name)
         pass
 
     def destruct(self):
         """
         Self-destructs.
         """
+        if self.dead:
+            raise RobotError("%s is too dead to self destruct!" % self.name)
         self.armor = -10
-        self.field.splashdamage(self.location)
+        self.speed = 0
+        self.throttle = 0
+        self.field.splashdamage(self.location, 20)
 
     def sonar(self):
         """
         Does sonar. This takes a scan of the field and returns the bearing to
         the nearest target.
         """
+        if self.dead:
+            raise RobotError("%s is too dead to scan!" % self.name)
         pass
 
     @property
@@ -60,6 +85,8 @@ class Robot(field.FieldObject):
         target where position could be False or a number and accuracy is inside
         [-2, 2] -- the angle
         """
+        if self.dead:
+            raise RobotError("%s is too dead to scan!" % self.name)
         pass
 
     @property
@@ -69,3 +96,5 @@ class Robot(field.FieldObject):
         """
         return self.steer + self.turret_rot
 
+class RobotError(Exception):
+    pass
