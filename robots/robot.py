@@ -4,21 +4,23 @@ import math
 import random
 import field
 import vector
+import fieldobject
 
-class Robot(field.FieldObject):
-    def __init__(name, (x, y), scanner=5, weapon=2, armor=2, engine=2,
-            heatsink=1):
+class Robot(fieldobject.FieldObject):
+    def __init__(self, name, field, location, scanner=5, weapon=2, armor=2,
+            engine=2, heatsink=1,mines=0,shield=0):
         self.name = name
         self.throttle = 0 # How fast we WANT to go
         self.speed = 0 # How fast we're ACTUALLY going
         self.steer = random.uniform(0, 2*math.pi) # Where we WANT to turn
         self.rotation = self.steer # Where we ARE turning
         self.turret_rot = 0 # Where our turret is pointing relative to self.steer
-        self.location = vector.Vector([x, y])
+        self.field = field
+        self.location = vector.Vector(location)
         self.scan_width = math.pi / 2
         self.heat = 0
 
-        assert sum(scanner,weapon,armor,engine,heatsink,mines,shield) <= 12, "You can only have 12 points"
+        assert sum([scanner,weapon,armor,engine,heatsink,mines,shield]) <= 12, "You can only have 12 points"
         self.scanrange = [250,  350, 500, 700, 1000, 1500][scanner]
         self.weapon =    [0.5,  0.8,  1., 1.2, 1.35,  1.5][weapon]
         self.armor =     [ 50,   66, 100, 120,  130,  150][armor]
@@ -44,8 +46,8 @@ class Robot(field.FieldObject):
         """
         if not self.dead:
             self.armor -= damage
-                if self.dead:
-                    self.destruct()
+            if self.dead:
+                self.destruct()
 
     def fire(self):
         """
@@ -69,15 +71,19 @@ class Robot(field.FieldObject):
     def sonar(self):
         """
         Does sonar. This takes a scan of the field and returns the bearing to
-        the nearest target.
+        the nearest target. Computed relative to the tank's steering.
         """
         if self.dead:
             raise RobotError("%s is too dead to scan!" % self.name)
-        pass
+        return vector.angle_normalize(
+                self.bearing(min(
+                    self.field.other_robots(self), 
+                    key=lambda other: (other.location - self.location).dist))
+                - self.rotation)
 
     @property
     def dead(self):
-        return self.health > 0
+        return self.armor <= 0
 
     def scan(self):
         """

@@ -1,26 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import math
+import vector
+import robot
 
-def distance(a, b):
-    """
-    Utility function. Returns distance between object a and object b.
-    """
-    return math.sqrt((a.x - b.x)**2 + (a.y - b.y)**2)
-
-def bearing(a, b):
-    """
-    Return the bearing from a to b as seen on a's compass.
-
-    |
-    |
-    |-.  this angle
-    |  \ 
-    a--.:___
-            ''---..__
-                     ''--b
-    """
-    return angle(vector.Vector([0, -1]), b.location - a.location)
+# NOTE: we're on CARTESIAN coordinates.
+NORTH = vector.Vector([0, 1])
 
 class Field:
     """
@@ -31,7 +16,7 @@ class Field:
         self.height = height
         self.objects = []
 
-    def splashdamage(self, loc, damage)):
+    def splashdamage(self, loc, damage):
         """
         Calls the hit() method on every object at the given location. Returns
         true if something was hit, false otherwise.
@@ -47,15 +32,16 @@ class Field:
     def remove(self, obj):
         self.objects.remove(obj)
 
-class FieldObject(object):
-    def __init__(self):
-        self.location = [0, 0]
-    def hit(self):
-        pass
     @property
-    def x(self):
-        return self.location[0]
-    @property
-    def y(self):
-        return self.location[1]
+    def robots(self):
+        """
+        Return the robots in self.objects
+        """
+        return [obj for obj in self.objects if isinstance(obj, robot.Robot)]
+
+    def other_robots(self, r):
+        """
+        Return all robots other than r
+        """
+        return [obj for obj in self.objects if r != obj]
 

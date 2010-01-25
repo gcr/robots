@@ -15,7 +15,15 @@ def angle(a,b):
     # ⇒ cos(θ) = D ÷ (|A||B|)
     # ⇒ θ = acos(D ÷ (|A||B|))
     return math.acos(a*b / (abs(a.dist) * abs(b.dist)))
-    
+
+def angle_normalize(angle):
+    """
+    Given an angle in radians, will return an equivalent angle between
+    [-pi, pi]
+    """
+    return angle if -math.pi < angle <= math.pi else angle - 2*math.pi
+
+
 def rotate(v, a):
     """Rotate a 2D vector by some angle in radians, a.
     rotate(0, 1, math.radians(90)) will rotate the point (0, 1) 90° about the
@@ -68,6 +76,12 @@ class Vector(list):
         u = Vector(self)
         u.dist = 1
         return u
+
+    @property
+    def angle(self):
+        """ Returns an angle in radians from the positive X axis """
+        tmp = angle(Vector([1,0]), self)
+        return tmp if self[1] >= 0 else -tmp
 
 if __name__ == "__main__":
     print "------ Vectors ------"
