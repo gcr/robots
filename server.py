@@ -1,5 +1,5 @@
-#!/usr/bin/pythonrequire 'rubygems'
-from twisted.web import server, resource
+#!/usr/bin/python
+from twisted.web import server, resource, error
 from twisted.internet import reactor
 from twisted.internet import task
 
@@ -19,10 +19,10 @@ class Simple(resource.Resource):
         self.list_to_return.append(request)
         return server.NOT_DONE_YET
 
-s = Simple()
+s = error.Error("Page not found")
 site = server.Site(s)
-l = task.LoopingCall(s.process_outstanding)
-l.start(5)
+#l = task.LoopingCall(s.process_outstanding)
+#l.start(5)
 reactor.listenTCP(8080, site)
 reactor.run()
 
