@@ -4,6 +4,7 @@
 from twisted.web import server, resource
 from json_resource import JsonResource
 from twisted.internet import task
+import string
 import random
 
 class Match(resource.Resource):
@@ -21,7 +22,8 @@ class Match(resource.Resource):
         resource.Resource.__init__(self)
         self.http_requests_waiting = []
         self.timer = task.LoopingCall(self.pump)
-        self.speed = 10.0 # seconds
+        #self.speed = 5.0 # seconds
+        self.speed = 1.0 # seconds
         self.start()
 
     def start(self):
@@ -52,8 +54,8 @@ class Match(resource.Resource):
     def render_GET(self, request):
         self.http_requests_waiting.append(request)
         # vv this is a 'deferred'
-        #defr = request.notifyFinish()
-        #defr.addErrback(self.connection_lost, request)
+        defr = request.notifyFinish()
+        defr.addErrback(self.connection_lost, request)
         return server.NOT_DONE_YET
 
 
@@ -73,7 +75,8 @@ class Matches(resource.Resource):
         """
         Returns a random string of digits guaranteed not to be in self.matches
         """
-        x = ''.join(random.choice('abcdefghijklmnopqrstuvwxyz012345') for _ in xrange(5))
+        x = ''.join(random.choice(string.letters + string.digits) for _ in
+                xrange(15))
         return x if x not in self.matches else self.new_random_match()
 
     def render_GET(self, request):
