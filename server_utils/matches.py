@@ -21,11 +21,12 @@ class Match(resource.Resource):
         resource.Resource.__init__(self)
         self.http_requests_waiting = []
         self.timer = task.LoopingCall(self.pump)
-        self.speed = 5.0 # seconds
+        self.speed = 900.0 # seconds
         self.start()
 
     def start(self):
-        self.timer.start(self.speed)
+        # Start the match, but don't do a tick right away.
+        self.timer.start(self.speed, now=False)
 
     def pause(self):
         self.timer.stop(self.speed)
@@ -38,6 +39,8 @@ class Match(resource.Resource):
         print "pump'd"
         print self.http_requests_waiting
         for request in self.http_requests_waiting:
+            if not request.connected:
+                print "Disconnected request: %s" % repr(request)
             JsonResource({'state': 'success'}).render(request)
         self.http_requests_waiting = []
 
