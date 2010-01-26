@@ -21,7 +21,7 @@ class Match(resource.Resource):
         resource.Resource.__init__(self)
         self.http_requests_waiting = []
         self.timer = task.LoopingCall(self.pump)
-        self.speed = 900.0 # seconds
+        self.speed = 10.0 # seconds
         self.start()
 
     def start(self):
@@ -39,13 +39,21 @@ class Match(resource.Resource):
         print "pump'd"
         print self.http_requests_waiting
         for request in self.http_requests_waiting:
-            if not request.connected:
-                print "Disconnected request: %s" % repr(request)
             JsonResource({'state': 'success'}).render(request)
         self.http_requests_waiting = []
 
+    def connection_lost(self, reason, request):
+        """
+        called when we lose the connection to a client
+        """
+        print "Connection lost"
+        self.http_requests_waiting.remove(request)
+
     def render_GET(self, request):
         self.http_requests_waiting.append(request)
+        # vv this is a 'deferred'
+        #defr = request.notifyFinish()
+        #defr.addErrback(self.connection_lost, request)
         return server.NOT_DONE_YET
 
 
@@ -96,22 +104,4 @@ class Matches(resource.Resource):
             return self.matches[path]
         else:
             return JsonResource({'error': 'No match!'})
-
-
-# class Simple(resource.Resource):
-#     isLeaf = True
-#     def __init__(self):
-#         self.list_to_return = []
-# 
-#     def process_outstanding(self):
-#         print self.list_to_return
-#         for request in self.list_to_return:
-#             request.write("hello there")
-#             request.finish()
-#         self.list_to_return = []
-# 
-#     def render_GET(self, request):
-#         self.list_to_return.append(request)
-#         return server.NOT_DONE_YET
-
 
