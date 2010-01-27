@@ -13,7 +13,6 @@ class JsonResource(resource.Resource):
         self.obj = obj
 
     def render_GET(self, request):
-        request.setResponseCode(500)
         request.write(json.dumps(self.obj))
         request.finish()
         return server.NOT_DONE_YET

@@ -30,7 +30,9 @@ class later_action(object):
             # the drgn blow'd up!
             self.defr.errback(e)
 
-class game(object):
+
+###################
+class Game(object):
     """
     Represents the logic for this game.
     """
@@ -49,11 +51,11 @@ class game(object):
 
     def pump(self):
         """
-        Go through the history. Carry out the action on the robot and
-        callback any Deferred.
+        Go through the history. Carry out the action on the robot.
         """
+        pass
 
-    def queue_action(self, robot_id, **kwargs):
+    def queue_action(self, robot_id, action, **kwargs):
         """
         Queue some action to go on the history.
         This returns a Deferred. Attach callbacks if you like; they'll get
@@ -61,10 +63,16 @@ class game(object):
         Will check to ensure that there aren't any actions from the given
         robot already.
         """
+        assert robot_id in self.robots and self.robots[robot_id] ("This robot "
+        "doesn't exist!")
+        pass
         
     @property
     def finished(self):
         """
         Are we finished?
         """
+        pass
 
+class ATRobotsInspiredGame(Game):
+    pass
