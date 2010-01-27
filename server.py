@@ -4,8 +4,8 @@
 from twisted.web import server, resource, error, http
 from twisted.internet import reactor
 
-from server_utils.json_resource import JsonResource
-from server_utils.matches import Matches, Match
+from server.json_resource import JsonResource
+from server.matches import Matches, Match
 
 # Which port to run on?
 PORT = 8080
