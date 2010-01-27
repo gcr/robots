@@ -16,5 +16,9 @@ class JsonResource(resource.Resource):
         request.write(json.dumps(self.obj))
         request.finish()
         return server.NOT_DONE_YET
-        # ^ seems deceptive, but is the correct way of handling this case
+        # ^ seems deceptive, but is the correct way of handling this case.
+        # Later versions of twisted will likely return a deferred instead.
+        # render() is supposed to either return a string or NOT_DONE_YET
+        # immediately, twisted doesn't know that we'll save the request object
+        # and directly write to it later even though it's completely supported
 

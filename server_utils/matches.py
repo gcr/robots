@@ -19,6 +19,13 @@ class Match(resource.Resource):
     All robots will call their signal_ready() method.
     """
     def __init__(self):
+        """
+        Private: whether the match will show up on public listings (still will
+            always grant a slot if someone knows the s33krit match URL)
+        Speed: how long to wait at the maximum for robot clients to say
+            something before giving up
+        Start_timeout: how long do we wait until we start
+        """
         resource.Resource.__init__(self)
         self.http_requests_waiting = []
         self.timer = task.LoopingCall(self.pump)
@@ -30,8 +37,10 @@ class Match(resource.Resource):
         # Start the match, but don't do a tick right away.
         self.timer.start(self.speed, now=False)
 
+
     def pause(self):
         self.timer.stop(self.speed)
+
 
     def pump(self):
         """
@@ -44,12 +53,14 @@ class Match(resource.Resource):
             JsonResource({'state': 'success'}).render(request)
         self.http_requests_waiting = []
 
+
     def connection_lost(self, reason, request):
         """
         called when we lose the connection to a client
         """
         print "Connection lost"
         self.http_requests_waiting.remove(request)
+
 
     def render_GET(self, request):
         self.http_requests_waiting.append(request)
@@ -59,17 +70,18 @@ class Match(resource.Resource):
         return server.NOT_DONE_YET
 
 
+
 class Matches(resource.Resource):
     """
     Represents a list of matches going on in this server.
 
     You can browse the matches by heading to http://server_url/matches and can
     register your own by going to http://server_url/matches/register.
-
     """
     def __init__(self):
         resource.Resource.__init__(self)
         self.matches = {}
+
 
     def new_random_match_string(self):
         """
