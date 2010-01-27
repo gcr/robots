@@ -70,10 +70,13 @@ class Server:
             else:
                 raise e
 
-    def register_match(self):
+    def register_match(self, **kwargs):
         """
         Register a match, then return a URL of that match.
         """
-        match_code = self._fetch(self.url_splice(self.host, self.MATCH, self.REGISTER))
+        match_code = self._fetch(self.url_splice(self.host, self.MATCH,
+            self.REGISTER), **kwargs)
         return self.url_splice(self.host, self.MATCH, match_code)
 
+class RobotException(Exception):
+    pass

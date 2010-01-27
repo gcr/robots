@@ -22,3 +22,13 @@ class JsonResource(resource.Resource):
         # immediately, twisted doesn't know that we'll save the request object
         # and directly write to it later even though it's completely supported
 
+
+
+class ErrorResource(resource.Resource):
+    def __init__(self, errmessage):
+        resource.Resource.__init__(self)
+        self.err_message = errmessage
+
+    def render_GET(self, request):
+        JsonResource({'client_error': self.err_message}).render(request)
+        return server.NOT_DONE_YET
