@@ -4,8 +4,8 @@
 from twisted.web import server, resource
 from json_resource import JsonResource, ErrorResource
 from twisted.internet import task, reactor
-import string
-import random
+import utils
+from robosocket import RoboSocket
 
 class Match(resource.Resource):
     """
@@ -16,22 +16,27 @@ class Match(resource.Resource):
         - a "game" complete with rules
         - a hash of robots
 
-    All robots will call their signal_ready() method.
+    When a robot requests a slot, it'll 
     """
-    def __init__(self, speed=5.0, private=False, start_timeout=10):
+    def __init__(self, speed=5.0, private=False, start_timeout=10,
+            lockstep=False):
         """
         Private: whether the match will show up on public listings (still will
             always grant a slot if someone knows the s33krit match URL)
-        Speed: how long to wait at the maximum for robot clients to say
-            something before giving up
-        Start_timeout: how long do we wait until we start
+        Speed: how long to wait for slow robot clients to do something before
+            skipping their turn
+        Start_timeout: how long do we wait until we start the match
+        lockstep: If set, this match will not skip a turn even if all the
+            clients are ready to move. If unset (default), the match will
+            continue to the next turn if all clients are waiting for something.
         """
         resource.Resource.__init__(self)
         self.http_requests_waiting = []
         self.timer = task.LoopingCall(self.pump)
-        #self.speed = 5.0 # seconds
+        self.sockets = {} # bind people to robots. Or not.
         self.speed = speed
         self.private = private
+        self.lockstep = lockstep
         if start_timeout:
             self.start_timer = reactor.callLater(start_timeout, self.start)
 
@@ -89,15 +94,6 @@ class Matches(resource.Resource):
         self.matches = {}
 
 
-    def new_random_match_string(self):
-        """
-        Returns a random string of digits guaranteed not to be in self.matches
-        """
-        x = ''.join(random.choice(string.letters + string.digits) for _ in
-                xrange(15))
-        return x if x not in self.matches else self.new_random_match()
-
-
     def render_GET(self, request):
         """
         Returns the public matches
@@ -109,7 +105,7 @@ class Matches(resource.Resource):
         """
         Registers a new match.
         """
-        n = self.new_random_match_string()
+        n = utils.random_string()
         self.matches[n] = Match(**kwargs)
         print "New match registered: %s" % n
         return n
@@ -134,6 +130,8 @@ class Matches(resource.Resource):
                     args['speed'] = float(request.args['speed'][0])
             if 'start_timeout' in request.args:
                 args['start_timeout'] = float(request.args['start_timeout'][0])
+            if 'lockstep' in request.args:
+                args['lockstep'] = True
             # success!
             return JsonResource(self.register_new(**args))
 
