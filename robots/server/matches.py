@@ -40,6 +40,27 @@ class Match(resource.Resource):
         # the client and then remove this socket from here if it still exists.
         # Note that this should NOT be cleared when the client disappears.
         self.slots = {}
+
+        # TODO: don't do this. this is a stupid system and I am a silly boy.
+        # Instead, store robots just in the game logic. Then, allow RoboSocket
+        # to bind callbacks to request.notifyFinish(). When robots connect
+        # before the match starts, roboSocket will call game.CreateNewRobot(id,
+        # attributes) which will return a robot and add it to the dictionary in
+        # the game logic. The request's errback looks like: if not
+        # match.started: game.remove_robot(returned_robot) so their robot will
+        # disappear if they do before the match.
+
+        # now, the problem of notifying people when the match starts? we'll have
+        # a function here, notifyStart, that when called, makes a Deferred and
+        # adds it to the list that'll be set off when start() is called. Just
+        # like how http.Request handles notifyStart(). This Deferred's callback
+        # will tell the client their connection information. be sure to set
+        # match.started to True before calling this off, or the other callback I
+        # mentioned will see that their HTTP request died and remove their
+        # robot.
+
+        # yeah, that seems a little better.
+        # i should keep this comment for documentation's sake.
         self.started = False
         self.speed = speed
         self.private = private
@@ -48,19 +69,20 @@ class Match(resource.Resource):
             self.start_timer = reactor.callLater(start_timeout, self.start)
 
 
-    def start(self):
-        # Start the match, but don't do a tick right away. loop through
-        # self.slots and assign robots for them IF there is a request
-        # (RoboSocket will handle unbinding them if not), then clear self.slots
-        # by setting it to {} 
-        # If there are no robots connected, then remove
-        # ourselves from the match list.
-        for robot_id in self.slots:
-            if robot_id:
-                JsonResource("mock start").render(self.slots[robot_id])
-        self.timer = task.LoopingCall(self.game.pump)
-        self.timer.start(self.speed, now=False)
-        self.started = True
+     def start(self):
+         # Start the match, but don't do a tick right away. loop through
+         # our notification list, firing off callbacks everywhichway to tell
+         # people "GUYS HEY GUYS WE'RE STARTING NAO"
+         # (RoboSocket will handle unbinding them if not), then clear self.slots
+         # by setting it to {} 
+         # If there are no robots connected, then remove
+         # ourselves from the match list.
+         self.started = True
+         for robot_id in self.slots:
+             if robot_id:
+                 JsonResource("mock start").render(self.slots[robot_id])
+         self.timer = task.LoopingCall(self.game.pump)
+         self.timer.start(self.speed, now=False)
 
 
     def request_slot(self, request):

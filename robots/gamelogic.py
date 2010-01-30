@@ -60,8 +60,8 @@ class Game(object):
         Queue some action to go on the history.
         This returns a Deferred. Attach callbacks if you like; they'll get
         executed once your robot carries out.
-        Will check to ensure that there aren't any actions from the given
-        robot already.
+        Will check to ensure that there aren't any actions from this robot
+        already.
         """
         assert robot_id in self.robots and self.robots[robot_id] ("This robot "
         "doesn't exist!")

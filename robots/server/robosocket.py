@@ -19,7 +19,16 @@ class RoboResource(resource.Resource):
         self.game = self.match.game
         self.robot_id = robot_id
 
+    @property
+    def robot(self, request):
+        " Which robot are we bound to? "
+        try:
+            return self.game.robots[self.robot_id]
+        except KeyError:
+            return None
+
     def render_GET(self, request):
+        " What to do when they connect to our URL "
         if not self.match.started:
             print request.args
             assert 'connect' in request.args, ("Match hasn't started yet! "
