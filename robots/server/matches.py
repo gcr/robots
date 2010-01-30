@@ -18,7 +18,7 @@ class Match(resource.Resource):
     """
     GAME_LOGIC = gamelogic.ATRobotsInspiredGame
 
-    def __init__(self, speed=5.0, private=False, start_timeout=0,
+    def __init__(self, matchlist, speed=5.0, private=False, start_timeout=0,
             lockstep=False):
         """
         Private: whether the match will show up on public listings (still will
@@ -31,30 +31,27 @@ class Match(resource.Resource):
             continue to the next turn if all clients are waiting for something.
         """
         resource.Resource.__init__(self)
+        self.matchlist = matchlist
         self.game = self.__class__.GAME_LOGIC()
         self.timer = None
 
         # TODO: don't do this. this is a stupid system and I am a silly boy.
         # Instead, store robots just in the game logic. Then, allow RoboSocket
         # to bind callbacks to request.notifyFinish(). When robots connect
-        # before the match starts, roboSocket will call game.CreateNewRobot(id,
-        # attributes) which will return a robot and add it to the dictionary in
-        # the game logic. The request's errback looks like: if not
-        # match.started: game.remove_robot(returned_robot) so their robot will
-        # disappear if they do before the match.
+        # before the match starts, roboSocket will create a new robot and add it
+        # to the game logic dictionary. The request's errback will remove the
+        # robot from the game logic if (and only if!) the match hasn't started
+        # yet so their robot will disappear if they do before the match.
 
-        # now, the problem of notifying people when the match starts? we'll have
-        # a function here, notifyStart, that when called, makes a Deferred and
-        # adds it to the list that'll be set off when start() is called. Just
-        # like how http.Request handles notifyStart(). This Deferred's callback
-        # will tell the client their connection information. be sure to set
-        # match.started to True before calling this off, or the other callback I
-        # mentioned will see that their HTTP request died and remove their
-        # robot.
+        # now, how to notify people when the match starts? Easy. We have the
+        # game logic stored Deferreds inside its history at time=0. If a robot
+        # connects and they're already in this history, gamelogic will
+        # *automatically* errback this deferred. if the match starts, then we'll
+        # have the callback send them their robot information. if they leave
+        # before the match, well, that's OK.
 
         # yeah, that seems a little better.
         # i should keep this comment for documentation's sake.
-        self.starting_notifications = []
 
         self.started = False
         self.speed = speed
@@ -65,28 +62,19 @@ class Match(resource.Resource):
 
 
     def start(self):
-         # Start the match, but don't do a tick right away. loop through
-         # our notification list, firing off callbacks everywhichway to tell
-         # people "GUYS HEY GUYS WE'RE STARTING NAO"
-         # (RoboSocket will handle unbinding them if not), then clear game.slots
-         # by removing objects that had None
+         # Start the match, but don't do a tick right away. clear game.robots
+         # by removing objects that had None, then set the timer.
          # If there are no robots connected, then remove
          # ourselves from the match list.
-         # TODO: FIX IT, we don't do that; instead, we fire off the callbacks
-         # in our notified robots list.
          self.started = True
-         for d in self.starting_notifications:
-             d.callback()
+         # TODO: have no robots in this match?
+         empty_robots = [rid for rid in self.game.robots if not self.game.robots[rid]]
+         for rid in empty_robots:
+             del self.game.robots[rid]
+         if len(self.game.robots) == 0:
+             self.matchlist.remove(self)
          self.timer = task.LoopingCall(self.game.pump)
          self.timer.start(self.speed, now=False)
-
-    def notify_start(self):
-        """
-        Returns a Deferred that will be called when the match is started.
-        """
-        d = Deferred()
-        self.starting_notifications.append(d)
-        return d
 
     def request_slot(self, request):
         """
@@ -109,7 +97,7 @@ class Match(resource.Resource):
         if robot_id.lower() == "start":
             assert not self.started, "Can't start a started match!"
             self.start()
-            return False
+            return JsonResource("")
         if robot_id.lower() == "register":
             assert not self.started, "Can't join a started match!"
             slot = self.request_slot(request)
@@ -142,8 +130,17 @@ class Matches(resource.Resource):
         """
         Returns the public matches
         """
+        pass
         return JsonResource(self.matches).render(request)
 
+
+    def remove(self, match):
+        """
+        Removes a given match from the match list.
+        """
+        to_remove = [k for k in self.matches if self.matches[k] == match]
+        for k in to_remove:
+            del self.matches[k]
 
     def register_new(self, **kwargs):
         """
@@ -152,7 +149,7 @@ class Matches(resource.Resource):
         n = utils.random_string(8)
         if n in self.matches:
             return self.register_new(**kwargs)
-        self.matches[n] = Match(**kwargs)
+        self.matches[n] = Match(self, **kwargs)
         print "New match registered: %s" % n
         return n
 
