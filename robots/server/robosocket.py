@@ -15,7 +15,6 @@ class RoboResource(resource.Resource):
     """
     isLeaf = True
     def __init__(self, match, robot_id):
-        print "robosocket: %s" % robot_id
         self.match = match
         self.game = self.match.game
         self.robot_id = robot_id
@@ -35,7 +34,6 @@ class RoboResource(resource.Resource):
         if not self.match.started:
             assert 'connect' in request.args, ("Match hasn't started yet! "
                     "You must connect first!")
-            # add the robot
             # must do three things:
             #   add a robot to game.robots
             #   when the match starts, return game.robots[robot_id]
