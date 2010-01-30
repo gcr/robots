@@ -4,6 +4,7 @@
 from twisted.web import server, resource
 from json_resource import JsonResource
 from twisted.internet import task, reactor
+from twisted.internet.defer import Deferred
 import utils
 import robosocket
 from robots import gamelogic
@@ -53,7 +54,7 @@ class Match(resource.Resource):
 
         # yeah, that seems a little better.
         # i should keep this comment for documentation's sake.
-        self.notify_start = []
+        self.starting_notifications = []
 
         self.started = False
         self.speed = speed
@@ -74,12 +75,18 @@ class Match(resource.Resource):
          # TODO: FIX IT, we don't do that; instead, we fire off the callbacks
          # in our notified robots list.
          self.started = True
-         for robot_id in self.game.robots:
-             if robot_id:
-                 JsonResource("mock start").render(self.game.robots[robot_id])
+         for d in self.starting_notifications:
+             d.callback()
          self.timer = task.LoopingCall(self.game.pump)
          self.timer.start(self.speed, now=False)
 
+    def notify_start(self):
+        """
+        Returns a Deferred that will be called when the match is started.
+        """
+        d = Deferred()
+        self.starting_notifications.append(d)
+        return d
 
     def request_slot(self, request):
         """
@@ -97,7 +104,7 @@ class Match(resource.Resource):
 
     def getChild(self, robot_id, request):
         """
-        Returns the robot that the client wanted
+        twisted: returns the robot that the client wanted
         """
         if robot_id.lower() == "start":
             assert not self.started, "Can't start a started match!"
