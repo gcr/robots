@@ -13,11 +13,13 @@ class RoboResource(resource.Resource):
     logic. It will set up callbacks so that the client gets a result back
     when the game logic decides to send one.
     """
+    isLeaf = True
     def __init__(self, match, robot_id):
         print "robosocket: %s" % robot_id
         self.match = match
         self.game = self.match.game
         self.robot_id = robot_id
+
 
     @property
     def robot(self, request):
@@ -27,10 +29,10 @@ class RoboResource(resource.Resource):
         except KeyError:
             return None
 
+
     def render_GET(self, request):
         " What to do when they connect to our URL "
         if not self.match.started:
-            print request.args
             assert 'connect' in request.args, ("Match hasn't started yet! "
                     "You must connect first!")
             return server.NOT_DONE_YET

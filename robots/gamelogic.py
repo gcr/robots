@@ -5,6 +5,7 @@ from twisted.internet.defer import Deferred
 import robot
 import field
 import vector
+import misc
 
 class later_action(object):
     """
@@ -16,6 +17,7 @@ class later_action(object):
         # actually a string name
         self.action = action
         self.kwargs = kwargs
+
 
     def __call__(self):
         try:
@@ -29,6 +31,7 @@ class later_action(object):
         except Exception, e:
             # the drgn blow'd up!
             self.defr.errback(e)
+
 
 
 ###################
@@ -49,6 +52,7 @@ class Game(object):
         # maps unique IDs to robots
         self.robots = {}
 
+
     def pump(self):
         """
         Go through the history. Carry out the action on the robot.
@@ -59,20 +63,23 @@ class Game(object):
         """
         Queue some action to go on the history.
         This returns a Deferred. Attach callbacks if you like; they'll get
-        executed once your robot carries out.
+        executed once your robot carries out its task.
         Will check to ensure that there aren't any actions from this robot
         already.
         """
         assert robot_id in self.robots and self.robots[robot_id] ("This robot "
         "doesn't exist!")
         pass
-        
+
+
     @property
     def finished(self):
         """
-        Are we finished?
+        Is the game finished?
         """
         pass
+
+
 
 class ATRobotsInspiredGame(Game):
     pass
