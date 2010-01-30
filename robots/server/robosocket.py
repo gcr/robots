@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from twisted.web import server, resource
-from json_resource import JsonResource, ErrorResource
+from json_resource import JsonResource
 from twisted.internet import task, reactor
 import utils
 

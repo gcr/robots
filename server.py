@@ -3,8 +3,7 @@
 
 from twisted.web import server, resource, error, http
 from twisted.internet import reactor
-
-from robots.server.json_resource import JsonResource
+from robots.server.custom_factories import JsonTracebackSite
 from robots.server.matches import Matches, Match
 
 # Which port to run on?
@@ -20,7 +19,7 @@ root = resource.Resource()
 for route in ROUTES:
     root.putChild(route, ROUTES[route])
 
-reactor.listenTCP(PORT, server.Site(root))
+reactor.listenTCP(PORT, JsonTracebackSite(root))
 print "Ready to run"
 reactor.run()
 

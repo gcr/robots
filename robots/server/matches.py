@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from twisted.web import server, resource
-from json_resource import JsonResource, ErrorResource
+from json_resource import JsonResource
 from twisted.internet import task, reactor
 import utils
 import robosocket
@@ -178,5 +178,5 @@ class Matches(resource.Resource):
             return self.matches[path]
 
         else:
-            return ErrorResource('This match does not exist!')
+            raise KeyError, "This match does not exist!"
 
