@@ -59,6 +59,35 @@ class Game(object):
         """
         pass
 
+
+    def create_robot(self, id, attributes):
+        """
+        Create a robot with the given ID and the given attributes, if any.
+        """
+        assert robot_id not in self.robots and not self.robots[robot_id], ("Can't "
+        "create a robot that's already there!")
+        # This would be the place where we impose strange limitations (e.g. no
+        # shields in this match or whatnot)
+        # Not now though.
+        if 'name' not in attributes:
+            attributes['name'] = misc.pick_cool_name()
+        self.robots[robot_id] = robot.Robot(
+                name,
+                self.field,
+                vector.Vector([random.randint(0, self.field.width),
+                               random.randint(0, self.field.height)]),
+                **attributes)
+        return self.robots[robot_id]
+
+
+    def remove_robot(self, robot_id):
+        """
+        Removes the robot with robot_id from the server
+        """
+        assert robot_id in self.robots, "Can't remove a robot that wasn't there"
+        del self.robots[robot_id]
+
+
     def queue_action(self, robot_id, action, **kwargs):
         """
         Queue some action to go on the history.

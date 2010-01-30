@@ -32,14 +32,6 @@ class Match(resource.Resource):
         resource.Resource.__init__(self)
         self.game = self.__class__.GAME_LOGIC()
         self.timer = None
-        # self.slots bind people to requests. It's sorta like the game logic's
-        # list of gamelogic.game.robots, but instead of binding ids to robots,
-        # we bind ids to http.Request s. When people want their robots to
-        # do something, the RoboSocket will call gamelogic.queue_action which
-        # will return a Deferred. RoboSocket's callback will send the result to
-        # the client and then remove this socket from here if it still exists.
-        # Note that this should NOT be cleared when the client disappears.
-        self.slots = {}
 
         # TODO: don't do this. this is a stupid system and I am a silly boy.
         # Instead, store robots just in the game logic. Then, allow RoboSocket
@@ -61,6 +53,8 @@ class Match(resource.Resource):
 
         # yeah, that seems a little better.
         # i should keep this comment for documentation's sake.
+        self.notify_start = []
+
         self.started = False
         self.speed = speed
         self.private = private
@@ -69,18 +63,20 @@ class Match(resource.Resource):
             self.start_timer = reactor.callLater(start_timeout, self.start)
 
 
-     def start(self):
+    def start(self):
          # Start the match, but don't do a tick right away. loop through
          # our notification list, firing off callbacks everywhichway to tell
          # people "GUYS HEY GUYS WE'RE STARTING NAO"
-         # (RoboSocket will handle unbinding them if not), then clear self.slots
-         # by setting it to {} 
+         # (RoboSocket will handle unbinding them if not), then clear game.slots
+         # by removing objects that had None
          # If there are no robots connected, then remove
          # ourselves from the match list.
+         # TODO: FIX IT, we don't do that; instead, we fire off the callbacks
+         # in our notified robots list.
          self.started = True
-         for robot_id in self.slots:
+         for robot_id in self.game.robots:
              if robot_id:
-                 JsonResource("mock start").render(self.slots[robot_id])
+                 JsonResource("mock start").render(self.game.robots[robot_id])
          self.timer = task.LoopingCall(self.game.pump)
          self.timer.start(self.speed, now=False)
 
@@ -91,29 +87,12 @@ class Match(resource.Resource):
         """
         assert not self.started, "This match is started. No more robots!"
         n = "robot_" + utils.random_string(15)
-        if n in self.slots:
+        if n in self.game.robots:
+            # try harder!
             return request_slot(self, request)
-        self.slots[n] = None
+        self.game.robots[n] = None
         print "New slot: %s" % n
         return n
-
-
-    def bind_slot(self, robot_id, request):
-        """
-        Bind a request to a slot.
-        """
-        assert robot_id in self.slots, "No such slot! INTERNAL ERROR"
-        print "Slot %s bound" % robot_id
-        self.slots[robot_id] = request
-
-
-    def unbind_slot(self, robot_id):
-        assert robot_id in self.slots, "No such slot! INTERNAL ERROR"
-        print "Slot %s unbound" % robot_id
-        # this messes up errbacks really bad
-        if self.slots[robot_id] and not self.slots[robot_id]._disconnected:
-            ErrorResource("this slot was forcefully unbound").render(self.slots[robot_id])
-        self.slots[robot_id] = None
 
 
     def getChild(self, robot_id, request):
@@ -128,13 +107,10 @@ class Match(resource.Resource):
             assert not self.started, "Can't join a started match!"
             slot = self.request_slot(request)
             return JsonResource(slot)
-        assert robot_id in self.slots, "Your robot doesn't exist!"
-        self.unbind_slot(robot_id)
-        self.bind_slot(robot_id, request)
-        d = request.notifyFinish()
-        def errback(exception, robot_id):
-            self.match.unbind_slot(robot_id)
-        d.addErrback(errback, robot_id)
+        # oh, they want an actual robot? aw. oh well.
+        assert robot_id in self.game.robots, "Your robot doesn't exist!"
+        # the RoboResource will handle and this request. twisted.web is happy
+        # to call its render_GET method.
         return robosocket.RoboResource(self, robot_id)
 
 

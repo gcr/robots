@@ -35,6 +35,14 @@ class RoboResource(resource.Resource):
         if not self.match.started:
             assert 'connect' in request.args, ("Match hasn't started yet! "
                     "You must connect first!")
+            d = request.notifyFinish()
+            def connect_lost(reason, robot_id):
+                print "Connection %s lost" % robot_id
+                if not self.match.started:
+                    self.game.robots[robot_id] = None
+                    print self.game.robots
+            d.addErrback(connect_lost, self.robot_id)
+            print "Robot connected."
             return server.NOT_DONE_YET
 
         # match started
