@@ -5,6 +5,7 @@ from twisted.web import server, resource
 from json_resource import JsonResource, ErrorResource
 from twisted.internet import task, reactor
 import utils
+from robots import misc
 
 class RoboResource(resource.Resource):
     """
@@ -40,6 +41,10 @@ class RoboResource(resource.Resource):
             #   if the robot drops the connection and there are no other robots
             #      waiting, game.robots[robot_id] to none.
             queue_defr = self.game.set_history(0, self.robot_id)
+            # note: in the case of multiple connections to the server, this
+            # would have run the last one's errback and cleared the last one's
+            # robot from game.robots. so as long as we create and assign the
+            # robot below this line, we should be good.
             # now, when this action gets carried out, send the connection
             # information to the robot.
             def p(s):
@@ -49,34 +54,19 @@ class RoboResource(resource.Resource):
             queue_defr.addErrback(lambda result:
                     ErrorResource(result.value[0]).render(request))
             # if the robot ever loses its http connection, then we'll simply
-            # remove it.
+            # remove it, BUT ONLY if the match hasn't started.
             reqdefr = request.notifyFinish()
-            reqdefr.addErrback(lambda result: p("Robot %s disappeared" %
-                    self.robot_id))
+            def remove_robot(result):
+                if not self.match.started:
+                    self.game.robots[self.robot_id] = None
+                print "Robot disconnected."
+                print self.game.robots
+            reqdefr.addErrback(remove_robot)
+            robot = self.game.create_robot(self.robot_id, request.args)
             print "Robot %s connected." % self.robot_id
+            print self.game.robots
             return server.NOT_DONE_YET
 
         # match started
         pass
         return server.NOT_DONE_YET
-
-
-
-#    def create_robot(self, id, attributes):
-#        """
-#        Create a robot with the given ID and the given attributes, if any.
-#        """
-#        assert robot_id not in self.robots and not self.robots[robot_id], ("Can't "
-#        "create a robot that's already there!")
-#        # This would be the place where we impose strange limitations (e.g. no
-#        # shields in this match or whatnot)
-#        # Not now though.
-#        if 'name' not in attributes:
-#            attributes['name'] = misc.pick_cool_name()
-#        self.robots[robot_id] = robot.Robot(
-#                name,
-#                self.field,
-#                vector.Vector([random.randint(0, self.field.width),
-#                               random.randint(0, self.field.height)]),
-#                **attributes)
-#        return self.robots[robot_id]

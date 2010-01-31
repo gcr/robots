@@ -27,6 +27,11 @@ class Robot(fieldobject.FieldObject):
         self.engine = (  [0.5,  0.8,  1., 1.2, 1.35,  1.5][engine]
                        * [1.33, 1.2,  1., 0.8, 0.75, 0.66][armor])
         self.heatsink = [0.75, 1.0, 1.125, 1.25, 1.33, 1.5][heatsink]
+
+    def __str__(self):
+        return "<Robot '%s' (%s armor)>" % (self.name, self.armor)
+    def __repr__(self):
+        return str(self)
              
     def pump(self):
         """

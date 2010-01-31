@@ -5,6 +5,7 @@ from twisted.internet.defer import Deferred
 import robot
 import field
 import vector
+import random
 import misc
 
 class Game(object):
@@ -38,6 +39,31 @@ class Game(object):
         """
         assert robot_id in self.robots, "Can't remove a robot that wasn't there"
         del self.robots[robot_id]
+
+
+    def create_robot(self, id, attributes):
+        """
+        Create a robot with the given ID and the given attributes, if any.
+        """
+        # This would be the place where we impose strange limitations (e.g. no
+        # shields in this match or whatnot)
+        # Not now though.
+        args = {}
+        if 'name' not in attributes:
+            name = misc.pick_cool_name()
+        else:
+            name = attributes['name'][0]
+        for attr in ['scanner', 'weapon', 'armor', 'engine', 'heatsink', 'mines', 'shield']:
+            if attr in attributes:
+                args[attr] = int(attributes[attr][0])
+        rob = robot.Robot(
+                name,
+                self.field,
+                vector.Vector([random.randint(0, self.field.width),
+                               random.randint(0, self.field.height)]),
+                **args)
+        self.robots[id] = rob
+        return rob
 
 
     def set_history(self, time, robot_id):
