@@ -40,7 +40,7 @@ class RoboResource(resource.Resource):
             #   when the match starts, return game.robots[robot_id]
             #   if the robot drops the connection and there are no other robots
             #      waiting, game.robots[robot_id] to none.
-            queue_defr = self.game.set_history(0, self.robot_id)
+            queue_defr = self.game.set_future(0, self.robot_id)
             # note: in the case of multiple connections to the server, this
             # would have run the last one's errback and cleared the last one's
             # robot from game.robots. so as long as we create and assign the

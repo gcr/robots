@@ -60,7 +60,6 @@ class Match(resource.Resource):
         if start_timeout:
             self.start_timer = reactor.callLater(start_timeout, self.start)
 
-
     def start(self):
          # Start the match, but don't do a tick right away. clear game.robots
          # by removing objects that had None, then set the timer.
@@ -73,8 +72,16 @@ class Match(resource.Resource):
              del self.game.robots[rid]
          if len(self.game.robots) == 0:
              self.matchlist.remove(self)
-         self.timer = task.LoopingCall(self.game.pump)
-         self.timer.start(self.speed, now=False)
+             return false
+         self.timer = task.LoopingCall(self.pump)
+         self.timer.start(self.speed, now=True)
+
+    def pump(self):
+        """
+        Go through one iteration of the game.
+        """
+        self.game.pump()
+        return true
 
     def request_slot(self, request):
         """
@@ -88,7 +95,6 @@ class Match(resource.Resource):
         self.game.robots[n] = None
         print "New slot: %s" % n
         return n
-
 
     def getChild(self, robot_id, request):
         """

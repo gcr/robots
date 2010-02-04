@@ -30,6 +30,7 @@ class Robot(fieldobject.FieldObject):
 
     def __str__(self):
         return "<Robot '%s' (%s armor)>" % (self.name, self.armor)
+
     def __repr__(self):
         return str(self)
              

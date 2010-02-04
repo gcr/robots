@@ -20,7 +20,7 @@ class Game(object):
         # maps time to a list of actions
         # {25: {1: defr, 2: defr, 3: defr}} means three actions will be carried out
         # should be executed at time=25
-        self.history = {}
+        self.future = {}
         self.field = field.Field()
         # maps unique IDs to robots
         self.robots = {}
@@ -30,7 +30,16 @@ class Game(object):
         """
         Go through the history. Carry out the action on the robot.
         """
-        pass
+        if self.time in self.future:
+            rids = self.future[self.time].keys()
+            random.shuffle(rids)
+            for rid in rids:
+                # Fire off the actions for each robot in self.future
+                # in a random order
+                self.future[self.time][rid].callback()
+            del self.future[self.time]
+        self.field.pump()
+        self.time +=1
 
 
     def remove_robot(self, robot_id):
@@ -66,7 +75,7 @@ class Game(object):
         return rob
 
 
-    def set_history(self, time, robot_id):
+    def set_future(self, time, robot_id):
         """
         Asks something to be executed at a certain time in the history.
         This returns a Deferred. Attach callbacks if you like; they'll get
@@ -76,17 +85,17 @@ class Game(object):
         """
         # Make sure there aren't any other robots here. If there are, then fire
         # off their Deferred errbacks and overwrite them.
-        for time in self.history:
-            if robot_id in self.history[time]:
+        for time in self.future:
+            if robot_id in self.future[time]:
                 print ("Uh oh! Duplicate connections from %s, canceling the "
                        "first") % robot_id
-                self.history[time][robot_id].errback(CheatingException("Canceling action"))
+                self.future[time][robot_id].errback(CheatingException("Canceling action"))
         # Now assign our Deferred. =3
         d = Deferred()
-        if time not in self.history:
+        if time not in self.future:
             # no history for this time yet
-            self.history[time] = {}
-        self.history[time][robot_id] = d
+            self.future[time] = {}
+        self.future[time][robot_id] = d
         return d
 
 
