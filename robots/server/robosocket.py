@@ -28,44 +28,47 @@ class RoboResource(resource.Resource):
         except KeyError:
             return None
 
+    def connect_new_robot(self, request):
+        """
+        Connect a robot when the user calls their ?connect URL before the match
+        starts.
+        """
+        # must do three things:
+        #   add a robot to game.robots
+        #   when the match starts, return game.robots[robot_id]
+        #   if the robot drops the connection and there are no other robots
+        #      waiting, game.robots[robot_id] to none.
+        queue_defr = self.game.set_future(0, self.robot_id)
+        # this will delete the robot if it already exists, so no need to
+        # worry about making a new one that might get deleted.
+        def when_match_starts(s):
+            print "Robot %s will join!" % self.robot_id
+            request.write(JsonResource({'robot': self.robot.name}))
+            request.finish()
+        queue_defr.addCallback(when_match_starts)
+        queue_defr.addErrback(lambda result:
+                ErrorResource(result.value[0]).render(request))
+        # if the robot ever loses its http connection, then we'll simply
+        # remove it, BUT ONLY if the match hasn't started.
+        reqdefr = request.notifyFinish()
+        def connection_lost(result):
+            if not self.match.started:
+                self.game.robots[self.robot_id] = None
+            print "Robot disconnected."
+            print self.game.robots
+        reqdefr.addErrback(connection_lost)
+
+        robot = self.game.create_robot(self.robot_id, request.args)
+        print "Robot %s connected." % self.robot_id
+        print self.game.robots
+        return server.NOT_DONE_YET
 
     def render_GET(self, request):
         " What to do when they connect to our URL "
         if not self.match.started:
             assert 'connect' in request.args, ("Match hasn't started yet! "
                     "You must connect first!")
-            # must do three things:
-            #   add a robot to game.robots
-            #   when the match starts, return game.robots[robot_id]
-            #   if the robot drops the connection and there are no other robots
-            #      waiting, game.robots[robot_id] to none.
-            queue_defr = self.game.set_future(0, self.robot_id)
-            # note: in the case of multiple connections to the server, this
-            # would have run the last one's errback and cleared the last one's
-            # robot from game.robots. so as long as we create and assign the
-            # robot below this line, we should be good.
-            # now, when this action gets carried out, send the connection
-            # information to the robot.
-            def p(s):
-                print s
-            queue_defr.addCallback(lambda _: p("Robot %s will join!" %
-                self.robot_id))
-            queue_defr.addErrback(lambda result:
-                    ErrorResource(result.value[0]).render(request))
-            # if the robot ever loses its http connection, then we'll simply
-            # remove it, BUT ONLY if the match hasn't started.
-            reqdefr = request.notifyFinish()
-            def remove_robot(result):
-                if not self.match.started:
-                    self.game.robots[self.robot_id] = None
-                print "Robot disconnected."
-                print self.game.robots
-            reqdefr.addErrback(remove_robot)
-            robot = self.game.create_robot(self.robot_id, request.args)
-            print "Robot %s connected." % self.robot_id
-            print self.game.robots
-            return server.NOT_DONE_YET
-
+            return self.connect_new_robot(request)
         # match started
         pass
         return server.NOT_DONE_YET

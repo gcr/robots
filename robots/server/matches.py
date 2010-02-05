@@ -66,7 +66,7 @@ class Match(resource.Resource):
          # If there are no robots connected, then remove
          # ourselves from the match list.
          self.started = True
-         # TODO: have no robots in this match?
+         # have no robots in this match?
          empty_robots = [rid for rid in self.game.robots if not self.game.robots[rid]]
          for rid in empty_robots:
              del self.game.robots[rid]
