@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from robots.server.json_resource import ErrorResource
+from server.json_resource import ErrorResource
 from twisted.web import server, http
 from twisted.python import log
 

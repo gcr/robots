@@ -3,8 +3,8 @@
 
 from twisted.web import server, resource, error, http
 from twisted.internet import reactor
-from robots.server.custom_factories import JsonTracebackSite
-from robots.server.matches import Matches, Match
+from server.custom_factories import JsonTracebackSite
+from server.matches import Matches, Match
 
 # Which port to run on?
 PORT = 8080
