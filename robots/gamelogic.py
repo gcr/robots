@@ -73,7 +73,7 @@ class Game(object):
 
     def set_future(self, time, robot_id):
         """
-        Asks something to be executed at a certain time in the history.
+        Asks something to be executed at a certain time in the game's future.
         This returns a Deferred. Attach callbacks if you like; they'll get
         executed once your robot carries out its task.
         Will check to ensure that there aren't any actions from this robot
