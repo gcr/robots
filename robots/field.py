@@ -16,6 +16,14 @@ class Field:
         self.height = height
         self.objects = []
 
+    def __json__(self):
+        """
+        Return a JSON representation of this field.
+        """
+        return {'width': self.width,
+                'height': self.height,
+                'objects': self.objects}
+
     def splashdamage(self, loc, damage):
         """
         Calls the hit() method on every object at the given location. Returns
@@ -28,6 +36,10 @@ class Field:
 
     def add(self, obj):
         self.objects.append(obj)
+
+    def pump(self):
+        for obj in self.objects:
+            obj.pump()
 
     def remove(self, obj):
         self.objects.remove(obj)

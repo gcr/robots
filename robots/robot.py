@@ -28,6 +28,13 @@ class Robot(fieldobject.FieldObject):
                        * [1.33, 1.2,  1., 0.8, 0.75, 0.66][armor])
         self.heatsink = [0.75, 1.0, 1.125, 1.25, 1.33, 1.5][heatsink]
 
+    def __json__(self):
+        return {'type': 'robot',
+                'name': self.name,
+                'location': self.location,
+                'armor': self.armor,
+                'heat': self.heat}
+
     def __str__(self):
         return "<Robot '%s' (%s armor)>" % (self.name, self.armor)
 

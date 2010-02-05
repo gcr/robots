@@ -25,6 +25,17 @@ class Game(object):
         # maps unique IDs to robots
         self.robots = {}
 
+    def __json__(self):
+        "warning: unsafe!"
+        return {'gametime': self.time,
+                'field': self.field,
+                'robots': [self.robots[r] for r in self.robots]}
+
+    def start(self):
+        assert self.time == 0, "This game is in-progress."
+        for r in self.robots:
+            self.field.add(r)
+
     def pump(self):
         """
         Go through the history. Carry out the action on the robot.
@@ -35,7 +46,7 @@ class Game(object):
             for rid in rids:
                 # Fire off the actions for each robot in self.future
                 # in a random order
-                self.future[self.time][rid].callback()
+                self.future[self.time][rid].callback(self.time)
             del self.future[self.time]
         self.field.pump()
         self.time +=1

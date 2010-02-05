@@ -41,10 +41,11 @@ class RoboResource(resource.Resource):
         queue_defr = self.game.set_future(0, self.robot_id)
         # this will delete the robot if it already exists, so no need to
         # worry about making a new one that might get deleted.
-        def when_match_starts(s):
+        def when_match_starts(_):
             print "Robot %s will join!" % self.robot_id
-            request.write(JsonResource({'robot': self.robot.name}))
-            request.finish()
+            JsonResource(self.game.robots[self.robot_id]).render(request)
+            #request.write(JsonResource({'robot': self.robot.name}))
+            #request.finish()
         queue_defr.addCallback(when_match_starts)
         queue_defr.addErrback(lambda result:
                 ErrorResource(result.value[0]).render(request))
@@ -55,7 +56,6 @@ class RoboResource(resource.Resource):
             if not self.match.started:
                 self.game.robots[self.robot_id] = None
             print "Robot disconnected."
-            print self.game.robots
         reqdefr.addErrback(connection_lost)
 
         robot = self.game.create_robot(self.robot_id, request.args)

@@ -24,7 +24,7 @@ class JsonResource(resource.Resource):
         self.j = JsonObjectEncoder()
 
     def render_GET(self, request):
-        request.write(j.encode(self.obj))
+        request.write(self.j.encode(self.obj))
         request.finish()
         return server.NOT_DONE_YET
         # ^ seems deceptive, but is the correct way of handling this case.

@@ -34,25 +34,6 @@ class Match(resource.Resource):
         self.matchlist = matchlist
         self.game = self.__class__.GAME_LOGIC()
         self.timer = None
-
-        # TODO: don't do this. this is a stupid system and I am a silly boy.
-        # Instead, store robots just in the game logic. Then, allow RoboSocket
-        # to bind callbacks to request.notifyFinish(). When robots connect
-        # before the match starts, roboSocket will create a new robot and add it
-        # to the game logic dictionary. The request's errback will remove the
-        # robot from the game logic if (and only if!) the match hasn't started
-        # yet so their robot will disappear if they do before the match.
-
-        # now, how to notify people when the match starts? Easy. We have the
-        # game logic stored Deferreds inside its history at time=0. If a robot
-        # connects and they're already in this history, gamelogic will
-        # *automatically* errback this deferred. if the match starts, then we'll
-        # have the callback send them their robot information. if they leave
-        # before the match, well, that's OK.
-
-        # yeah, that seems a little better.
-        # i should keep this comment for documentation's sake.
-
         self.started = False
         self.speed = speed
         self.private = private
@@ -73,6 +54,7 @@ class Match(resource.Resource):
          if len(self.game.robots) == 0:
              self.matchlist.remove(self)
              return false
+         self.game.start()
          self.timer = task.LoopingCall(self.pump)
          self.timer.start(self.speed, now=True)
 
@@ -114,6 +96,12 @@ class Match(resource.Resource):
         # to call its render_GET method.
         return robosocket.RoboResource(self, robot_id)
 
+    def render_GET(self, request):
+        gdict = self.game.__json__()
+        gdict['started'] = self.started
+        gdict['private'] = self.private
+        return JsonResource(self.game).render(request)
+
 
 
 class Matches(resource.Resource):
@@ -125,19 +113,16 @@ class Matches(resource.Resource):
     """
     MIN_MATCH_SPEED = 0.5               # fastest match allowed
 
-
     def __init__(self):
         resource.Resource.__init__(self)
         self.matches = {}
-
 
     def render_GET(self, request):
         """
         Returns the public matches
         """
         pass
-        return JsonResource(self.matches).render(request)
-
+        return JsonResource([n for n in self.matches if not n.private]).render(request)
 
     def remove(self, match):
         """
@@ -157,7 +142,6 @@ class Matches(resource.Resource):
         self.matches[n] = Match(self, **kwargs)
         print "New match registered: %s" % n
         return n
-
 
     def getChild(self, path, request):
         """
