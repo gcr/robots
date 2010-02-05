@@ -25,7 +25,6 @@ class Game(object):
         # maps unique IDs to robots
         self.robots = {}
 
-
     def pump(self):
         """
         Go through the history. Carry out the action on the robot.
@@ -41,14 +40,12 @@ class Game(object):
         self.field.pump()
         self.time +=1
 
-
     def remove_robot(self, robot_id):
         """
         Removes the robot with robot_id from the server
         """
         assert robot_id in self.robots, "Can't remove a robot that wasn't there"
         del self.robots[robot_id]
-
 
     def create_robot(self, id, attributes):
         """
@@ -74,7 +71,6 @@ class Game(object):
         self.robots[id] = rob
         return rob
 
-
     def set_future(self, time, robot_id):
         """
         Asks something to be executed at a certain time in the history.
@@ -98,7 +94,6 @@ class Game(object):
         self.future[time][robot_id] = d
         return d
 
-
     def robot_action(self, robot_id, action_str, **kwargs):
         """
         This gets a Deferred from set_history. When called, that Deferred will
@@ -112,7 +107,6 @@ class Game(object):
             assert robot_id in self.robots and self.robots[robot_id] ("This robot "
         "doesn't exist!")
         pass
-
 
     @property
     def finished(self):

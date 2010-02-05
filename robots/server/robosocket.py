@@ -20,7 +20,6 @@ class RoboResource(resource.Resource):
         self.game = self.match.game
         self.robot_id = robot_id
 
-
     @property
     def robot(self, request):
         " Which robot are we bound to? "

@@ -116,7 +116,6 @@ class Match(resource.Resource):
 
 
 
-#################################
 class Matches(resource.Resource):
     """
     Represents a list of matches going on in this server.

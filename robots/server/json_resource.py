@@ -23,7 +23,6 @@ class JsonResource(resource.Resource):
         # and directly write to it later even though it's completely supported
 
 
-
 class ErrorResource(resource.Resource):
     def __init__(self, errmessage):
         resource.Resource.__init__(self)
