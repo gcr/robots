@@ -24,6 +24,8 @@ class JsonResource(resource.Resource):
         self.j = JsonObjectEncoder()
 
     def render_GET(self, request):
+        request.setHeader("Cache-Control", "no-cache, must-revalidate")
+        request.setHeader("Expires", "Sat, 26 Jul 1997 05:00:00 GMT")
         request.write(self.j.encode(self.obj))
         request.finish()
         return server.NOT_DONE_YET

@@ -7,6 +7,8 @@ from twisted.internet import task, reactor
 from twisted.internet.defer import Deferred
 import utils
 import robosocket
+import jinja_resource
+import history
 from courier import gamelogic
 
 class Match(resource.Resource):
@@ -116,41 +118,18 @@ class Matches(resource.Resource):
     def __init__(self):
         resource.Resource.__init__(self)
         self.matches = {}
+        self.history = history.History()
 
     def render_GET(self, request):
         """
         Returns the public matches
         """
-        pass
-        return JsonResource([n for n in self.matches if not n.private]).render(request)
-
-    def remove(self, match):
-        """
-        Removes a given match from the match list.
-        """
-        to_remove = [k for k in self.matches if self.matches[k] == match]
-        for k in to_remove:
-            del self.matches[k]
-
-    def register_new(self, **kwargs):
-        """
-        Registers a new match.
-        """
-        n = utils.random_string(8)
-        if n in self.matches:
-            return self.register_new(**kwargs)
-        self.matches[n] = Match(self, **kwargs)
-        print "New match registered: %s" % n
-        return n
-
-    def getChild(self, path, request):
-        """
-        Either:
-            - Registers and starts a new match
-            - Gets a match if there was one
-            - Gets the current matches
-        """
-        if path.lower() == "register":
+        mlist = [n for n in self.matches if not self.matches[n].private]
+        if 'list' in request.args:
+            return JsonResource(mlist).render(request)
+        elif 'history' in request.args:
+            return history.HistoryResource(self.history).render(request)
+        elif 'register' in request.args:
             # Client wants a new match? Try to make one!
             args = {}
             if 'private' in request.args:
@@ -164,12 +143,48 @@ class Matches(resource.Resource):
             if 'lockstep' in request.args:
                 args['lockstep'] = True
             # success!
-            return JsonResource(self.register_new(**args))
+            return JsonResource(self.register_new(**args)).render(request)
+        # browser visiting
+        return jinja_resource.MatchList(matches=mlist).render(request)
 
+    def remove(self, match):
+        """
+        Removes a given match from the match list.
+        """
+        to_remove = [k for k in self.matches if self.matches[k] == match]
+        for k in to_remove:
+            del self.matches[k]
+        # append to history for long-polling clients
+        mlist = [n for n in self.matches if not self.matches[n].private]
+        self.history.add(mlist)
+
+    def register_new(self, **kwargs):
+        """
+        Registers a new match.
+        """
+        n = utils.random_string(8)
+        if n in self.matches:
+            return self.register_new(**kwargs)
+        self.matches[n] = Match(self, **kwargs)
+        print "New match registered: %s" % n
+        # append to history for long-polling clients
+        if not self.matches[n].private:
+            mlist = [n for n in self.matches if not self.matches[n].private]
+            self.history.add(mlist)
+        return n
+
+    def getChild(self, path, request):
+        """
+        Either:
+            - Registers and starts a new match
+            - Gets a match if there was one
+            - Gets the current matches
+        """
+        if path == '':
+            return self
         elif path in self.matches:
             # Client wants a specific match
             return self.matches[path]
-
         else:
             raise KeyError, "This match does not exist!"
 

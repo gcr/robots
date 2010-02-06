@@ -1,0 +1,12 @@
+{% extends 'base.htm' %}
+
+{% block content %}
+<ul>
+    {% for match in matches %}
+    <li><a href="matches/{{ match }}">{{ match }}</a></li>
+    {% endfor %}
+</ul>
+<a href="/matches?register=true">Register match </a>
+<br />
+<a href="/matches?register=t&private=t">Register private match </a>
+{% endblock %}

@@ -5,6 +5,8 @@
 This class keeps track of the history for the game state.
 """
 from twisted.internet.defer import Deferred
+from twisted.web import resource, server
+from json_resource import JsonResource
 
 class History():
     """
@@ -53,3 +55,26 @@ class History():
         return d
 
 
+class HistoryResource(resource.Resource):
+    """
+    This class allows you to get live, streaming events from a history.
+    Call it like this:
+    http://somehost/someresource?since=0
+    and the server will block until it gets everything.
+    Call
+    http://somehost/someresource?get_time=t
+    and the server will immediately let you know what the next time is.
+    """
+    def __init__(self, history):
+        resource.Resource.__init__(self)
+        self.history = history
+    def render_GET(self, request):
+        if 'get_time' in request.args:
+            return str(len(self.history.history))
+        assert 'since' in request.args, 'Must have some time since something'
+        t = int(request.args['since'][0])
+        d = self.history.catch_up(t)
+        def report_history_to_client(history):
+            JsonResource(history).render(request)
+        d.addCallback(report_history_to_client)
+        return server.NOT_DONE_YET
