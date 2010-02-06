@@ -26,7 +26,7 @@ function ajaxRequest(url, data, cb) {
     });
 }
 
-function StreamingHistory(url, time, cb) {
+function StreamingHistory(url, state, cb) {
     /// This object will run a callback when something on the server changes.
     /// Give it a URL to ping and a callback to execute whenever that
     /// happens and it'll go on its way. Whenever the server does something,
@@ -34,14 +34,14 @@ function StreamingHistory(url, time, cb) {
     /// a way so you won't ever skip history you missed.
     this.cb = cb;
     this.url = url;
-    this.time = time;
+    this.state = state;
 
     var self = this;
-    if (this.time == -1) {
-        // they don't know what time they're at? uh oh! we'd best tell them,
+    if (this.state == -1) {
+        // they don't know what state they're at? uh oh! we'd best tell them,
         // but this is bad because they're going to miss things!
-        ajaxRequest(url, {get_time: true}, function(time, textStatus) {
-            self.time = time;
+        ajaxRequest(url, {get_state: true}, function(state, textStatus) {
+            self.state = state;
             self.nextHist();
         });
     } else {
@@ -53,10 +53,10 @@ StreamingHistory.prototype.nextHist = function() {
     /// Carry out the next action in the history, calling callback if we get
     /// anything.
     var self = this;
-    ajaxRequest(this.url, {since: this.time}, function (actions) {
+    ajaxRequest(this.url, {since: this.state}, function (actions) {
         for (var i = 0, l = actions.length; i < l; i++) {
             self.cb(actions[i]);
-            self.time++;
+            self.state++;
         }
         self.nextHist();
     });

@@ -72,7 +72,7 @@ class HistoryResource(resource.Resource):
         resource.Resource.__init__(self)
         self.history = history
     def render_GET(self, request):
-        if 'get_time' in request.args:
+        if 'get_state' in request.args:
             return JsonResource(self.history.time).render(request)
         assert 'since' in request.args, 'Must have some time since something'
         t = int(request.args['since'][0])
