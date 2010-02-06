@@ -5,7 +5,7 @@ from twisted.web import server, resource
 from json_resource import JsonResource, ErrorResource
 from twisted.internet import task, reactor
 import utils
-from robots import misc
+from courier import misc
 
 class RoboResource(resource.Resource):
     """

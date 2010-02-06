@@ -7,7 +7,7 @@ from twisted.internet import task, reactor
 from twisted.internet.defer import Deferred
 import utils
 import robosocket
-from robots import gamelogic
+from courier import gamelogic
 
 class Match(resource.Resource):
     """
