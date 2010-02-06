@@ -13,7 +13,9 @@ PORT = 8080
 ROUTES = {
             '':        jinja_resource.Index(),
             '/':       jinja_resource.Index(),
-            'index':   jinja_resource.Index(),
+            'js':      static.File("server/static/js"),
+            'css':     static.File("server/static/css"),
+            'img':     static.File("server/static/img"),
             'matches': Matches(),
 }
 

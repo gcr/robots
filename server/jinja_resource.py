@@ -16,7 +16,7 @@ class JinjaResource(resource.Resource):
         self.variables = kwargs
 
     def render_GET(self, request):
-        request.setHeader("Content-Type", "text/plain; charset=utf-8")
+        request.setHeader("Content-Type", "text/html; charset=utf-8")
         request.write(self.template.render(self.variables).encode('utf-8'))
         request.finish()
         return server.NOT_DONE_YET
