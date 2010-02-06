@@ -155,8 +155,8 @@ class Matches(resource.Resource):
         for k in to_remove:
             del self.matches[k]
         # append to history for long-polling clients
-        mlist = [n for n in self.matches if not self.matches[n].private]
-        self.history.add(mlist)
+        if not match.private:
+            self.history.add({'removed': to_remove})
 
     def register_new(self, **kwargs):
         """
@@ -169,8 +169,7 @@ class Matches(resource.Resource):
         print "New match registered: %s" % n
         # append to history for long-polling clients
         if not self.matches[n].private:
-            mlist = [n for n in self.matches if not self.matches[n].private]
-            self.history.add(mlist)
+            self.history.add({'added': n})
         return n
 
     def getChild(self, path, request):
