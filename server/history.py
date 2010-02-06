@@ -6,7 +6,7 @@ This class keeps track of the history for the game state.
 """
 from twisted.internet.defer import Deferred
 from twisted.web import resource, server
-from json_resource import JsonResource
+from json_resource import JsonResource, ErrorResource
 
 class History():
     """
@@ -15,7 +15,10 @@ class History():
     def __init__(self):
         self.deferreds = {}
         self.history = []
-        self.time = 0
+
+    @property
+    def time(self):
+        return len(self.history)
 
     def add(self, to_store):
         """
@@ -70,7 +73,7 @@ class HistoryResource(resource.Resource):
         self.history = history
     def render_GET(self, request):
         if 'get_time' in request.args:
-            return str(len(self.history.history))
+            return JsonResource(self.history.time).render(request)
         assert 'since' in request.args, 'Must have some time since something'
         t = int(request.args['since'][0])
         d = self.history.catch_up(t)

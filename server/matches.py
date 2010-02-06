@@ -126,7 +126,9 @@ class Matches(resource.Resource):
         """
         mlist = [n for n in self.matches if not self.matches[n].private]
         if 'list' in request.args:
-            return JsonResource(mlist).render(request)
+            return JsonResource({
+                'history': self.history.time, 'matches': mlist
+                }).render(request)
         elif 'history' in request.args:
             return history.HistoryResource(self.history).render(request)
         elif 'register' in request.args:

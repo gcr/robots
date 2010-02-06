@@ -10,3 +10,12 @@
 <br />
 <a href="/matches?register=t&private=t">Register private match </a>
 {% endblock %}
+
+{% block script %}
+    <script type="text/javascript" charset="utf-8">
+        sh = new StreamingHistory("/matches?history=t", 0, function (action) {
+                console.log("Next action:");
+                console.log(action);
+        });
+    </script>
+{% endblock %}

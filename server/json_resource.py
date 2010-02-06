@@ -45,5 +45,6 @@ class ErrorResource(resource.Resource):
         self.err_message = errmessage
 
     def render_GET(self, request):
+        #request.setResponseCode(500)
         JsonResource({'client_error': self.err_message}).render(request)
         return server.NOT_DONE_YET
