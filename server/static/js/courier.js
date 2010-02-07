@@ -61,3 +61,58 @@ StreamingHistory.prototype.nextHist = function() {
         self.nextHist();
     });
 }
+
+/* ------------------ jQuery match list --------------------- */
+Match = function(id) {
+    // Represents a match.
+    var self = this;
+    self.mid = id;
+    self.url = "/matches/" + id;
+    self.jq = $("<div>");
+}
+Match.prototype.render_list = function() {
+    // renders this match as if in a list, later refining ourselves to provide
+    // better information.
+    this.jq.html("<li>" +
+            "<a class='match_" + this.mid + "' href='/matches/" + this.mid + "'>" +
+            this.mid + "</a></li>");
+    console.log(this.jq.html());
+}
+
+jQuery.fn.courierMatchList = function() {
+    // apply matchList to the specified jquery objects
+    // do something like $("#match_list").courierMatchList(); and I'll handle
+    // all the rest.
+    var jq = this;
+    var matches = {};
+    jq.text("One moment...");
+    var list = $("<ul></ul>");
+    ajaxRequest("/matches", {list: true}, function(matchstate) {
+        // retrieve thi list of matches
+        for (var l=matchstate.matches.length, i=0; i < l; i++) {
+            var m = new Match(matchstate.matches[i]);
+            list.append(m.jq);
+            m.render_list();
+            matches[m.mid] = m;
+        }
+        jq.html(list);
+        var sh = new StreamingHistory("/matches?history=t",
+            matchstate.history,
+            function (action) {
+                if ('added' in action) {
+                    var m = new Match(action.added);
+                    list.append(m.jq.hide());
+                    m.render_list();
+                    m.jq.fadeIn();
+                    matches[action.added] = m;
+                } else if ('removed' in action) {
+                    var m = matches[action.removed];
+                    delete matches[action.removed];
+                    m.jq.fadeOut(function() {
+                        m.jq.remove();
+                    });
+                }
+            });
+    });
+    return jq;
+}

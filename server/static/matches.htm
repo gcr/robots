@@ -1,11 +1,13 @@
 {% extends 'base.htm' %}
 
 {% block content %}
-<ul>
-    {% for match in matches %}
-    <li><a href="matches/{{ match }}">{{ match }}</a></li>
-    {% endfor %}
-</ul>
+<div class='matchlist'>
+    <ul>
+        {% for match in matches %}
+        <li><a href="matches/{{ match }}">{{ match }}</a></li>
+        {% endfor %}
+    </ul>
+</div>
 <a href="/matches?register=true">Register match </a>
 <br />
 <a href="/matches?register=t&private=t">Register private match </a>
@@ -13,9 +15,8 @@
 
 {% block script %}
     <script type="text/javascript" charset="utf-8">
-        sh = new StreamingHistory("/matches?history=t", 0, function (action) {
-                console.log("Next action:");
-                console.log(action);
+        $(document).ready(function() {
+            $(".matchlist").courierMatchList();
         });
     </script>
 {% endblock %}

@@ -34,7 +34,7 @@ class Match(resource.Resource):
         """
         resource.Resource.__init__(self)
         self.matchlist = matchlist
-        self.game = self.__class__.GAME_LOGIC()
+        self.game = self.GAME_LOGIC()
         self.timer = None
         self.started = False
         self.speed = speed
@@ -49,13 +49,12 @@ class Match(resource.Resource):
          # If there are no robots connected, then remove
          # ourselves from the match list.
          self.started = True
-         # have no robots in this match?
          empty_robots = [rid for rid in self.game.robots if not self.game.robots[rid]]
          for rid in empty_robots:
              del self.game.robots[rid]
          if len(self.game.robots) == 0:
              self.matchlist.remove(self)
-             return false
+             return False
          self.game.start()
          self.timer = task.LoopingCall(self.pump)
          self.timer.start(self.speed, now=True)
@@ -84,14 +83,6 @@ class Match(resource.Resource):
         """
         twisted: returns the robot that the client wanted
         """
-        if robot_id.lower() == "start":
-            assert not self.started, "Can't start a started match!"
-            self.start()
-            return JsonResource("")
-        if robot_id.lower() == "register":
-            assert not self.started, "Can't join a started match!"
-            slot = self.request_slot(request)
-            return JsonResource(slot)
         # oh, they want an actual robot? aw. oh well.
         assert robot_id in self.game.robots, "Your robot doesn't exist!"
         # the RoboResource will handle and this request. twisted.web is happy
@@ -99,6 +90,15 @@ class Match(resource.Resource):
         return robosocket.RoboResource(self, robot_id)
 
     def render_GET(self, request):
+        if "start" in request.args:
+            assert not self.started, "Can't start a started match!"
+            self.start()
+            return JsonResource("").render(request)
+        elif "register" in request.args:
+            assert not self.started, "Can't join a started match!"
+            slot = self.request_slot(request)
+            return JsonResource(slot).render(request)
+        # redirect to the browser
         gdict = self.game.__json__()
         gdict['started'] = self.started
         gdict['private'] = self.private
@@ -176,10 +176,7 @@ class Matches(resource.Resource):
 
     def getChild(self, path, request):
         """
-        Either:
-            - Registers and starts a new match
-            - Gets a match if there was one
-            - Gets the current matches
+        Which match does the user want?
         """
         if path == '':
             return self
