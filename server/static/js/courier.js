@@ -48,7 +48,6 @@ function StreamingHistory(url, state, cb) {
         this.nextHist();
     }
 }
-
 StreamingHistory.prototype.nextHist = function() {
     /// Carry out the next action in the history, calling callback if we get
     /// anything.
@@ -62,7 +61,8 @@ StreamingHistory.prototype.nextHist = function() {
     });
 }
 
-/* ------------------ jQuery match list --------------------- */
+
+/* ------------------ Match list --------------------- */
 Match = function(id) {
     // Represents a match.
     var self = this;
@@ -73,10 +73,21 @@ Match = function(id) {
 Match.prototype.render_list = function() {
     // renders this match as if in a list, later refining ourselves to provide
     // better information.
-    this.jq.html("<li>" +
-            "<a class='match_" + this.mid + "' href='/matches/" + this.mid + "'>" +
-            this.mid + "</a></li>");
-    console.log(this.jq.html());
+    this.jq.html("<a class='match_" + this.mid +
+            "' href='/matches/" + this.mid + "'>Match " +
+            this.mid + "</a>");
+    var match_info_jq = $("<div>one moment...</div>").appendTo(this.jq);
+    ajaxRequest(this.url, {info: true}, function(minfo){
+            match_info_jq.html("Time created: " + minfo.init_time);
+            match_info_jq.append("<br />Started? " + minfo.started);
+            match_info_jq.append("<br />Private? " + minfo.private);
+            var robot_list = $("<ul>").appendTo(match_info_jq);
+            $.each(minfo.robots, function(i, robj) {
+                var robot = new Robot(robj);
+                robot_list.append($("<li>").append(robot.jq));
+                robot.render_row();
+            });
+    });
 }
 
 jQuery.fn.courierMatchList = function() {
@@ -115,4 +126,23 @@ jQuery.fn.courierMatchList = function() {
             });
     });
     return jq;
+}
+
+
+/* ------------------ Robots --------------------- */
+function Robot () {
+    var r = arguments[0]
+    if (typeof r == 'object' && r !== null) {
+        this.name = r.name;
+        this.armor = r.armor;
+        this.heat = r.heat;
+    }
+    this.jq = $("<div>");
+}
+Robot.prototype.render_row = function() {
+    if (this.name) {
+        this.jq.html("<\"" + this.name + "\", armor: " + this.armor + ">");
+    } else {
+        this.jq.html("(no robot)");
+    }
 }
