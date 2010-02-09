@@ -23,12 +23,26 @@ This framework runs in three parts:
     3. A web page of some sort so a human can see the field and watch their
        robots perform
 
+URL reference:
+    http://host/matches                 Redirects the user to the list of
+                                        matches if in a browser
+    http://host/matches?history=t       Tracks the history of the match list
+                                        (for long polling clients)
+    http://host/matches?list=t          JSON object of current list of matches.
+    http://host/matches?register=t      Registers a match. Returns the ID of the
+                                        match along with a code so you can start
+                                        it.
+    http://host/matches/00000           Web page of certain match.
+    http://host/matches/00000?register=t Register a slot in a match.
+    http://host/matches/000/slot?connect=t Connect to a running match.
+    http://host/matches/000?start=t&code=c Start a match.
+
 Basic outline of a match:
 - The person writes a robot in their progamming language of choice.
 - The robot, when ready, connects to a unique match URL on the server. This is
     probably a unique, temporary URL with a special query parameter that only
     that instance of the robot and the server should know. Probably something
-    like http://robotwars.com/socket_471f3e355b5f00bcc461a7bd2d8cc5b5 
+    like http://robotwars.com/matches/12358912/robot_982349721347
     The URL should should disappear after the match is over. This method should
     easily do two things:
 
@@ -40,7 +54,7 @@ Basic outline of a match:
 
     - Or, allow the robot to do this in an automated fashion, for e.g.
       tournaments and such. The user could assign a unique ID to their robot in
-      the source code, register that ID to their account, and then stick the
+      their source code, register that ID to their account, and then stick the
       robot in tournaments or whatever. It would then connect to the match. If
       it should go to a match right away; e.g. if another person "challenged"
       the robot or if it's in a tournament, the server will report its "match
@@ -56,7 +70,6 @@ Basic outline of a match:
           if robot is none:
             sys.exit("Connection failed.")
 
-          robot.signal_ready()
           while not robot.dead():
             robot.shoot()
 
@@ -75,7 +88,6 @@ Basic outline of a match:
                   if robot is none:
                     sys.exit("Connection failed.")
 
-                  robot.signal_ready()
                   while not robot.dead():
                     robot.shoot()
                   if robot.is_winner():
@@ -85,7 +97,6 @@ Basic outline of a match:
       like:
 
           def run_robot(robot):
-              robot.signal_ready()
               while not robot.dead():
                 robot.shoot
           ID = md5sum("StormBot " + VERSION + external_ip)
@@ -97,13 +108,12 @@ Basic outline of a match:
       computer, just waiting for a fight and connecting immediately when there
       is one.
 
-- Once the robot is connected, it would optionally declare attributes about
-    itself and then signal that it's ready; say, something like this:
+- The robot could optionally declare attributes about itself when it connects;
+  say, something like this:
 
-        robot.set_type({'speed': 25,
+        robot.connect_with_type({'speed': 25,
                         'armor': 30,
                         'power': 90})
-        robot.signal_ready()
 
         The robot.signal_ready() call blocks until ALL opponents call it.
 
@@ -115,10 +125,6 @@ Basic outline of a match:
 
     In this example, robot.scan() would block for a bit -- scanning takes time
     of course! -- and then prints all the robots that it found to the console.
-
-    If the robot uses a blocking call before it's called signal_ready(), that
-    call will be executed automatically to prevent n00bs from messing up the
-    game.
 
 - When all but one robot is dead, they could call stuff like robot.dead() to
   find out if they're dead and robot.is_winner() to see if they are the winner,
