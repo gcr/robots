@@ -31,7 +31,7 @@ class Robot(fieldobject.FieldObject):
     def __json__(self):
         return {'type': 'robot',
                 'name': self.name,
-                'location': self.location,
+                #'location': self.location,
                 'armor': self.armor,
                 'heat': self.heat}
 

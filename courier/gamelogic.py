@@ -26,9 +26,7 @@ class Game(object):
         self.robots = {}
 
     def __json__(self):
-        "warning: unsafe!"
         return {'gametime': self.time,
-                'field': self.field,
                 'robots': [self.robots[r] for r in self.robots]}
 
     def start(self):
