@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import datetime
 from twisted.web import server, resource
 from json_resource import JsonResource
 from twisted.internet import task, reactor
@@ -40,6 +41,7 @@ class Match(resource.Resource):
         self.speed = speed
         self.private = private
         self.lockstep = lockstep
+        self.init_time = datetime.datetime.now()
         if start_timeout:
             self.start_timer = reactor.callLater(start_timeout, self.start)
 
@@ -98,11 +100,14 @@ class Match(resource.Resource):
             assert not self.started, "Can't join a started match!"
             slot = self.request_slot(request)
             return JsonResource(slot).render(request)
+        elif 'info' in request.args:
+            client_info = self.game.__json__()
+            client_info['init_time'] = str(self.init_time)
+            client_info['started'] = self.started
+            client_info['private'] = self.private
+            return JsonResource(client_info).render(request)
         # redirect to the browser
-        gdict = self.game.__json__()
-        gdict['started'] = self.started
-        gdict['private'] = self.private
-        return JsonResource(self.game).render(request)
+        return jinja_resource.Match(match_id=self.matchlist.match_id_for(self)).render(request)
 
 
 
@@ -148,6 +153,12 @@ class Matches(resource.Resource):
             return JsonResource(self.register_new(**args)).render(request)
         # browser visiting
         return jinja_resource.MatchList(matches=mlist).render(request)
+
+    def match_id_for(self, match):
+        """
+        finds a match ID for a given match
+        """
+        return [k for k in self.matches if self.matches[k] == match][0]
 
     def remove(self, match):
         """
