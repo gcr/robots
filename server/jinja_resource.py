@@ -36,3 +36,7 @@ class Index(JinjaResource):
 class MatchList(JinjaResource):
     template_name = 'matches.htm'
     variables = {'title': 'Match list'}
+
+class Match(JinjaResource):
+    template_name = 'match.htm'
+    variables = {'title': 'Robot Match'}
