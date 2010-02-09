@@ -88,7 +88,7 @@ jQuery.fn.courierMatchList = function() {
     jq.text("One moment...");
     var list = $("<ul></ul>");
     ajaxRequest("/matches", {list: true}, function(matchstate) {
-        // retrieve thi list of matches
+        // retreive the list of matches
         for (var l=matchstate.matches.length, i=0; i < l; i++) {
             var m = new Match(matchstate.matches[i]);
             list.append(m.jq);
