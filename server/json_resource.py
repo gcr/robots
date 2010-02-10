@@ -9,7 +9,7 @@ class JsonObjectEncoder(json.JSONEncoder):
     Serialize using object.__json__ if it has one.
     """
     def default(self, obj):
-        if hasattr(obj, '__json__') and callable(getattr(obj, '__json__')):
+        if hasattr(obj, '__json__') and callable(obj.__json__):
             return obj.__json__()
         raise TypeError, '%s is not JSON serializable' % obj
 
@@ -26,6 +26,7 @@ class JsonResource(resource.Resource):
     def render_GET(self, request):
         request.setHeader("Cache-Control", "no-cache, must-revalidate")
         request.setHeader("Expires", "Sat, 26 Jul 1997 05:00:00 GMT")
+        request.setHeader('Content-type', 'application/json')
         json = self.j.encode(self.obj)
         if 'jsonp' in request.args:
             json = "%s(%s)" % (request.args['jsonp'][0], json)
