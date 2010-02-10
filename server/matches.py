@@ -66,7 +66,7 @@ class Match(resource.Resource):
         Go through one iteration of the game.
         """
         self.game.pump()
-        return true
+        return True
 
     def request_slot(self, request):
         """
@@ -76,7 +76,7 @@ class Match(resource.Resource):
         n = "robot_" + utils.random_string(15)
         if n in self.game.robots:
             # try harder!
-            return request_slot(self, request)
+            return self.request_slot(request)
         self.game.robots[n] = None
         print "New slot: %s" % n
         return n

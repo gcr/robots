@@ -14,7 +14,8 @@ class Robot(fieldobject.FieldObject):
         self.speed = 0 # How fast we're ACTUALLY going
         self.steer = random.uniform(0, 2*math.pi) # Where we WANT to turn
         self.rotation = self.steer # Where we ARE turning
-        self.turret_rot = 0 # Where our turret is pointing relative to self.steer
+        self.turret_rot = 0 # Where our turret is pointing
+                            # relative to self.steer
         self.field = field
         self.location = vector.Vector(location)
         self.scan_width = math.pi / 2

@@ -11,7 +11,7 @@ function ajaxRequest(url, data, cb) {
         data: data,
         success: function(data, textStatus) {
             if (typeof data == 'object' && 'client_error' in data) {
-                alert("An error! " + data['client_error']);
+                alert("An error! " + data.client_error);
             } else {
                 cb(data, textStatus);
             }
@@ -22,7 +22,7 @@ function ajaxRequest(url, data, cb) {
             } else {
                 alert("An error! " + e);
             }
-        },
+        }
     });
 }
 
@@ -59,11 +59,11 @@ StreamingHistory.prototype.nextHist = function() {
         }
         self.nextHist();
     });
-}
+};
 
 
 /* ------------------ Match list --------------------- */
-Match = function(id) {
+function Match(id) {
     // Represents a match.
     var self = this;
     self.mid = id;
@@ -80,7 +80,7 @@ Match.prototype.render_list = function() {
     ajaxRequest(this.url, {info: true}, function(minfo){
             match_info_jq.html("Time created: " + minfo.init_time);
             match_info_jq.append("<br />Started? " + minfo.started);
-            match_info_jq.append("<br />Private? " + minfo.private);
+            match_info_jq.append("<br />Private? " + minfo['private']);
             var robot_list = $("<ul>").appendTo(match_info_jq);
             $.each(minfo.robots, function(i, robj) {
                 var robot = new Robot(robj);
@@ -88,7 +88,7 @@ Match.prototype.render_list = function() {
                 robot.render_row();
             });
     });
-}
+};
 
 jQuery.fn.courierMatchList = function() {
     // apply matchList to the specified jquery objects
@@ -110,14 +110,15 @@ jQuery.fn.courierMatchList = function() {
         var sh = new StreamingHistory("/matches?history=t",
             matchstate.history,
             function (action) {
+                var m = 5;
                 if ('added' in action) {
-                    var m = new Match(action.added);
+                    m = new Match(action.added);
                     list.append(m.jq.hide());
                     m.render_list();
                     m.jq.fadeIn();
                     matches[action.added] = m;
                 } else if ('removed' in action) {
-                    var m = matches[action.removed];
+                    m = matches[action.removed];
                     delete matches[action.removed];
                     m.jq.fadeOut(function() {
                         m.jq.remove();
@@ -126,12 +127,12 @@ jQuery.fn.courierMatchList = function() {
             });
     });
     return jq;
-}
+};
 
 
 /* ------------------ Robots --------------------- */
 function Robot () {
-    var r = arguments[0]
+    var r = arguments[0];
     if (typeof r == 'object' && r !== null) {
         this.name = r.name;
         this.armor = r.armor;
@@ -145,4 +146,4 @@ Robot.prototype.render_row = function() {
     } else {
         this.jq.html("(no robot)");
     }
-}
+};

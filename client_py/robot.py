@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from urlparse import urljoin, urlsplit
+from urlparse import urlsplit
 import urllib2
 import urllib
 import socket
