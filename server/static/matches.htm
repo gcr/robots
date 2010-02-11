@@ -1,6 +1,7 @@
 {% extends 'base.htm' %}
 
 {% block content %}
+<a href="/matches/" class='matchlist_refresh'>Refresh</a>
 <div class='matchlist'>
     <ul>
         {% for match in matches %}
@@ -16,7 +17,12 @@
 {% block script %}
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function() {
-            $(".matchlist").courierMatchList();
+            var ml = new MatchList();
+            ml.populate($(".matchlist"), true);
+            $(".matchlist_refresh").click(function() {
+                ml.populate($(".matchlist"), true);
+                return false;
+            });
         });
     </script>
 {% endblock %}

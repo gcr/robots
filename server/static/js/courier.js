@@ -4,7 +4,7 @@
  **/
 
 function ajaxRequest(url, data, cb) {
-    $.ajax({
+    return $.ajax({
         url: url,
         dataType: 'jsonp',
         jsonp: 'jsonp',
@@ -40,7 +40,7 @@ function StreamingHistory(url, state, cb) {
     if (this.state == -1) {
         // they don't know what state they're at? uh oh! we'd best tell them,
         // but this is bad because they're going to miss things!
-        ajaxRequest(url, {get_state: true}, function(state, textStatus) {
+        this.xhr = ajaxRequest(url, {get_state: true}, function(state, textStatus) {
             self.state = state;
             self.nextHist();
         });
@@ -52,7 +52,7 @@ StreamingHistory.prototype.nextHist = function() {
     /// Carry out the next action in the history, calling callback if we get
     /// anything.
     var self = this;
-    ajaxRequest(this.url, {since: this.state}, function (actions) {
+    this.xhr = ajaxRequest(this.url, {since: this.state}, function (actions) {
         for (var i = 0, l = actions.length; i < l; i++) {
             self.cb(actions[i]);
             self.state++;
@@ -60,73 +60,10 @@ StreamingHistory.prototype.nextHist = function() {
         self.nextHist();
     });
 };
-
-
-/* ------------------ Match list --------------------- */
-function Match(id) {
-    // Represents a match.
-    var self = this;
-    self.mid = id;
-    self.url = "/matches/" + id;
-    self.jq = $("<div>");
-}
-Match.prototype.render_list = function() {
-    // renders this match as if in a list, later refining ourselves to provide
-    // better information.
-    this.jq.html("<a class='match_" + this.mid +
-            "' href='/matches/" + this.mid + "'>Match " +
-            this.mid + "</a>");
-    var match_info_jq = $("<div>one moment...</div>").appendTo(this.jq);
-    ajaxRequest(this.url, {info: true}, function(minfo){
-            match_info_jq.html("Time created: " + minfo.init_time);
-            match_info_jq.append("<br />Started? " + minfo.started);
-            match_info_jq.append("<br />Private? " + minfo['private']);
-            var robot_list = $("<ul>").appendTo(match_info_jq);
-            $.each(minfo.robots, function(i, robj) {
-                var robot = new Robot(robj);
-                robot_list.append($("<li>").append(robot.jq));
-                robot.render_row();
-            });
-    });
-};
-
-jQuery.fn.courierMatchList = function() {
-    // apply matchList to the specified jquery objects
-    // do something like $("#match_list").courierMatchList(); and I'll handle
-    // all the rest.
-    var jq = this;
-    var matches = {};
-    jq.text("One moment...");
-    var list = $("<ul></ul>");
-    ajaxRequest("/matches", {list: true}, function(matchstate) {
-        // retreive the list of matches
-        for (var l=matchstate.matches.length, i=0; i < l; i++) {
-            var m = new Match(matchstate.matches[i]);
-            list.append(m.jq);
-            m.render_list();
-            matches[m.mid] = m;
-        }
-        jq.html(list);
-        var sh = new StreamingHistory("/matches?history=t",
-            matchstate.history,
-            function (action) {
-                var m = 5;
-                if ('added' in action) {
-                    m = new Match(action.added);
-                    list.append(m.jq.hide());
-                    m.render_list();
-                    m.jq.fadeIn();
-                    matches[action.added] = m;
-                } else if ('removed' in action) {
-                    m = matches[action.removed];
-                    delete matches[action.removed];
-                    m.jq.fadeOut(function() {
-                        m.jq.remove();
-                    });
-                }
-            });
-    });
-    return jq;
+StreamingHistory.prototype.stop = function() {
+    if (this.xhr !== undefined) {
+        this.xhr.abort();
+    }
 };
 
 
@@ -145,5 +82,94 @@ Robot.prototype.render_row = function() {
         this.jq.html("<\"" + this.name + "\", armor: " + this.armor + ">");
     } else {
         this.jq.html("(no robot)");
+    }
+};
+
+
+/* ------------------ Match list --------------------- */
+function Match(id) {
+    // Represents a match.
+    var self = this;
+    self.mid = id;
+    self.url = "/matches/" + id;
+}
+Match.prototype.render_list = function(jq) {
+    // renders this match as if in a list, later refining ourselves to provide
+    // better information.
+    jq.html("<a class='match_" + this.mid +
+            "' href='/matches/" + this.mid + "'>Match " +
+            this.mid + "</a>");
+    var match_info_jq = $("<div>one moment...</div>").appendTo(jq);
+    ajaxRequest(this.url, {info: true}, function(minfo){
+            match_info_jq.html("Time created: " + minfo.init_time);
+            match_info_jq.append("<br />Started? " + minfo.started);
+            match_info_jq.append("<br />Private? " + minfo['private']);
+            var robot_list = $("<ul>").appendTo(match_info_jq);
+            $.each(minfo.robots, function(i, robj) {
+                var robot = new Robot(robj);
+                robot_list.append($("<li>").append(robot.jq));
+                robot.render_row();
+            });
+    });
+};
+
+function MatchList() {
+    // represents a new match list. run populate(jq) to populate into a jquery
+    // object.
+    this.matches = {};
+    this.match_jq = {};
+    this.populating = false;
+}
+MatchList.prototype.populate = function(jq, stream) {
+    // list the active matches. if stream is true-ish, then follow the changes
+    // made.
+    if (this.populating) {
+        // we're already waiting!
+        return false;
+    }
+    this.populating = true;
+    this.stop_listening();
+    jq.text("One moment...");
+    var self = this;
+    ajaxRequest("/matches", {list: true}, function(matchstate) {
+        var list = $("<ul></ul>");
+        // retreive the list of matches
+        for (var l=matchstate.matches.length, i=0; i < l; i++) {
+            var m = new Match(matchstate.matches[i]);
+            var m_jq = $("<li>").appendTo(list);
+            m.render_list(m_jq);
+            self.matches[m.mid] = m;
+            self.match_jq[m.mid] = m_jq;
+        }
+        jq.html(list);
+        if (stream) {
+            self.sh = new StreamingHistory("/matches?history=t",
+                matchstate.history,
+                function (action) {
+                    var m;
+                    if ('added' in action) {
+                        m = new Match(action.added);
+                        var m_jq = $("<li>").appendTo(list).hide();
+                        m.render_list(m_jq);
+                        m_jq.fadeIn();
+                        self.matches[action.added] = m;
+                        self.match_jq[m.mid] = m_jq;
+                    } else if ('removed' in action) {
+                        m = self.matches[action.removed];
+                        delete self.matches[action.removed];
+                        self.match_jq[m.mid].fadeOut(function() {
+                            self.match_jq[m.mid].remove();
+                            delete self.match_jq[m.mid];
+                        });
+                    }
+            });
+        }
+        // finish up; release the 'lock'
+        self.populating = false;
+    });
+};
+MatchList.prototype.stop_listening = function() {
+    if (this.sh !== undefined) {
+        this.sh.stop();
     }
 };
