@@ -10,7 +10,7 @@ class FieldObject(object):
     def __json__(self):
         return {'location': self.location}
 
-    def hit(self):
+    def hit(self, damage):
         print str(self) + " hit"
         pass
 
