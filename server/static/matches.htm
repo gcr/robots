@@ -17,11 +17,20 @@
 {% block script %}
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function() {
-            var ml = new MatchList();
-            ml.populate($(".matchlist"), true);
-            $(".matchlist_refresh").click(function() {
-                ml.populate($(".matchlist"), true);
-                return false;
+            var ml = new courier.MatchList();
+            var mljq = $(".matchlist").empty();
+            var ml_loading = $("<div>One moment...</div>").appendTo(mljq);
+            ml.on_new_match(function(match) {
+                var match_jq = $("<li>Match " + 
+                    "<a href='" + match.mid + "'>" + match.mid + "</a>" +
+                    "</li>").appendTo(mljq);
+                match.render_list($("<div>").appendTo(match_jq));
+                ml.on_match_delete(match, function() {
+                    match_jq.fadeOut(function() {$(this).remove();});
+                });
+            });
+            ml.populate(true, function() {
+                ml_loading.remove();
             });
         });
     </script>
