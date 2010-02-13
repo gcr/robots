@@ -12,7 +12,7 @@ courier.ui = (function() { // begin courier namespace
       if (robot.name) {
         jq.text("<\"" + robot.name + "\", armor: " + robot.armor + ">");
       } else {
-        jq.text("(no robot)");
+        jq.text("(unconnected robot)");
       }
     }
 
