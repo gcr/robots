@@ -3,71 +3,9 @@
  * requires jquery
  **/
 
-var courier = (function() { // begin courier namespace
+var courier = courier || {};
 
-function ajaxRequest(url, data, cb) {
-    return $.ajax({
-        url: url,
-        dataType: 'jsonp',
-        jsonp: 'jsonp',
-        data: data,
-        success: function(data, textStatus) {
-            if (typeof data == 'object' && 'client_error' in data) {
-                alert("An error! " + data.client_error);
-            } else {
-                cb(data, textStatus);
-            }
-        },
-        error: function(xhr, e, exception) {
-            if (e == 'timeout') {
-                ajaxRequest(url, data, cb);
-            } else {
-                alert("An error! " + e);
-            }
-        }
-    });
-}
-
-function StreamingHistory(url, state, cb) {
-    /// This object will run a callback when something on the server changes.
-    /// Give it a URL to ping and a callback to execute whenever that
-    /// happens and it'll go on its way. Whenever the server does something,
-    /// the callback will run with the server's response. This is done in such
-    /// a way so you won't ever skip history you missed.
-    this.cb = cb;
-    this.url = url;
-    this.state = state;
-
-    var self = this;
-    if (this.state == -1) {
-        // they don't know what state they're at? uh oh! we'd best tell them,
-        // but this is bad because they're going to miss things!
-        this.xhr = ajaxRequest(url, {get_state: true}, function(state, textStatus) {
-            self.state = state;
-            self.nextHist();
-        });
-    } else {
-        this.nextHist();
-    }
-}
-StreamingHistory.prototype.nextHist = function() {
-    /// Carry out the next action in the history, calling callback if we get
-    /// anything.
-    var self = this;
-    this.xhr = ajaxRequest(this.url, {since: this.state}, function (actions) {
-        for (var i = 0, l = actions.length; i < l; i++) {
-            self.cb(actions[i]);
-            self.state++;
-        }
-        self.nextHist();
-    });
-};
-StreamingHistory.prototype.stop = function() {
-    if (this.xhr !== undefined) {
-        this.xhr.abort();
-    }
-};
-
+courier.match = (function() { // begin courier namespace
 
 /* ------------------ Robots --------------------- */
 function Robot () {
@@ -97,7 +35,7 @@ function Match(id) {
 Match.prototype.render_list = function(jq) {
     // renders this match as if in a list, later refining ourselves to provide
     // better information.
-    ajaxRequest(this.url, {info: true}, function(minfo){
+    courier.core.ajaxRequest(this.url, {info: true}, function(minfo){
             jq.html("Time created: " + minfo.init_time);
             jq.append("<br />Started? " + minfo.started);
             jq.append("<br />Private? " + minfo['private']);
@@ -126,7 +64,7 @@ MatchList.prototype.populate = function(stream, cb) {
     }
     this.populating = true;
     var self = this;
-    ajaxRequest("/matches", {list: true}, function(matchstate) {
+    courier.core.ajaxRequest("/matches", {list: true}, function(matchstate) {
         // retreive the list of matches
         for (var l=matchstate.matches.length, i=0; i < l; i++) {
             var m = new Match(matchstate.matches[i]);
@@ -145,7 +83,7 @@ MatchList.prototype.populate = function(stream, cb) {
 MatchList.prototype.begin_stream = function(time) {
     // start streaming since 'time'
     var self = this;
-    this.sh = new StreamingHistory("/matches?history=t",
+    this.sh = new courier.core.StreamingHistory("/matches?history=t",
         time,
         function (action) {
             if ('added' in action) {
@@ -187,8 +125,6 @@ MatchList.prototype.remove_match = function(match) {
 
 // public methods
 return {
-    ajaxRequest: ajaxRequest,
-    StreamingHistory: StreamingHistory,
     Robot: Robot,
     Match: Match,
     MatchList: MatchList
