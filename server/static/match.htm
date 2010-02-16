@@ -4,3 +4,12 @@
 oh hello, welcome!
 you are match {{ match_id }}, amiright?
 {% endblock %}
+
+{% block script %}
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function() {
+            alert(window.location.pathname.split("/matches/")[1]);
+            alert("{{ match_id }}");
+        });
+    </script>
+{% endblock %}

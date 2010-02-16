@@ -42,7 +42,7 @@ courier.ui = (function() { // begin courier namespace
       ml.on_new_match(
         function(match) {
           var match_jq = $("<li>Match " + 
-              "<a href='" + match.mid + "'>" + match.mid + "</a>" +
+              "<a href='/matches/" + match.mid + "'>" + match.mid + "</a>" +
               "</li>").appendTo(mljq);
           RenderMatchRow($("<div>").appendTo(match_jq), match);
           ml.on_match_delete(match,
