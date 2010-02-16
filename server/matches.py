@@ -2,10 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-from twisted.web import server, resource
+from twisted.web import resource
 from json_resource import JsonResource
 from twisted.internet import task, reactor
-from twisted.internet.defer import Deferred
 import utils
 import robosocket
 import jinja_resource
@@ -42,8 +41,37 @@ class Match(resource.Resource):
         self.private = private
         self.lockstep = lockstep
         self.init_time = datetime.datetime.now()
+        self.history = history.History()
+        self.set_up_callbacks()
         if start_timeout:
             self.start_timer = reactor.callLater(start_timeout, self.start)
+
+    def set_up_callbacks(self):
+        """
+        Sets up the callbacks to be run whenever something interesting happens.
+        """
+        def on_pump(objects):
+            self.history.add({"field": objects})
+        self.game.on_pump(on_pump)
+        def on_hit(obj, location):
+            self.history.add({"hit": {'obj': obj, 'location': location}})
+        self.game.on_hit(on_hit)
+        def on_splash(obj, location, damage):
+            self.history.add({"splash_damage":
+                {"objects": obj, "location": location, "damage": damage}})
+        self.game.on_splash(on_splash)
+        # when a robot disappears
+        def on_remove_robot(robot):
+            self.history.add({"remove_robot": robot})
+        self.game.on_remove_robot(on_remove_robot)
+        # when a robot 'disconnects' before a match starts; the client should
+        # gray it out or something.
+        def on_disconnect_robot(robot):
+            self.history.add({"disconnect_robot": robot})
+        self.game.on_disconnect_robot(on_disconnect_robot)
+        def on_new_robot(robot):
+            self.history.add({"connected_robot": robot})
+        self.game.on_new_robot(on_new_robot)
 
     def start(self):
          # Start the match, but don't do a tick right away. clear game.robots
@@ -53,13 +81,14 @@ class Match(resource.Resource):
          self.started = True
          empty_robots = [rid for rid in self.game.robots if not self.game.robots[rid]]
          for rid in empty_robots:
-             del self.game.robots[rid]
+             self.game.remove_robot(rid)
          if len(self.game.robots) == 0:
              self.matchlist.remove(self)
              return False
          self.game.start()
          self.timer = task.LoopingCall(self.pump)
          self.timer.start(self.speed, now=True)
+         self.history.add({"match_started": True})
 
     def pump(self):
         """
@@ -78,6 +107,7 @@ class Match(resource.Resource):
             # try harder!
             return self.request_slot(request)
         self.game.robots[n] = None
+        self.history.add({"new_slot": None})
         print "New slot: %s" % n
         return n
 
@@ -100,9 +130,12 @@ class Match(resource.Resource):
             assert not self.started, "Can't join a started match!"
             slot = self.request_slot(request)
             return JsonResource(slot).render(request)
+        elif 'history' in request.args:
+            return history.HistoryResource(self.history).render(request)
         elif 'info' in request.args:
             client_info = self.game.__json__()
             client_info['init_time'] = str(self.init_time)
+            client_info['history'] = self.history.time
             client_info['started'] = self.started
             client_info['private'] = self.private
             return JsonResource(client_info).render(request)

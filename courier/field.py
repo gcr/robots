@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import math
 import vector
 import robot
 
@@ -15,6 +14,31 @@ class Field:
         self.width = width
         self.height = height
         self.objects = []
+        # a callback
+        self.on_splash_cb = None
+        self.on_hit_cb = None
+        self.on_pump_cb = None
+
+    def on_pump(self, f):
+        """
+        Will run this callback every time we 'pump' the field. The argument
+        to the callback will be the list of objects.
+        """
+        self.on_pump_cb = f
+
+    def on_splash(self, f):
+        """
+        Assigns a callback to be run on splashdamage. This callback
+        will contain all objects within the vicinity of the splash damage
+        along with the location of the focal point. The objects list is [(obj,
+        damage), (obj, damage), ...]
+        """
+        self.on_splash_cb = f
+
+    def on_hit(self, f):
+        """ Assigns a callback to be called whenever an object is hit. This
+        callback will be passed the object that was hit and its location. """
+        self.on_hit_cb = f
 
     def __json__(self):
         """
@@ -29,10 +53,15 @@ class Field:
         Calls the hit() method on every object at the given location. Returns
         true if something was hit, false otherwise.
         """
+        hit_objs = []
         for obj in self.objects:
             dist = (obj.location - loc).dist
             if dist > 20:
-                obj.hit(float(damage) / dist)
+                d = float(damage) / dist
+                hit_objs.append(obj, d)
+                obj.hit(d)
+        if self.on_splash_cb:
+            self.on_splash_cb(hit_objs, loc, damage)
 
     def add(self, obj):
         self.objects.append(obj)
@@ -40,6 +69,8 @@ class Field:
     def pump(self):
         for obj in self.objects:
             obj.pump()
+        if self.on_pump_cb:
+            self.on_pump_cb(self.objects)
 
     def remove(self, obj):
         self.objects.remove(obj)

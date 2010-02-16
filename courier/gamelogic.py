@@ -24,6 +24,10 @@ class Game(object):
         self.field = field.Field()
         # maps unique IDs to robots
         self.robots = {}
+        # callbacks
+        self.on_new_robot_cb = None
+        self.on_disconnect_robot_cb = None
+        self.on_remove_robot_cb = None
 
     def __json__(self):
         return {'gametime': self.time,
@@ -49,12 +53,50 @@ class Game(object):
         self.field.pump()
         self.time +=1
 
+    # callbacks -- passed straight away onto our field
+    def on_pump(self, f):
+        self.field.on_pump(f)
+
+    def on_hit(self, f):
+        self.field.on_hit(f)
+
+    def on_splash(self, f):
+        self.field.on_splash(f)
+
+    def on_new_robot(self, f):
+        " runs f when a new robot is created."
+        self.on_new_robot_cb = f
+
+    def on_disconnect_robot(self, f):
+        " runs f when a robot is disconnected."
+        self.on_disconnect_robot_cb = f
+
+    def on_remove_robot(self, f):
+        """
+        runs f when a robot is removed from the game. the client should just
+        take it out of its robot list.
+        """
+        self.on_remove_robot_cb = f
+
     def remove_robot(self, robot_id):
         """
         Removes the robot with robot_id from the server
         """
         assert robot_id in self.robots, "Can't remove a robot that wasn't there"
+        if self.on_remove_robot_cb:
+            self.on_remove_robot_cb(self.robots[robot_id])
         del self.robots[robot_id]
+
+    def disconnect_robot(self, robot_id):
+        """
+        Disconnects the robot from the game.
+        """
+        if self.time == 0:
+            if self.on_disconnect_robot_cb:
+                self.on_disconnect_robot_cb(self.robots[robot_id])
+            self.robots[robot_id] = None
+        else:
+            self.remove_robot(robot_id)
 
     def create_robot(self, id, attributes):
         """
@@ -78,6 +120,8 @@ class Game(object):
                                random.randint(0, self.field.height)]),
                 **args)
         self.robots[id] = rob
+        if self.on_new_robot_cb:
+            self.on_new_robot_cb(rob)
         return rob
 
     def set_future(self, time, robot_id):
@@ -112,9 +156,8 @@ class Game(object):
         defr.addCallback(lambda result: request.send(result))
         (keep in mind that deferreds are chained)
         """
-        if self.time != 0:
-            assert robot_id in self.robots and self.robots[robot_id] ("This robot "
-        "doesn't exist!")
+        assert robot_id in self.robots and self.robots[robot_id] ("This robot "
+            "doesn't exist!")
         pass
 
     @property

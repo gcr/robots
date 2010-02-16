@@ -53,7 +53,7 @@ class RoboResource(resource.Resource):
         reqdefr = request.notifyFinish()
         def connection_lost(result):
             if not self.match.started:
-                self.game.robots[self.robot_id] = None
+                self.game.disconnect_robot(self.robot_id)
             print "Robot disconnected."
         reqdefr.addErrback(connection_lost)
 
