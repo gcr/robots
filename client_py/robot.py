@@ -51,10 +51,10 @@ class Server:
         Fetch a JSON object from a web page, encoding keyword parameters
         """
         result = json.loads(self._fetch_raw(url, **kwargs))
-        # a 'client error' is when the server signals something to the client
-        # and it's ALL THE CLIENT'S FAULT.
-        if isinstance(result, dict) and 'client_error' in result:
-            raise RobotException(result['client_error'])
+        # a 'exception' is when the server signals the client that something
+        # went wrong
+        if isinstance(result, dict) and 'exception' in result:
+            raise RobotException(result['exception'])
         return result
 
 
