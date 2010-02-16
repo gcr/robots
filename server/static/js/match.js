@@ -33,7 +33,7 @@ function Match(id) {
   this.url = "/matches/" + id;
   this.populating = false;
 }
-Match.prototype.populate = function(cb) {
+Match.prototype.populate = function(stream, cb) {
   // get information about this match and run the callback.
   if (this.populating) {
     return false;
@@ -52,8 +52,19 @@ Match.prototype.populate = function(cb) {
       if (typeof cb == 'function') {
         cb(self);
       }
+      if (stream) {
+        self.begin_stream(minfo.history);
+      }
       self.populating = false;
     });
+};
+Match.prototype.begin_stream = function(time) {
+  var self = this;
+  this.sh = new courier.core.StreamingHistory(this.url + "?history=t",
+      time,
+      function(action) {
+        console.log(action);
+      });
 };
 
 function MatchList() {

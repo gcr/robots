@@ -19,7 +19,7 @@ courier.ui = (function() { // begin courier namespace
     function RenderMatchRow(jq, match) {
       // this function will render the given match as a row to the given
       // jquery object
-      match.populate(
+      match.populate(false,
         function () {
           jq.html("Time created: " + match.init_time);
           jq.append("<br />Started? " + match.started);

@@ -36,7 +36,7 @@ class Game(object):
     def start(self):
         assert self.time == 0, "This game is in-progress."
         for r in self.robots:
-            self.field.add(r)
+            self.field.add(self.robots[r])
 
     def pump(self):
         """

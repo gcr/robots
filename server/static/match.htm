@@ -8,8 +8,10 @@ you are match {{ match_id }}, amiright?
 {% block script %}
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function() {
-            alert(window.location.pathname.split("/matches/")[1]);
-            alert("{{ match_id }}");
+            // this is written through template substitution on the server.
+            var match_id = "{{ match_id }}";
+            var m = new courier.match.Match(match_id);
+            m.populate(true);
         });
     </script>
 {% endblock %}
