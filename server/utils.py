@@ -13,3 +13,10 @@ def random_string(size):
     return x
 
 
+def is_trueish(s):
+    """
+    returns true if something seems to be true, false if otherwise.
+    """
+    if str(s).lower() in ["", "false", "nil", "null", "0", "no"]:
+        return False
+    return True

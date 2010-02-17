@@ -142,12 +142,41 @@ MatchList.prototype.remove_match = function(match) {
   delete this.matches[match.mid];
 };
 
+function registerMatch(priv, speed, start_timeout, lockstep) {
+  // Register a new match on the server.
+  // priv: Whether to show the match on the server list.
+  // speed: how fast (in seconds) each step should be
+  // start_timeout: how long to wait until we start
+  // lockstep: whether to immediately step if all the robots have an action
+  //   queued
+  // you can also pass a callback: run this function when the match is
+  //   registered.
+  //
+  // we will pass a match object and the auth code into the callback.
+  var cb;
+  if (arguments.length > 0 && typeof arguments[arguments.length-1] == 'function') {
+    cb = arguments[arguments.length-1];
+  } else {
+    cb = undefined;
+  }
+  courier.core.ajaxRequest("/matches?register=t",
+      {'private': typeof priv != 'function'? priv : undefined,
+        speed: typeof speed != 'function'? speed : undefined,
+        start_timeout: typeof start_timeout != 'function'? start_timeout : undefined,
+        lockstep: typeof lockstep != 'function'? lockstep : undefined}, 
+        function(data) {
+          if (cb) {
+            cb(new Match(data.match), data.auth_code);
+          }
+        });
+}
 
 // public methods
 return {
   Robot: Robot,
   Match: Match,
-  MatchList: MatchList
+  MatchList: MatchList,
+  registerMatch: registerMatch
 };
 
 })();  // end courier namespace

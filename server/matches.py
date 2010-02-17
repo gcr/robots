@@ -42,6 +42,8 @@ class Match(resource.Resource):
         self.lockstep = lockstep
         self.init_time = datetime.datetime.now()
         self.history = history.History()
+        # Anyone with this auth code has permission to start the match.
+        self.auth_code = utils.random_string(15)
         self.set_up_callbacks()
         if start_timeout:
             self.start_timer = reactor.callLater(start_timeout, self.start)
@@ -173,17 +175,17 @@ class Matches(resource.Resource):
             # Client wants a new match? Try to make one!
             args = {}
             if 'private' in request.args:
-                args['private'] = True
+                args['private'] = utils.is_trueish(request.args['private'][0]);
             if 'speed' in request.args:
-                assert (float(request.args['speed'][0]) <
+                assert (float(request.args['speed'][0]) >
                     self.__class__.MIN_MATCH_SPEED), "Match can't be that fast!"
                 args['speed'] = float(request.args['speed'][0])
             if 'start_timeout' in request.args:
                 args['start_timeout'] = float(request.args['start_timeout'][0])
             if 'lockstep' in request.args:
                 args['lockstep'] = True
-            # success!
-            return JsonResource(self.register_new(**args)).render(request)
+            m, auth_code = self.register_new(**args)
+            return JsonResource({'match': m, 'auth_code': auth_code}).render(request)
         # browser visiting
         return jinja_resource.MatchList(matches=mlist).render(request)
 
@@ -206,7 +208,7 @@ class Matches(resource.Resource):
 
     def register_new(self, **kwargs):
         """
-        Registers a new match.
+        Registers a new match. Returns a 2-tuple: (match, auth code)
         """
         n = utils.random_string(8)
         if n in self.matches:
@@ -216,7 +218,7 @@ class Matches(resource.Resource):
         # append to history for long-polling clients
         if not self.matches[n].private:
             self.history.add({'added': n})
-        return n
+        return (n, self.matches[n].auth_code)
 
     def getChild(self, path, request):
         """

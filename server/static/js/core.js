@@ -15,7 +15,7 @@ function ajaxRequest(url, data, cb) {
     data: data,
     success:
       function(data, textStatus) {
-        if (typeof data == 'object' && 'client_error' in data) {
+        if (typeof data == 'object' && 'exception' in data) {
           alert("An error! " + data.client_error);
         } else {
           cb(data, textStatus);

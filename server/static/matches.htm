@@ -9,15 +9,24 @@
         {% endfor %}
     </ul>
 </div>
-<a href="/matches?register=true">Register match </a>
+<a class="register" href="/matches?register=true">Register match </a>
 <br />
-<a href="/matches?register=t&private=t">Register private match </a>
+<a class="register private_button" href="/matches?register=t&private=t">Register private match </a>
 {% endblock %}
 
 {% block script %}
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function() {
             courier.ui.RenderMatchList($("#matchlist"));
+
+            $(".register").click(function() {
+                var jq = $(this);
+                courier.match.registerMatch(
+                    jq.hasClass('private_button')
+                    //console.log
+                );
+                return false;
+            });
         });
     </script>
 {% endblock %}
