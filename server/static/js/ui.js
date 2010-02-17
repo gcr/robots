@@ -36,7 +36,7 @@ courier.ui = (function() { // begin courier namespace
     function RenderMatchList(jq) {
       // this object will render the match list into the jQuery object jq
       // (given)
-      var ml = new courier.match.MatchList();
+      var ml = new courier.matchlist.MatchList();
       var mljq = jq.empty();
       var ml_loading = $("<div>One moment...</div>").appendTo(mljq);
       ml.on_new_match(
