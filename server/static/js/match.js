@@ -150,9 +150,8 @@ function registerMatch(priv, speed, start_timeout, lockstep) {
   // lockstep: whether to immediately step if all the robots have an action
   //   queued
   // you can also pass a callback: run this function when the match is
-  //   registered.
-  //
-  // we will pass a match object and the auth code into the callback.
+  //   registered. we'll pass a match object and the auth code in there
+  //   for you.
   var cb;
   if (arguments.length > 0 && typeof arguments[arguments.length-1] == 'function') {
     cb = arguments[arguments.length-1];
