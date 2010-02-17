@@ -11,9 +11,9 @@ function MatchList() {
   // represents a new match list. run populate(jq) to populate into a jquery
   // object.
   this.matches = {};
-  this.match_del_cb = {};
+  this.matchDelCb = {};
   this.populating = false;
-  this.new_match_callback = undefined;
+  this.newMatchCallback = undefined;
 }
 MatchList.prototype.populate = function(stream, cb) {
   // Get the list of matches, and run cb when we get them all.
@@ -28,65 +28,65 @@ MatchList.prototype.populate = function(stream, cb) {
       // retreive the list of matches
       for (var l=matchstate.matches.length, i=0; i < l; i++) {
         var m = new courier.match.Match(matchstate.matches[i]);
-        self.new_match(m);
+        self.newMatch(m);
       }
       if (typeof cb == 'function') {
         cb();
       }
       if (stream) {
-        self.begin_stream(matchstate.history);
+        self.beginStream(matchstate.history);
       }
       // finish up; release the 'lock'
       self.populating = false;
     });
 };
-MatchList.prototype.begin_stream = function(time) {
+MatchList.prototype.beginStream = function(time) {
   // start streaming since 'time'
   var self = this;
   this.sh = new courier.core.StreamingHistory("/matches?history=t",
     time,
     function (action) {
       if ('added' in action) {
-        self.new_match(new courier.match.Match(action.added));
+        self.newMatch(new courier.match.Match(action.added));
       } else if ('removed' in action) {
-        self.remove_match(self.matches[action.removed]);
+        self.removeMatch(self.matches[action.removed]);
       }
     });
 };
-MatchList.prototype.stop_stream = function() {
+MatchList.prototype.stopStream = function() {
   // stop streaming
   if (this.sh !== undefined) {
     this.sh.stop();
   }
 };
-MatchList.prototype.on_new_match = function(cb) {
+MatchList.prototype.onNewMatch = function(cb) {
   // run the specified callback when a new match appears!
-  this.new_match_callback = cb;
+  this.newMatchCallback = cb;
 };
-MatchList.prototype.new_match = function(match) {
+MatchList.prototype.newMatch = function(match) {
   // add the match to us
   this.matches[match.mid] = match;
-  if (typeof this.new_match_callback == 'function') {
-    this.new_match_callback(match);
+  if (typeof this.newMatchCallback == 'function') {
+    this.newMatchCallback(match);
   }
 };
-MatchList.prototype.on_match_delete = function(match, cb) {
+MatchList.prototype.onMatchDelete = function(match, cb) {
   // be sure to run this callback when we delete a match.
-  this.match_del_cb[match.mid] = cb;
+  this.matchDelCb[match.mid] = cb;
 };
-MatchList.prototype.remove_match = function(match) {
+MatchList.prototype.removeMatch = function(match) {
   // delete the given match.
-  if (typeof this.match_del_cb[match.mid] == 'function') {
-    this.match_del_cb[match.mid](match);
+  if (typeof this.matchDelCb[match.mid] == 'function') {
+    this.matchDelCb[match.mid](match);
   }
   delete this.matches[match.mid];
 };
 
-function registerMatch(priv, speed, start_timeout, lockstep) {
+function registerMatch(priv, speed, startTimeout, lockstep) {
   // Register a new match on the server.
   // priv: Whether to show the match on the server list.
   // speed: how fast (in seconds) each step should be
-  // start_timeout: how long to wait until we start
+  // startTimeout: how long to wait until we start
   // lockstep: whether to immediately step if all the robots have an action
   //   queued
   // you can also pass a callback: run this function when the match is
@@ -101,7 +101,7 @@ function registerMatch(priv, speed, start_timeout, lockstep) {
   courier.core.ajaxRequest("/matches?register=t",
       {'private': typeof priv != 'function'? priv : undefined,
         speed: typeof speed != 'function'? speed : undefined,
-        start_timeout: typeof start_timeout != 'function'? start_timeout : undefined,
+        start_timeout: typeof startTimeout != 'function'? startTimeout : undefined,
         lockstep: typeof lockstep != 'function'? lockstep : undefined}, 
         function(data) {
           if (cb) {

@@ -17,7 +17,7 @@ function Robot () {
   }
   this.jq = $("<div>");
 }
-Robot.prototype.render_row = function() {
+Robot.prototype.renderRow = function() {
   if (this.name) {
     this.jq.html("<\"" + this.name + "\", armor: " + this.armor + ">");
   } else {
@@ -42,7 +42,7 @@ Match.prototype.populate = function(stream, cb) {
   var self = this;
   courier.core.ajaxRequest(this.url, {info: true},
     function(minfo){
-      self.init_time = minfo.init_time;
+      self.initTime = minfo.init_time;
       self.started = minfo.started;
       self['private'] = minfo['private'];
       self.robots = [];
@@ -53,12 +53,12 @@ Match.prototype.populate = function(stream, cb) {
         cb(self);
       }
       if (stream) {
-        self.begin_stream(minfo.history);
+        self.beginStream(minfo.history);
       }
       self.populating = false;
     });
 };
-Match.prototype.begin_stream = function(time) {
+Match.prototype.beginStream = function(time) {
   var self = this;
   this.sh = new courier.core.StreamingHistory(this.url + "?history=t",
       time,

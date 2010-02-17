@@ -9,8 +9,8 @@ you are match {{ match_id }}, amiright?
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function() {
             // this is written through template substitution on the server.
-            var match_id = "{{ match_id }}";
-            var m = new courier.match.Match(match_id);
+            var matchId = "{{ match_id }}";
+            var m = new courier.match.Match(matchId);
             m.populate(true);
         });
     </script>

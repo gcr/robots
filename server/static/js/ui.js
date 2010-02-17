@@ -21,38 +21,38 @@ courier.ui = (function() { // begin courier namespace
       // jquery object
       match.populate(false,
         function () {
-          jq.html("Time created: " + match.init_time);
+          jq.html("Time created: " + match.initTime);
           jq.append("<br />Started? " + match.started);
           jq.append("<br />Private? " + match['private']);
-          var robot_list = $("<ul>").appendTo(jq);
+          var robotList = $("<ul>").appendTo(jq);
           $.each(match.robots, function(i, robot) {
-            // todo: render robot to robot_list
-            RenderRobotRow($("<li>").appendTo(robot_list), robot);
+            // todo: render robot to robotList
+            RenderRobotRow($("<li>").appendTo(robotList), robot);
           });
         });
     }
 
-    
+
     function RenderMatchList(jq) {
       // this object will render the match list into the jQuery object jq
       // (given)
       var ml = new courier.matchlist.MatchList();
       var mljq = jq.empty();
-      var ml_loading = $("<div>One moment...</div>").appendTo(mljq);
-      ml.on_new_match(
+      var mlLoading = $("<div>One moment...</div>").appendTo(mljq);
+      ml.onNewMatch(
         function(match) {
-          var match_jq = $("<li>Match " + 
+          var matchJq = $("<li>Match " +
               "<a href='/matches/" + match.mid + "'>" + match.mid + "</a>" +
               "</li>").appendTo(mljq);
-          RenderMatchRow($("<div>").appendTo(match_jq), match);
-          ml.on_match_delete(match,
+          RenderMatchRow($("<div>").appendTo(matchJq), match);
+          ml.onMatchDelete(match,
             function() {
-              match_jq.fadeOut(function() {$(this).remove();});
+              matchJq.fadeOut(function() {$(this).remove();});
             });
         });
       ml.populate(true,
         function() {
-          ml_loading.remove();
+          mlLoading.remove();
         });
     }
 
