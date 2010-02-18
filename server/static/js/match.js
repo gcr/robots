@@ -45,6 +45,9 @@ Match.prototype.populate = function(stream, cb) {
       if (typeof cb == 'function') {
         cb(self);
       }
+      if (typeof self.onMatchStartedCb == 'function') {
+        self.onMatchStartedCb();
+      }
       if (stream) {
         self.beginStream(minfo.history);
       }
