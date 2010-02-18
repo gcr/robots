@@ -56,11 +56,35 @@ courier.ui = (function() { // begin courier namespace
         });
     }
 
+    function DrawField(match, field) {
+      // Draw the field to the field() object.
+      match.onFieldUpdate(
+          function(field) {
+            console.log(field);
+          });
+    }
 
+    function RenderRobotList(m, list) {
+      m.onNewSlot(
+          function (rob) {
+              console.log("new slot");
+              console.log(m);
+          });
+      m.onConnectedRobot(
+          function (rob) {
+              console.log(m);
+          });
+      m.onDisconnectRobot(
+          function (rob) {
+              console.log(m);
+          });
+    }
 
     return {
       RenderMatchList: RenderMatchList,
       RenderRobotRow: RenderRobotRow,
-      RenderMatchRow: RenderMatchRow
+      RenderMatchRow: RenderMatchRow,
+      RenderRobotList: RenderRobotList,
+      DrawField: DrawField
     };
 })();

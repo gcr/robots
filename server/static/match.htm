@@ -2,7 +2,7 @@
 
 {% block content %}
 oh hello, welcome!
-you are match {{ match_id }}, amiright?
+<div class="robotlist"></div>
 {% endblock %}
 
 {% block script %}
@@ -12,19 +12,7 @@ you are match {{ match_id }}, amiright?
             var matchId = "{{ match_id }}";
             var m = new courier.match.Match(matchId);
             console.log(courier.core.readCookie(matchId));
-            m.onNewSlot(
-                function (rob) {
-                    console.log("new slot");
-                    console.log(rob);
-                });
-            m.onConnectedRobot(
-                function (rob) {
-                    console.log(rob);
-                });
-            m.onDisconnectRobot(
-                function (rob) {
-                    console.log(rob);
-                });
+            courier.ui.RenderRobotList(m, $(".robotlist"));
             m.populate(true);
         });
     </script>

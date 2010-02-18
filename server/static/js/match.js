@@ -40,13 +40,23 @@ Match.prototype.populate = function(stream, cb) {
       self['private'] = minfo['private'];
       self.robots = [];
       for (var i = 0,l = minfo.robots.length; i < l; i++) {
-        self.robots[i] = new Robot(minfo.robots[i]);
-      }
-      if (typeof cb == 'function') {
-        cb(self);
+        if (typeof self.onNewSlotCb == 'function') {
+          self.onNewSlotCb();
+        }
+        if (minfo.robots[i]) {
+          self.robots[i] = new Robot(minfo.robots[i]);
+          if (typeof self.onConnectedRobotCb == 'function') {
+            self.onConnectedRobotCb(self.robots[i]);
+          }
+        } else {
+          self.robots[i] = null;
+        }
       }
       if (typeof self.onMatchStartedCb == 'function') {
         self.onMatchStartedCb();
+      }
+      if (typeof cb == 'function') {
+        cb(self);
       }
       if (stream) {
         self.beginStream(minfo.history);
@@ -56,35 +66,81 @@ Match.prototype.populate = function(stream, cb) {
 };
 Match.prototype.beginStream = function(time) {
   var self = this;
+  var callbacks = {
+    'field': 'onFieldUpdateCb',
+    'hit': 'onHitCb',
+    'splash_damage': 'onSplashCb',
+    'remove_robot': 'onRemoveRobotCb',
+    'disconnect_robot': 'onDisconnectRobotCb',
+    'connected_robot': 'onConnectedRobotCb',
+    'new_slot': 'onNewSlotCb',
+    'match_started': 'onMatchStarted'};
+  function get_callback(data) {
+    // Tells you which callback should be associated with the data.
+    // for example, data might be {disconnected_robot: 'super harvey eater'} and
+    // this little function would tell you that.
+    for (var cb in callbacks) {
+      if (callbacks.hasOwnProperty(cb)) {
+        if (typeof data[cb] != 'undefined' && typeof self[callbacks[cb]] == 'function') {
+          return cb;
+        }
+      }
+    }
+  }
+  var rob, i, l;
   this.sh = new courier.core.StreamingHistory(this.url + "?history=t",
       time,
       function(action) {
-        if (action.hasOwnProperty('field') &&
-            typeof self.onFieldUpdateCb == 'function') {
-          self.onFieldUpdateCb(action.field);
-        } else if (action.hasOwnProperty('hit') &&
-                   typeof self.onHitCb == 'function') {
-          self.onHitCb(action.hit.obj, action.hit.location);
-        } else if (action.hasOwnProperty('splash_damage') &&
-                   typeof self.onSplashCb == 'function') {
-          self.onSplashCb(action.splash_damage.objects,
+        // This handles what to do when the server tells us something
+        switch (get_callback(action)) {
+          case 'field':
+            self.onFieldUpdateCb(action.field);
+            break;
+          case 'hit':
+            self.onHitCb(action.hit.obj, action.hit.location);
+            break;
+          case 'splash_damage':
+            self.onSplashCb(action.splash_damage.objects,
                           action.splash_damage.location,
                           action.splash_damage.damage);
-        } else if (action.hasOwnProperty('remove_robot') &&
-                   typeof self.onRemoveRobotCb == 'function') {
-          self.onRemoveRobotCb(new Robot(action.remove_robot));
-        } else if (action.hasOwnProperty('disconnect_robot') &&
-                   typeof self.onDisconnectRobotCb == 'function') {
-          self.onDisconnectRobotCb(new Robot(action.disconnect_robot));
-        } else if (action.hasOwnProperty('connected_robot') &&
-                   typeof self.onConnectedRobotCb == 'function') {
-          self.onConnectedRobotCb(new Robot(action.connected_robot));
-        } else if (action.hasOwnProperty('new_slot') &&
-                   typeof self.onNewSlotCb == 'function') {
-          self.onNewSlotCb(new Robot(action.new_slot));
-        } else if (action.hasOwnProperty('match_started') &&
-                   typeof self.onMatchStarted == 'function') {
-          self.onMatchStarted();
+            break;
+          case 'remove_robot':
+            rob = new Robot(action.remove_robot);
+            for (i=0,l=self.robots.length; i<l; i++) {
+              if (self.robots[i].name == rob.name) {
+                delete self.robots[i];
+                break;
+              }
+            }
+            self.onRemoveRobotCb(rob);
+            break;
+          case 'disconnect_robot':
+            rob = new Robot(action.disconnect_robot);
+            for (i=0,l=self.robots.length; i<l; i++) {
+              if (self.robots[i] && self.robots[i].name == rob.name) {
+                self.robots[i] = null;
+                break;
+              }
+            }
+            self.onDisconnectRobotCb(rob);
+            break;
+          case 'connected_robot':
+            rob = new Robot(action.connected_robot);
+            for (i=0,l=self.robots.length; i<l; i++) {
+              if (self.robots[i] === null) {
+                self.robots[i] = rob;
+                break;
+              }
+            }
+            self.onConnectedRobotCb(rob);
+            break;
+          case 'new_slot':
+            self.robots[self.robots.length] = null;
+            self.onNewSlotCb();
+            break;
+          case 'match_started':
+            self.onMatchStarted();
+            break;
         }
       });
 };
