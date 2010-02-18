@@ -22,9 +22,11 @@
             $(".register").click(function() {
                 var jq = $(this);
                 courier.matchlist.registerMatch(
-                    jq.hasClass('private_button')
-                    //console.log
-                );
+                    jq.hasClass('private_button'),
+                    function(match, code) {
+                        courier.core.createCookie(match.mid, code, 1);
+                        window.location.pathname = "/matches/" + match.mid;
+                    });
                 return false;
             });
         });

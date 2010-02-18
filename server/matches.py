@@ -52,8 +52,8 @@ class Match(resource.Resource):
         """
         Sets up the callbacks to be run whenever something interesting happens.
         """
-        def on_pump(objects):
-            self.history.add({"field": objects})
+        def on_pump(field):
+            self.history.add({"field": field})
         self.game.on_pump(on_pump)
         def on_hit(obj, location):
             self.history.add({"hit": {'obj': obj, 'location': location}})

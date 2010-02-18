@@ -59,10 +59,6 @@ MatchList.prototype.stopStream = function() {
     this.sh.stop();
   }
 };
-MatchList.prototype.onNewMatch = function(cb) {
-  // run the specified callback when a new match appears!
-  this.newMatchCallback = cb;
-};
 MatchList.prototype.newMatch = function(match) {
   // add the match to us
   this.matches[match.mid] = match;
@@ -70,16 +66,20 @@ MatchList.prototype.newMatch = function(match) {
     this.newMatchCallback(match);
   }
 };
-MatchList.prototype.onMatchDelete = function(match, cb) {
-  // be sure to run this callback when we delete a match.
-  this.matchDelCb[match.mid] = cb;
-};
 MatchList.prototype.removeMatch = function(match) {
   // delete the given match.
   if (typeof this.matchDelCb[match.mid] == 'function') {
     this.matchDelCb[match.mid](match);
   }
   delete this.matches[match.mid];
+};
+MatchList.prototype.onNewMatch = function(cb) {
+  // run the specified callback when a new match appears!
+  this.newMatchCallback = cb;
+};
+MatchList.prototype.onMatchDelete = function(match, cb) {
+  // be sure to run this callback when we delete a match.
+  this.matchDelCb[match.mid] = cb;
 };
 
 function registerMatch(priv, speed, startTimeout, lockstep) {

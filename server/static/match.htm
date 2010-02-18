@@ -11,6 +11,20 @@ you are match {{ match_id }}, amiright?
             // this is written through template substitution on the server.
             var matchId = "{{ match_id }}";
             var m = new courier.match.Match(matchId);
+            console.log(courier.core.readCookie(matchId));
+            m.onNewSlot(
+                function (rob) {
+                    console.log("new slot");
+                    console.log(rob);
+                });
+            m.onConnectedRobot(
+                function (rob) {
+                    console.log(rob);
+                });
+            m.onDisconnectRobot(
+                function (rob) {
+                    console.log(rob);
+                });
             m.populate(true);
         });
     </script>

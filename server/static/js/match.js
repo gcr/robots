@@ -17,13 +17,6 @@ function Robot () {
   }
   this.jq = $("<div>");
 }
-Robot.prototype.renderRow = function() {
-  if (this.name) {
-    this.jq.html("<\"" + this.name + "\", armor: " + this.armor + ">");
-  } else {
-    this.jq.html("(no robot)");
-  }
-};
 
 
 /* ------------------ Match --------------------- */
@@ -63,9 +56,44 @@ Match.prototype.beginStream = function(time) {
   this.sh = new courier.core.StreamingHistory(this.url + "?history=t",
       time,
       function(action) {
-        console.log(action);
+        if (action.hasOwnProperty('field') &&
+            typeof self.onFieldUpdateCb == 'function') {
+          self.onFieldUpdateCb(action.field);
+        } else if (action.hasOwnProperty('hit') &&
+                   typeof self.onHitCb == 'function') {
+          self.onHitCb(action.hit.obj, action.hit.location);
+        } else if (action.hasOwnProperty('splash_damage') &&
+                   typeof self.onSplashCb == 'function') {
+          self.onSplashCb(action.splash_damage.objects,
+                          action.splash_damage.location,
+                          action.splash_damage.damage);
+        } else if (action.hasOwnProperty('remove_robot') &&
+                   typeof self.onRemoveRobotCb == 'function') {
+          self.onRemoveRobotCb(new Robot(action.remove_robot));
+        } else if (action.hasOwnProperty('disconnect_robot') &&
+                   typeof self.onDisconnectRobotCb == 'function') {
+          self.onDisconnectRobotCb(new Robot(action.disconnect_robot));
+        } else if (action.hasOwnProperty('connected_robot') &&
+                   typeof self.onConnectedRobotCb == 'function') {
+          self.onConnectedRobotCb(new Robot(action.connected_robot));
+        } else if (action.hasOwnProperty('new_slot') &&
+                   typeof self.onNewSlotCb == 'function') {
+          self.onNewSlotCb(new Robot(action.new_slot));
+        } else if (action.hasOwnProperty('match_started') &&
+                   typeof self.onMatchStarted == 'function') {
+          self.onMatchStarted();
+        }
       });
 };
+courier.core.createPropertySetters(Match, "Cb",
+    ["onFieldUpdate",
+     "onHit",
+     "onSplash",
+     "onRemoveRobot",
+     "onNewSlot",
+     "onDisconnectRobot",
+     "onConnectedRobot",
+     "onMatchStarted"]);
 
 // public methods
 return {

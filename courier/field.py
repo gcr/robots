@@ -70,7 +70,7 @@ class Field:
         for obj in self.objects:
             obj.pump()
         if self.on_pump_cb:
-            self.on_pump_cb(self.objects)
+            self.on_pump_cb(self)
 
     def remove(self, obj):
         self.objects.remove(obj)
