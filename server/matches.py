@@ -75,11 +75,12 @@ class Match(resource.Resource):
             self.history.add({"connected_robot": robot})
         self.game.on_new_robot(on_new_robot)
 
-    def start(self):
+    def start(self, auth_code):
          # Start the match, but don't do a tick right away. clear game.robots
          # by removing objects that had None, then set the timer.
          # If there are no robots connected, then remove
          # ourselves from the match list.
+         assert auth_code == self.auth_code, "Authentication code is incorrect."
          self.started = True
          empty_robots = [rid for rid in self.game.robots if not self.game.robots[rid]]
          for rid in empty_robots:
@@ -126,7 +127,8 @@ class Match(resource.Resource):
     def render_GET(self, request):
         if "start" in request.args:
             assert not self.started, "Can't start a started match!"
-            self.start()
+            assert 'auth_code' in request.args, "Need an authentication code to start this match."
+            self.start(request.args['auth_code'][0])
             return JsonResource("").render(request)
         elif "register" in request.args:
             assert not self.started, "Can't join a started match!"
