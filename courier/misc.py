@@ -29,7 +29,7 @@ def pick_cool_name():
     suffix = ("killer crusher atomizer shooter 2 2.0 9000 1000 3000 5000 "
         "beta alpha prime robot bot buzzer sniper tank juggernaut man "
         "eater bender zapper warrior bringer optimizer algorithm "
-        "transformer cruncher ultra").split()
+        "transformer cruncher ultra overload").split()
 
     use_suffix = random.random() > 0.3
     grammar = [prefix, middle, suffix] if use_suffix else [prefix, middle]

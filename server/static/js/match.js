@@ -158,11 +158,10 @@ Match.prototype.disconnectRobot = function(robot) {
 Match.prototype.removeSlot = function() {
   // The slot disappeared forever. We should clear it. The server will enusure
   // that it's disconnected first.
-  //todo: remove slot and all CBs
   for (var i=0,l=this.robots.length; i<l; i++) {
     if (this.robots[i] === null) {
-      delete this.robots[i];
-      delete this.onDisconnectRobot[i];
+      this.robots.splice(i, 1);
+      this.onDisconnectRobot.splice(i, 1);
       if (typeof this.onRemoveSlotCb == 'function') {
         this.onRemoveSlotCb();
       }
@@ -173,10 +172,10 @@ Match.prototype.removeSlot = function() {
 Match.prototype.onDisconnectRobot = function(robot, cb) {
   // Run this callback when this robot is disconnected.
   for (var i=0,l=this.robots.length; i<l; i++) {
-    if (this.robots[i].name == robot.name) {
+    if (this.robots[i] && this.robots[i].name == robot.name) {
       this.onDisconnectRobotCb[i] = cb;
+      break;
     }
-    break;
   }
 };
 courier.core.createPropertySetters(Match, "Cb",

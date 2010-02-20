@@ -10,9 +10,9 @@ oh hello, welcome!
         $(document).ready(function() {
             // this is written through template substitution on the server.
             var matchId = "{{ match_id }}";
-            var m = new courier.match.Match(matchId);
+            var m = new courier.match.Match(matchId, courier.core.readCookie(matchId));
             console.log(courier.core.readCookie(matchId));
-            courier.ui.RenderRobotList(m, $(".robotlist"));
+            courier.ui.WatchMatchRobots(m, $(".robotlist"));
             m.populate(true);
         });
     </script>
