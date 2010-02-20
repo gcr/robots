@@ -72,11 +72,21 @@ courier.ui = (function() { // begin courier namespace
           });
       m.onConnectedRobot(
           function (rob) {
+              console.log("Connected robot");
+              m.onDisconnectRobot(rob,
+                function() {
+                  console.log("Robot disconnected");
+                  console.log(rob);
+                });
               console.log(m);
           });
-      m.onDisconnectRobot(
+      m.onRemoveSlot(
           function (rob) {
-              console.log(m);
+            console.log("Slot removed.");
+          });
+      m.onMatchStart(
+          function () {
+            console.log("Match started.");
           });
     }
 
