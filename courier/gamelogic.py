@@ -27,7 +27,7 @@ class Game(object):
         # callbacks
         self.on_new_robot_cb = None
         self.on_disconnect_robot_cb = None
-        self.on_remove_robot_cb = None
+        self.on_remove_slot_cb = None
 
     def __json__(self):
         return {'gametime': self.time,
@@ -71,32 +71,31 @@ class Game(object):
         " runs f when a robot is disconnected."
         self.on_disconnect_robot_cb = f
 
-    def on_remove_robot(self, f):
+    def on_remove_slot(self, f):
         """
         runs f when a robot is removed from the game. the client should just
         take it out of its robot list.
         """
-        self.on_remove_robot_cb = f
+        self.on_remove_slot_cb = f
 
-    def remove_robot(self, robot_id):
+    def remove_slot(self, robot_id):
         """
-        Removes the robot with robot_id from the server
+        Removes the slot with robot_id from the server.
         """
-        assert robot_id in self.robots, "Can't remove a robot that wasn't there"
-        if self.on_remove_robot_cb:
-            self.on_remove_robot_cb(self.robots[robot_id])
+        assert robot_id in self.robots, "Can't remove a slot that wasn't there"
+        if self.robots[robot_id]:
+            self.disconnect_robot(robot_id)
+        if self.on_remove_slot_cb:
+            self.on_remove_slot_cb()
         del self.robots[robot_id]
 
     def disconnect_robot(self, robot_id):
         """
         Disconnects the robot from the game.
         """
-        if self.time == 0:
-            if self.on_disconnect_robot_cb:
-                self.on_disconnect_robot_cb(self.robots[robot_id])
-            self.robots[robot_id] = None
-        else:
-            self.remove_robot(robot_id)
+        if self.on_disconnect_robot_cb:
+            self.on_disconnect_robot_cb(self.robots[robot_id])
+        self.robots[robot_id] = None
 
     def create_robot(self, id, attributes):
         """

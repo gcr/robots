@@ -63,9 +63,9 @@ class Match(resource.Resource):
                 {"objects": obj, "location": location, "damage": damage}})
         self.game.on_splash(on_splash)
         # when a robot disappears
-        def on_remove_robot(robot):
-            self.history.add({"remove_robot": robot})
-        self.game.on_remove_robot(on_remove_robot)
+        def on_remove_slot():
+            self.history.add({"remove_slot": True})
+        self.game.on_remove_slot(on_remove_slot)
         # when a robot 'disconnects' before a match starts; the client should
         # gray it out or something.
         def on_disconnect_robot(robot):
@@ -83,7 +83,7 @@ class Match(resource.Resource):
          self.started = True
          empty_robots = [rid for rid in self.game.robots if not self.game.robots[rid]]
          for rid in empty_robots:
-             self.game.remove_robot(rid)
+             self.game.remove_slot(rid)
          if len(self.game.robots) == 0:
              self.matchlist.remove(self)
              return False

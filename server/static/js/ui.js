@@ -32,7 +32,6 @@ courier.ui = (function() { // begin courier namespace
         });
     }
 
-
     function RenderMatchList(jq) {
       // this object will render the match list into the jQuery object jq
       // (given)

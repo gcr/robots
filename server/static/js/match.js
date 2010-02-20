@@ -20,11 +20,12 @@ function Robot () {
 
 
 /* ------------------ Match --------------------- */
-function Match(id) {
+function Match(id, auth_code) {
   // Represents a match.
   this.mid = id;
   this.url = "/matches/" + id;
   this.populating = false;
+  this.auth_code = auth_code;
 }
 Match.prototype.populate = function(stream, cb) {
   // get information about this match and run the callback.
@@ -49,7 +50,7 @@ Match.prototype.populate = function(stream, cb) {
         }
       }
       if (minfo.started) {
-        self.startMatch();
+        self.matchStarted();
       }
       if (typeof cb == 'function') {
         cb(self);
@@ -64,7 +65,7 @@ Match.prototype.beginStream = function(time) {
   var self = this;
   function get_action(data) {
     // Assumes that the object has just one property. We'll return that for
-    // you.
+    // you. get_action({'match_started': true}) => 'match_started'
     for (var i in data) {
       if (data.hasOwnProperty(i)) {
         return i;
@@ -94,8 +95,8 @@ Match.prototype.beginStream = function(time) {
                             action.splash_damage.damage);
             }
             break;
-          case 'remove_robot':
-            self.removeSlot(action.remove_robot? new Robot(action.remove_robot) : null);
+          case 'remove_slot':
+            self.removeSlot();
             break;
           case 'disconnect_robot':
             self.disconnectRobot(new Robot(action.disconnect_robot));
@@ -112,14 +113,16 @@ Match.prototype.beginStream = function(time) {
         }
       });
 };
-Match.prototype.startMatch = function() {
+Match.prototype.matchStarted = function() {
+  // confused? Match.matchStarted() fires when someone starts the match.
+  // However, Match.startMatch() will try to start the match if we have the
+  // proper auth code.
   if (typeof this.onMatchStartCb == 'function') {
     this.onMatchStartCb();
   }
 };
 Match.prototype.newSlot = function() {
-  // Make a new slot. Will return the slot number.
-  //todo: create a blank slot.
+  // Make a new slot.
   var l = this.robots.length;
   this.robots[l] = null;
   this.onDisconnectRobotCb[l] = null;
@@ -128,8 +131,7 @@ Match.prototype.newSlot = function() {
   }
 };
 Match.prototype.connectRobot = function(robot) {
-  // Add a robot to our next newest slot.
-  //todo: add robot to the next blank slot.
+  // Add this robot to our next empty slot.
   for (var i=0,l=this.robots.length; i<l; i++) {
     if (this.robots[i] === null) {
       this.robots[i] = robot;
@@ -153,19 +155,16 @@ Match.prototype.disconnectRobot = function(robot) {
     }
   }
 };
-Match.prototype.removeSlot = function(robot) {
-  // The robot or slot disappeared forever. We should clear it.
-  // if robot !== null, then disconnect it first.
+Match.prototype.removeSlot = function() {
+  // The slot disappeared forever. We should clear it. The server will enusure
+  // that it's disconnected first.
   //todo: remove slot and all CBs
-  if (robot !== null) {
-    this.disconnectRobot(robot);
-  }
   for (var i=0,l=this.robots.length; i<l; i++) {
     if (this.robots[i] === null) {
       delete this.robots[i];
       delete this.onDisconnectRobot[i];
-      if (typeof this.onSlotRobotCb == 'function') {
-        this.onSlotRobotCb(robot);
+      if (typeof this.onRemoveSlotCb == 'function') {
+        this.onRemoveSlotCb();
       }
       break;
     }
