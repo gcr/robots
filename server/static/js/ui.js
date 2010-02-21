@@ -22,7 +22,7 @@ courier.ui = (function() { // begin courier namespace
         function () {
           jq.html("Time created: " + match.initTime);
           jq.append("<br />Started? " + match.started);
-          jq.append("<br />Private? " + match['private']);
+          jq.append("<br />Public? " + match['public']);
           var robotList = $("<ul>").appendTo(jq);
           $.each(match.robots, function(i, robot) {
             // todo: render robot to robotList

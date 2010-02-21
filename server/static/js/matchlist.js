@@ -82,9 +82,9 @@ MatchList.prototype.onMatchDelete = function(match, cb) {
   this.matchDelCb[match.mid] = cb;
 };
 
-function registerMatch(priv, speed, startTimeout, lockstep) {
+function registerMatch(pub, speed, startTimeout, lockstep) {
   // Register a new match on the server.
-  // priv: Whether to show the match on the server list.
+  // pub: Whether to show the match on the server list.
   // speed: how fast (in seconds) each step should be
   // startTimeout: how long to wait until we start
   // lockstep: whether to immediately step if all the robots have an action
@@ -99,7 +99,7 @@ function registerMatch(priv, speed, startTimeout, lockstep) {
     cb = undefined;
   }
   courier.core.ajaxRequest("/matches?register=t",
-      {'private': typeof priv != 'function'? priv : undefined,
+      {'public': typeof pub != 'function'? pub : undefined,
         'speed': typeof speed != 'function'? speed : undefined,
         'start_timeout': typeof startTimeout != 'function'? startTimeout : undefined,
         'lockstep': typeof lockstep != 'function'? lockstep : undefined},

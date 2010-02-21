@@ -17,6 +17,6 @@ def is_trueish(s):
     """
     returns true if something seems to be true, false if otherwise.
     """
-    if str(s).lower() in ["", "false", "nil", "null", "0", "no"]:
+    if str(s).lower() in ["false", "nil", "null", "0", "no", "f", "n"]:
         return False
     return True

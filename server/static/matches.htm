@@ -11,7 +11,7 @@
 </div>
 <a class="register" href="/matches?register=true">Register match </a>
 <br />
-<a class="register private_button" href="/matches?register=t&private=t">Register private match </a>
+<a class="register private_button" href="/matches?register=t&public=f">Register private match </a>
 {% endblock %}
 
 {% block script %}
@@ -22,7 +22,7 @@
             $(".register").click(function() {
                 var jq = $(this);
                 courier.matchlist.registerMatch(
-                    jq.hasClass('private_button'),
+                    !(jq.hasClass('private_button')),
                     function(match, code) {
                         courier.core.createCookie(match.mid, code, 1);
                         window.location.pathname = "/matches/" + match.mid;

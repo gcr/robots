@@ -39,7 +39,7 @@ Match.prototype.populate = function(stream, cb) {
     function(minfo){
       self.initTime = minfo.init_time;
       self.started = minfo.started;
-      self['private'] = minfo['private'];
+      self['public'] = minfo['public'];
       self.robots = [];
       // the following is a callback. each one should correspond to one slot
       // in self.robots. Be sure to keep track of this and keep it updated!

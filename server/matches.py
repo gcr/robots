@@ -20,10 +20,10 @@ class Match(resource.Resource):
     """
     GAME_LOGIC = gamelogic.ATRobotsInspiredGame
 
-    def __init__(self, matchlist, speed=5.0, private=False, start_timeout=0,
+    def __init__(self, matchlist, speed=5.0, public=True, start_timeout=0,
             lockstep=False):
         """
-        Private: whether the match will show up on public listings (still will
+        True: whether the match will show up on public listings (still will
             always grant a slot if someone knows the s33krit match URL)
         Speed: how long to wait for slow robot clients to do something before
             skipping their turn
@@ -38,7 +38,7 @@ class Match(resource.Resource):
         self.timer = None
         self.started = False
         self.speed = speed
-        self.private = private
+        self.public = public
         self.lockstep = lockstep
         self.init_time = datetime.datetime.now()
         self.history = history.History()
@@ -141,7 +141,7 @@ class Match(resource.Resource):
             client_info['init_time'] = str(self.init_time)
             client_info['history'] = self.history.time
             client_info['started'] = self.started
-            client_info['private'] = self.private
+            client_info['public'] = self.public
             return JsonResource(client_info).render(request)
         # redirect to the browser
         return jinja_resource.Match(match_id=self.matchlist.match_id_for(self)).render(request)
@@ -166,7 +166,7 @@ class Matches(resource.Resource):
         """
         Returns the public matches
         """
-        mlist = [n for n in self.matches if not self.matches[n].private]
+        mlist = [n for n in self.matches if self.matches[n].public]
         if 'list' in request.args:
             return JsonResource({
                 'history': self.history.time, 'matches': mlist
@@ -176,8 +176,8 @@ class Matches(resource.Resource):
         elif 'register' in request.args:
             # Client wants a new match? Try to make one!
             args = {}
-            if 'private' in request.args:
-                args['private'] = utils.is_trueish(request.args['private'][0]);
+            if 'public' in request.args:
+                args['public'] = utils.is_trueish(request.args['public'][0]);
             if 'speed' in request.args:
                 assert (float(request.args['speed'][0]) >
                     self.__class__.MIN_MATCH_SPEED), "Match can't be that fast!"
@@ -205,8 +205,8 @@ class Matches(resource.Resource):
         for k in to_remove:
             print "Removing match %s" % k
             del self.matches[k]
-        # append to history for long-polling clients
-        if not match.private:
+        # append to our history for long-polling clients
+        if match.public:
             self.history.add({'removed': to_remove})
 
     def register_new(self, **kwargs):
@@ -219,7 +219,7 @@ class Matches(resource.Resource):
         self.matches[n] = Match(self, **kwargs)
         print "New match registered: %s" % n
         # append to history for long-polling clients
-        if not self.matches[n].private:
+        if self.matches[n].public:
             self.history.add({'added': n})
         return (n, self.matches[n].auth_code)
 
