@@ -71,7 +71,7 @@ MatchList.prototype.removeMatch = function(match) {
   if (typeof this.matchDelCb[match.mid] == 'function') {
     this.matchDelCb[match.mid](match);
   }
-  delete this.matches[match.mid];
+  this.matches.splice(match.mid, 1);
 };
 MatchList.prototype.onNewMatch = function(cb) {
   // run the specified callback when a new match appears!
@@ -100,14 +100,14 @@ function registerMatch(priv, speed, startTimeout, lockstep) {
   }
   courier.core.ajaxRequest("/matches?register=t",
       {'private': typeof priv != 'function'? priv : undefined,
-        speed: typeof speed != 'function'? speed : undefined,
-        start_timeout: typeof startTimeout != 'function'? startTimeout : undefined,
-        lockstep: typeof lockstep != 'function'? lockstep : undefined}, 
-        function(data) {
-          if (cb) {
-            cb(new courier.match.Match(data.match), data.auth_code);
-          }
-        });
+        'speed': typeof speed != 'function'? speed : undefined,
+        'start_timeout': typeof startTimeout != 'function'? startTimeout : undefined,
+        'lockstep': typeof lockstep != 'function'? lockstep : undefined},
+      function(data) {
+        if (cb) {
+          cb(new courier.match.Match(data.match), data.auth_code);
+        }
+      });
 }
 
 // public methods

@@ -8,8 +8,7 @@ var courier = courier || {};
 courier.match = (function() { // begin courier namespace
 
 /* ------------------ Robots --------------------- */
-function Robot () {
-  var r = arguments[0];
+function Robot (r) {
   if (typeof r == 'object' && r !== null) {
     this.name = r.name;
     this.armor = r.armor;
@@ -28,32 +27,32 @@ function Match(id, auth_code) {
   this.auth_code = auth_code;
 }
 Match.prototype.populate = function(stream, cb) {
-  // get information about this match and run the callback.
+  // Get information about this match and run the callback when we have it.
   if (this.populating) {
     return false;
   }
   this.populating = true;
   var self = this;
-  courier.core.ajaxRequest(this.url, {info: true},
+  courier.core.ajaxRequest(this.url, {'info': true},
     function(minfo){
       self.initTime = minfo.init_time;
       self.started = minfo.started;
       self['private'] = minfo['private'];
       self.robots = [];
       // the following is a callback. each one should correspond to one slot
-      // in self.robots.
-      self.onDisconnectRobotCb = [];
+      // in self.robots. Be sure to keep track of this and keep it updated!
+     self.onDisconnectRobotCb = [];
       for (var i = 0,l = minfo.robots.length; i < l; i++) {
         self.newSlot();
         if (minfo.robots[i]) {
           self.connectRobot(new Robot(minfo.robots[i]));
         }
       }
-      if (minfo.started) {
-        self.matchStarted();
-      }
       if (typeof cb == 'function') {
         cb(self);
+      }
+      if (minfo.started) {
+        self.matchStarted();
       }
       if (stream) {
         self.beginStream(minfo.history);
@@ -62,7 +61,6 @@ Match.prototype.populate = function(stream, cb) {
     });
 };
 Match.prototype.beginStream = function(time) {
-  var self = this;
   function get_action(data) {
     // Assumes that the object has just one property. We'll return that for
     // you. get_action({'match_started': true}) => 'match_started'
@@ -73,10 +71,11 @@ Match.prototype.beginStream = function(time) {
     }
     return null;
   }
+  var self = this;
   this.sh = new courier.core.StreamingHistory(this.url + "?history=t",
       time,
       function(action) {
-        // This handles what to do when the server tells us something
+        // This handles what to do when the server tells us something.
         switch (get_action(action)) {
           case 'field':
             if (typeof self.onFieldUpdateCb == 'function') {
@@ -113,6 +112,10 @@ Match.prototype.beginStream = function(time) {
         }
       });
 };
+Match.prototype.startMatch = function() {
+  // Will try to start the match.
+  // TODO: only if self.auth_code is set.
+};
 Match.prototype.matchStarted = function() {
   // confused? Match.matchStarted() fires when someone starts the match.
   // However, Match.startMatch() will try to start the match if we have the
@@ -122,7 +125,7 @@ Match.prototype.matchStarted = function() {
   }
 };
 Match.prototype.newSlot = function() {
-  // Make a new slot.
+  // Make a new blank slot.
   var l = this.robots.length;
   this.robots[l] = null;
   this.onDisconnectRobotCb[l] = null;
