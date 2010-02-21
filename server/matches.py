@@ -89,9 +89,9 @@ class Match(resource.Resource):
              self.matchlist.remove(self)
              return False
          self.game.start()
-         self.timer = task.LoopingCall(self.pump)
-         self.timer.start(self.speed, now=False)
          self.history.add({"match_started": True})
+         self.timer = task.LoopingCall(self.pump)
+         self.timer.start(self.speed, now=True)
 
     def pump(self):
         """
@@ -155,7 +155,7 @@ class Matches(resource.Resource):
     You can browse the matches by heading to http://server_url/matches and can
     register your own by going to http://server_url/matches/register.
     """
-    MIN_MATCH_SPEED = 0.5               # fastest match allowed
+    MIN_MATCH_SPEED = 0.05               # fastest match allowed
 
     def __init__(self):
         resource.Resource.__init__(self)

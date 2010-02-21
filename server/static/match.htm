@@ -11,6 +11,8 @@ oh hello, welcome!
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function() {
             // this is written through template substitution on the server.
+            //             |
+            //             v
             var matchId = "{{ match_id }}";
             var authCode = courier.core.readCookie(matchId);
             var m = new courier.match.Match(matchId, courier.core.readCookie(matchId));
@@ -24,7 +26,7 @@ oh hello, welcome!
             } else {
                 $("#startmatch").remove();
             }
-            courier.drawing.renderField(m, $("#field"));
+            courier.drawing.followField(m, $("#field"));
             m.populate(true);
         });
     </script>
