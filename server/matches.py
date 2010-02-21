@@ -90,7 +90,7 @@ class Match(resource.Resource):
              return False
          self.game.start()
          self.timer = task.LoopingCall(self.pump)
-         self.timer.start(self.speed, now=True)
+         self.timer.start(self.speed, now=False)
          self.history.add({"match_started": True})
 
     def pump(self):

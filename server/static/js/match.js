@@ -109,16 +109,18 @@ Match.prototype.beginStream = function(time) {
             self.newSlot();
             break;
           case 'match_started':
-            self.startMatch();
+            self.matchStarted();
             break;
         }
       });
 };
 Match.prototype.startMatch = function() {
   // Will try to start the match.
+  console.log("Starting match...");
   if (this.authCode && !(this.starting || this.started)) {
+    this.starting = true;
     courier.core.ajaxRequest( this.url,
-        {start: true, auth_code: this.authCode});
+        {start: true, auth_code: this.authCode}, function(){});
   }
 };
 Match.prototype.matchStarted = function() {

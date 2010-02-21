@@ -1,2 +1,7 @@
 body {
 }
+
+canvas {
+    background-color: #888;
+    border: 1px solid black;
+}

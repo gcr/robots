@@ -4,6 +4,7 @@
 oh hello, welcome!
 <a href="#" id="startmatch">Start match</a>
 <div class="robotlist"></div>
+<canvas id='field' width='500' height='500'></canvas>
 {% endblock %}
 
 {% block script %}
@@ -23,6 +24,7 @@ oh hello, welcome!
             } else {
                 $("#startmatch").remove();
             }
+            courier.drawing.renderField(m, $("#field"));
             m.populate(true);
         });
     </script>
