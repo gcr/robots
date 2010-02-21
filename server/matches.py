@@ -203,6 +203,7 @@ class Matches(resource.Resource):
         """
         to_remove = [k for k in self.matches if self.matches[k] == match]
         for k in to_remove:
+            print "Removing match %s" % k
             del self.matches[k]
         # append to history for long-polling clients
         if not match.private:

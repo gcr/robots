@@ -2,6 +2,7 @@
 
 {% block content %}
 oh hello, welcome!
+<a href="#" id="startmatch">Start match</a>
 <div class="robotlist"></div>
 {% endblock %}
 
@@ -10,9 +11,18 @@ oh hello, welcome!
         $(document).ready(function() {
             // this is written through template substitution on the server.
             var matchId = "{{ match_id }}";
+            var authCode = courier.core.readCookie(matchId);
             var m = new courier.match.Match(matchId, courier.core.readCookie(matchId));
-            console.log(courier.core.readCookie(matchId));
             courier.ui.WatchMatchRobots(m, $(".robotlist"));
+            if (authCode) {
+                $("#startmatch").click(
+                    function() {
+                        m.startMatch();
+                        return false;
+                    });
+            } else {
+                $("#startmatch").remove();
+            }
             m.populate(true);
         });
     </script>

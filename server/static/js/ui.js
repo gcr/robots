@@ -38,9 +38,9 @@ courier.ui = (function() { // begin courier namespace
       var mlLoading = $("<div>One moment...</div>").appendTo(mljq);
       ml.onNewMatch(
         function(match) {
-          var matchJq = $("<li>Match " +
-              "<a href='/matches/" + match.mid + "'>" + match.mid + "</a>" +
-              "</li>").appendTo(mljq);
+          var matchJq = $("<li>").append(
+              $("<a>", {href: '/matches/' + match.mid}).append(match.mid)
+            ).appendTo(mljq);
           RenderMatchRow($("<div>").appendTo(matchJq), match);
           ml.onMatchDelete(match,
             function() {

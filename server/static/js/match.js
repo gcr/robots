@@ -19,12 +19,14 @@ function Robot (r) {
 
 
 /* ------------------ Match --------------------- */
-function Match(id, auth_code) {
+function Match(id, authCode) {
   // Represents a match.
   this.mid = id;
   this.url = "/matches/" + id;
   this.populating = false;
-  this.auth_code = auth_code;
+  this.starting = false;
+  this.started = false;
+  this.authCode = authCode;
 }
 Match.prototype.populate = function(stream, cb) {
   // Get information about this match and run the callback when we have it.
@@ -114,12 +116,17 @@ Match.prototype.beginStream = function(time) {
 };
 Match.prototype.startMatch = function() {
   // Will try to start the match.
-  // TODO: only if self.auth_code is set.
+  if (this.authCode && !(this.starting || this.started)) {
+    courier.core.ajaxRequest( this.url,
+        {start: true, auth_code: this.authCode});
+  }
 };
 Match.prototype.matchStarted = function() {
   // confused? Match.matchStarted() fires when someone starts the match.
   // However, Match.startMatch() will try to start the match if we have the
   // proper auth code.
+  this.started = true;
+  this.starting = false;
   if (typeof this.onMatchStartCb == 'function') {
     this.onMatchStartCb();
   }
