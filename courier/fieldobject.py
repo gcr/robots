@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import vector
 import field
 
 class FieldObject(object):
@@ -8,7 +9,7 @@ class FieldObject(object):
         self.location = vector.Vector([0, 0])
 
     def __json__(self):
-        return {'location': self.location}
+        return {'type': 'object', 'location': self.location}
 
     def hit(self, damage):
         print str(self) + " hit"
