@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from urlparse import urlsplit
+from urlparse import urlparse, urlsplit
 import urllib2
 import urllib
 import socket
@@ -15,7 +15,7 @@ class Server(object):
     RoboLink API instead unless you're doing something really sneaky.
     """
     # constants - URL builders
-    MATCH = "matches/"
+    MATCH = "matches"
 
     def __init__(self, url="http://localhost:8080"):
         """
@@ -28,15 +28,16 @@ class Server(object):
 
     # useful functions
     @classmethod
-    def url_splice(cls, *parts):
+    def url_concat(cls, *parts):
         """
         splice a URL together; just concatenate it really
         """
         parts = list(parts)
         # remove trailing slash
-        if parts[0].strip()[-1] != '/':
-            parts[0] = parts[0].strip() + "/"
-        return ''.join(parts)
+        for i, path in enumerate(parts):
+            if path.strip().endswith('/'):
+                parts[i] = path.strip()[:-1]
+        return '/'.join(parts)
 
     @classmethod
     def _fetch_raw(cls, url, kwargs=None):
@@ -46,9 +47,7 @@ class Server(object):
         if kwargs:
             url = url + "?" + urllib.urlencode(kwargs)
         print url
-        result = urllib2.urlopen(url).read()
-        print result
-        return result
+        return urllib2.urlopen(url).read()
 
     @classmethod
     def _fetch(cls, url, kwargs):
@@ -80,7 +79,7 @@ class Server(object):
         Register a match, then return a URL of that match.
         """
         kwargs['register'] = 't'
-        result = self._fetch(self.url_splice(self.host, self.MATCH,
+        result = self._fetch(self.url_concat(self.host, self.MATCH,
             self.REGISTER), kwargs)
         return result
 
@@ -121,13 +120,26 @@ class RoboLink(object):
         """
         if not url:
             url = cls.ask_for_url()
-        print "Registering with %s..." % url
-        slot_url = Server.url_splice(url, Server._fetch(url, {'register': 't'}))
-        print slot_url
-        print "Here is your robot's slot: %s" % slot_url
-        print ("If your robot crashes, use that URL next time "
-                "you connect to rejoin the match.\n\nWaiting for game...")
+        # if they already have a url like http://server/matches/aoa/robot_bbb,
+        # then skip the step of registering stuff.
+        path = urlparse(url)[2][1:]
+        #                       ^ urlparse returns a path with a leading slash
+        print path
+        if path.startswith(Server.MATCH):
+            path = path[len(Server.MATCH)+1:]
+            #                            ^ must account for trailing slash
+        print path.split('/')
+        if len(path.split('/')) < 2:
+            print "Registering with match..."
+            slot_url = Server.url_concat(url, Server._fetch(url, {'register': 't'}))
+            print slot_url
+            print "Here is your robot's slot:\n    %s    \n" % slot_url
+            print ("If your robot crashes, use that URL next time "
+                    "you connect to rejoin the match.\n")
+        else:
+            slot_url = url
         kwargs['connect'] = 't'
+        print "Waiting for game to start..."
         return Robot(url, Server._fetch(slot_url, kwargs))
 
 class RobotException(Exception):

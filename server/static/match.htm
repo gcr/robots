@@ -17,14 +17,16 @@ oh hello, welcome!
             var authCode = courier.core.readCookie(matchId);
             var m = new courier.match.Match(matchId, courier.core.readCookie(matchId));
             courier.ui.WatchMatchRobots(m, $(".robotlist"));
+            var startBtn = $("#startmatch");
             if (authCode) {
-                $("#startmatch").click(
+                startBtn.click(
                     function() {
+                        startBtn.remove();
                         m.startMatch();
                         return false;
                     });
             } else {
-                $("#startmatch").remove();
+                startBtn.remove();
             }
             courier.drawing.followField(m, $("#field"));
             m.populate(true);

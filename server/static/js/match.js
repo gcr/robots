@@ -114,12 +114,17 @@ Match.prototype.beginStream = function(time) {
         }
       });
 };
-Match.prototype.startMatch = function() {
+Match.prototype.startMatch = function(cb) {
   // Will try to start the match.
   if (this.authCode && !(this.starting || this.started)) {
     this.starting = true;
     courier.core.ajaxRequest( this.url,
-        {start: true, auth_code: this.authCode}, function(){});
+        {start: true, auth_code: this.authCode},
+        function() {
+          if (typeof cb == 'function') {
+            cb();
+          }
+        });
   }
 };
 Match.prototype.matchStarted = function() {
