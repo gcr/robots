@@ -26,7 +26,7 @@ function ajaxRequest(url, data, cb) {
         if (e == 'timeout') {
           ajaxRequest(url, data, cb);
         } else {
-          alert("An error! " + e);
+          alert("Oh no! An error appeared, and I can't fix it! " + e);
         }
       }
   });

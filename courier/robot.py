@@ -35,7 +35,8 @@ class Robot(fieldobject.FieldObject):
                 #'location': self.location, # dangerous!
                 'armor': self.armor,
                 'heat': self.heat,
-                'rotation': self.rotation}
+                'rotation': self.rotation,
+                'turret_rot': self.turret_rot}
 
     def __str__(self):
         return "<Robot '%s' (%s armor)>" % (self.name, self.armor)

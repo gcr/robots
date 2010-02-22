@@ -8,7 +8,7 @@ from twisted.python import log
 class ErrorJsonRequest(server.Request):
     def processingFailed(self, reason):
         log.err(reason)
-        self.setResponseCode(http.INTERNAL_SERVER_ERROR)
+        #self.setResponseCode(http.INTERNAL_SERVER_ERROR)
         ErrorResource(reason.value[0]).render(self)
         return reason
 

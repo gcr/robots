@@ -43,7 +43,7 @@ Match.prototype.populate = function(stream, cb) {
       self.robots = [];
       // the following is a callback. each one should correspond to one slot
       // in self.robots. Be sure to keep track of this and keep it updated!
-     self.onDisconnectRobotCb = [];
+      self.onDisconnectRobotCb = [];
       for (var i = 0,l = minfo.robots.length; i < l; i++) {
         self.newSlot();
         if (minfo.robots[i]) {
@@ -172,7 +172,7 @@ Match.prototype.removeSlot = function() {
   for (var i=0,l=this.robots.length; i<l; i++) {
     if (this.robots[i] === null) {
       this.robots.splice(i, 1);
-      this.onDisconnectRobot.splice(i, 1);
+      this.onDisconnectRobotCb.splice(i, 1);
       if (typeof this.onRemoveSlotCb == 'function') {
         this.onRemoveSlotCb();
       }
