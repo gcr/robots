@@ -46,7 +46,6 @@ class Server(object):
         """
         if kwargs:
             url = url + "?" + urllib.urlencode(kwargs)
-        print url
         return urllib2.urlopen(url).read()
 
     @classmethod
@@ -124,15 +123,12 @@ class RoboLink(object):
         # then skip the step of registering stuff.
         path = urlparse(url)[2][1:]
         #                       ^ urlparse returns a path with a leading slash
-        print path
         if path.startswith(Server.MATCH):
             path = path[len(Server.MATCH)+1:]
             #                            ^ must account for trailing slash
-        print path.split('/')
         if len(path.split('/')) < 2:
             print "Registering with match..."
             slot_url = Server.url_concat(url, Server._fetch(url, {'register': 't'}))
-            print slot_url
             print "Here is your robot's slot:\n    %s    \n" % slot_url
             print ("If your robot crashes, use that URL next time "
                     "you connect to rejoin the match.\n")
