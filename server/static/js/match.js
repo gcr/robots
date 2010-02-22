@@ -116,7 +116,6 @@ Match.prototype.beginStream = function(time) {
 };
 Match.prototype.startMatch = function() {
   // Will try to start the match.
-  console.log("Starting match...");
   if (this.authCode && !(this.starting || this.started)) {
     this.starting = true;
     courier.core.ajaxRequest( this.url,

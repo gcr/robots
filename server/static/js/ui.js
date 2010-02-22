@@ -53,14 +53,6 @@ courier.ui = (function() { // begin courier namespace
         });
     }
 
-    function DrawField(match, field) {
-      // Draw the field to the field() object.
-      match.onFieldUpdate(
-          function(field) {
-            console.log(field);
-          });
-    }
-
     function WatchMatchRobots(m, list) {
       // Give me a match, and I'll be sure to keep list updated with the list
       // of robots. I'll watch to see whether they disconnect or if new ones
@@ -107,17 +99,12 @@ courier.ui = (function() { // begin courier namespace
             var e_slot_jq = empty_slots.splice(0, 1)[0];
             e_slot_jq.remove();
           });
-      m.onMatchStart(
-          function () {
-            console.log("Match started.");
-          });
     }
 
     return {
       RenderMatchList: RenderMatchList,
       RenderRobotRow: RenderRobotRow,
       RenderMatchRow: RenderMatchRow,
-      WatchMatchRobots: WatchMatchRobots,
-      DrawField: DrawField
+      WatchMatchRobots: WatchMatchRobots
     };
 })();
