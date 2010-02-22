@@ -93,6 +93,7 @@ class Game(object):
         """
         Disconnects the robot from the game.
         """
+        print "Disconnected %s" % robot_id
         if self.on_disconnect_robot_cb:
             self.on_disconnect_robot_cb(self.robots[robot_id])
         self.robots[robot_id] = None

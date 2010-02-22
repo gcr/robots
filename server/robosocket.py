@@ -46,8 +46,11 @@ class RoboResource(resource.Resource):
             print "Robot %s will join!" % self.robot_id
             JsonResource(self.game.robots[self.robot_id]).render(request)
         queue_defr.addCallback(when_match_starts)
-        queue_defr.addErrback(lambda result:
-                ErrorResource(result.value[0]).render(request))
+        def when_req_canceled(result):
+            # if another robot with our robot ID joins
+            self.game.disconnect_robot(self.robot_id)
+            ErrorResource(result.value[0]).render(request)
+        queue_defr.addErrback(when_req_canceled)
         # if the robot ever loses its http connection, then we'll simply
         # remove it, BUT ONLY if the match hasn't started.
         reqdefr = request.notifyFinish()
