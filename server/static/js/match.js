@@ -140,9 +140,8 @@ Match.prototype.matchStarted = function() {
 };
 Match.prototype.newSlot = function() {
   // Make a new blank slot.
-  var l = this.robots.length;
-  this.robots[l] = null;
-  this.onDisconnectRobotCb[l] = null;
+  this.robots.push(null);
+  this.onDisconnectRobotCb.push(null);
   if (typeof this.onNewSlotCb == 'function') {
     this.onNewSlotCb();
   }
