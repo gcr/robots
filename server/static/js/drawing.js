@@ -48,7 +48,7 @@ courier.drawing = (function() { // begin courier namespace
     Field.prototype.render = function(field) {
       // This gets run at every field update.
       // field: {"width": 1024, heigth: 1025,
-      //    "objects": [
+      //    "objects": [ # see FieldObject.field_info() in fieldobject.py, robot.py
       //           {'type': 'robot', 'location': [23, 35], ...}
       //        ]
       // }
@@ -57,11 +57,14 @@ courier.drawing = (function() { // begin courier namespace
 
       ctx.clearRect(0,0,this.width,this.height);
       this.withTransform(
-        function(ctx) {
+        function() {
           for (var i=0,l=field.objects.length; i<l; i++) {
             switch (field.objects[i].type) {
               case 'robot':
                 self.drawRobot(field.objects[i]);
+                break;
+              case 'object':
+                // default
                 break;
             }
           }
