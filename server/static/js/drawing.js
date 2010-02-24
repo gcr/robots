@@ -7,7 +7,16 @@ var courier = courier || {};
 
 courier.drawing = (function() { // begin courier namespace
 
-    function withTransform(ctx, width, height, wantWidth, wantHeight, cb) {
+    function Field(width, height, jq) {
+      this.jq = jq;
+      this.actual_width = jq[0].width;
+      this.actual_height = jq[0].width;
+      this.width = width;
+      this.height = height;
+      this.ctx = jq[0].getContext('2d');
+    }
+    Field.prototype.withTransform = function(cb) {
+      var ctx = this.ctx;
       ctx.save();
       // we have:
       // lower left is 0, height
@@ -15,14 +24,16 @@ courier.drawing = (function() { // begin courier namespace
       // we want:
       // lower left corner to be 0, 0
       // upper right corner to be 1000, 1000
-      ctx.translate(0, height);
-      ctx.scale((width/wantWidth), -(height/wantHeight));
-      cb();
+      ctx.translate(0, this.actual_height);
+      ctx.scale((this.actual_width/this.width), -(this.actual_height/this.height));
+      cb(ctx);
       ctx.restore();
-    }
-
-    function drawRobot(ctx, width, height, rob) {
+    };
+    Field.prototype.drawRobot = function(rob) {
       // Renders a robot at location with rotation and a certain color.
+      // Not really a proper robot object; more like a dictionary that the
+      // server returns. See FieldObject.field_info()
+      var ctx = this.ctx;
       ctx.save();
           ctx.translate(rob.location[0], rob.location[1]);
           ctx.rotate(-rob.rotation);
@@ -33,37 +44,38 @@ courier.drawing = (function() { // begin courier namespace
           ctx.lineTo(-15, -15);
           ctx.fill();
       ctx.restore();
-    }
-
-    function renderField(field, jq) {
+    };
+    Field.prototype.render = function(field) {
       // This gets run at every field update.
       // field: {"width": 1024, heigth: 1025,
       //    "objects": [
       //           {'type': 'robot', 'location': [23, 35], ...}
       //        ]
       // }
-      var ctx = jq[0].getContext('2d');
-      var width = jq[0].width;
-      var height = jq[0].height;
-      ctx.clearRect(0,0,width,height);
-      withTransform(ctx, width, height, field.width, field.height,
-        function() {
+      var self = this;
+      var ctx = this.jq[0].getContext('2d');
+
+      ctx.clearRect(0,0,this.width,this.height);
+      this.withTransform(
+        function(ctx) {
           for (var i=0,l=field.objects.length; i<l; i++) {
             switch (field.objects[i].type) {
               case 'robot':
-                drawRobot(ctx, width, height, field.objects[i]);
+                self.drawRobot(field.objects[i]);
                 break;
             }
           }
         });
-    }
+    };
 
     function followField(m, jq) {
       // We'll set up our field so that when M updates, the <canvas /> in jq
       // will too.
+      var f = new Field(m.field_size[0], m.field_size[1], jq);
+      console.log(m.field_size);
       m.onFieldUpdate(
-        function(field) {
-          renderField(field, jq);
+        function(field_dat) {
+          f.render(field_dat);
         });
     }
 

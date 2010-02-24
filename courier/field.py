@@ -19,6 +19,12 @@ class Field:
         self.on_hit_cb = None
         self.on_pump_cb = None
 
+    def __json__(self):
+        """
+        Return a JSON representation of this field.
+        """
+        return {'objects': [obj.field_info() for obj in self.objects]}
+
     def on_pump(self, f):
         """
         Will run this callback every time we 'pump' the field. The argument
@@ -39,14 +45,6 @@ class Field:
         """ Assigns a callback to be called whenever an object is hit. This
         callback will be passed the object that was hit and its location. """
         self.on_hit_cb = f
-
-    def __json__(self):
-        """
-        Return a JSON representation of this field.
-        """
-        return {'width': self.width,
-                'height': self.height,
-                'objects': [obj.field_info() for obj in self.objects]}
 
     def splashdamage(self, loc, damage):
         """

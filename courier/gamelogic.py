@@ -31,7 +31,8 @@ class Game(object):
 
     def __json__(self):
         return {'gametime': self.time,
-                'robots': [self.robots[r] for r in self.robots]}
+                'robots': [self.robots[r] for r in self.robots],
+                'field_size': (self.field.width, self.field.height)}
 
     def start(self):
         assert self.time == 0, "This game is in-progress."

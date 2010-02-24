@@ -28,8 +28,10 @@ oh hello, welcome!
             } else {
                 startBtn.remove();
             }
-            courier.drawing.followField(m, $("#field"));
-            m.populate(true);
+            m.populate(true, 
+                function(match) {
+                    courier.drawing.followField(match, $("#field"));
+                });
         });
     </script>
 {% endblock %}
