@@ -30,13 +30,20 @@ class Robot(fieldobject.FieldObject):
         self.heatsink = [0.75, 1.0, 1.125, 1.25, 1.33, 1.5][heatsink]
 
     def __json__(self):
+        return {'name': self.name,
+                'armor': self.armor,
+                'heat': self.heat}
+
+    def field_info(self):
+        # return enough information for the client to draw on the screen. This
+        # should usually be kept secret (ie not in self.__json__).
         return {'type': 'robot',
                 'name': self.name,
-                #'location': self.location, # dangerous!
-                'armor': self.armor,
-                'heat': self.heat,
+                'location': self.location,
                 'rotation': self.rotation,
-                'turret_rot': self.turret_rot}
+                'turret_rot': self.turret_rot,
+                'speed': self.speed,
+               }
 
     def __str__(self):
         return "<Robot '%s' (%s armor)>" % (self.name, self.armor)

@@ -11,6 +11,11 @@ class FieldObject(object):
     def __json__(self):
         return {'type': 'object', 'location': self.location}
 
+    def field_info(self):
+        # The field will send this information to the client. It should be
+        # enough to draw on the screen.
+        return {'type': 'object', 'location': self.location}
+
     def hit(self, damage):
         print str(self) + " hit"
         pass

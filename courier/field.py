@@ -46,7 +46,7 @@ class Field:
         """
         return {'width': self.width,
                 'height': self.height,
-                'objects': [(obj.location, obj) for obj in self.objects]}
+                'objects': [obj.field_info() for obj in self.objects]}
 
     def splashdamage(self, loc, damage):
         """

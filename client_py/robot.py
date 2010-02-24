@@ -92,8 +92,6 @@ class Robot(object):
         self.name = data['name']
         self.armor = data['armor']
         self.heat = data['heat']
-        self.rotation = data['rotation']
-        self.turret_rot = data['turret_rot']
         print self
 
     def __str__(self):

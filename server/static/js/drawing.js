@@ -21,11 +21,11 @@ courier.drawing = (function() { // begin courier namespace
       ctx.restore();
     }
 
-    function drawRobot(ctx, width, height, location, rotation, color) {
+    function drawRobot(ctx, width, height, rob) {
       // Renders a robot at location with rotation and a certain color.
       ctx.save();
-          ctx.translate(location[0], location[1]);
-          ctx.rotate(-rotation);
+          ctx.translate(rob.location[0], rob.location[1]);
+          ctx.rotate(-rob.rotation);
           ctx.beginPath();
           ctx.moveTo(0, 25);
           ctx.lineTo(15, -15);
@@ -39,9 +39,7 @@ courier.drawing = (function() { // begin courier namespace
       // This gets run at every field update.
       // field: {"width": 1024, heigth: 1025,
       //    "objects": [
-      //        [[422, 133],
-      //            {"armor": 100, "heat": 0, "type": "robot", "name": "power
-      //            eating bot", 'rotation': 3}]
+      //           {'type': 'robot', 'location': [23, 35], ...}
       //        ]
       // }
       var ctx = jq[0].getContext('2d');
@@ -50,13 +48,10 @@ courier.drawing = (function() { // begin courier namespace
       ctx.clearRect(0,0,width,height);
       withTransform(ctx, width, height, field.width, field.height,
         function() {
-          var loc, obj;
           for (var i=0,l=field.objects.length; i<l; i++) {
-            loc = field.objects[i][0];
-            obj = field.objects[i][1];
-            switch (obj.type) {
+            switch (field.objects[i].type) {
               case 'robot':
-                drawRobot(ctx, width, height, loc, obj.rotation);
+                drawRobot(ctx, width, height, field.objects[i]);
                 break;
             }
           }
