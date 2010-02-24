@@ -46,11 +46,11 @@ class RoboResource(resource.Resource):
             print "Robot %s will join!" % self.robot_id
             JsonResource(self.game.robots[self.robot_id]).render(request)
         queue_defr.addCallback(when_match_starts)
-        def when_req_canceled(result):
+        def when_duplicate_connection(result):
             # if another robot with our robot ID joins
             self.game.disconnect_robot(self.robot_id)
             ErrorResource(result.value[0]).render(request)
-        queue_defr.addErrback(when_req_canceled)
+        queue_defr.addErrback(when_duplicate_connection)
         # if the robot ever loses its http connection, then we'll simply
         # remove it, BUT ONLY if the match hasn't started.
         reqdefr = request.notifyFinish()
@@ -71,6 +71,11 @@ class RoboResource(resource.Resource):
             assert 'connect' in request.args, ("Match hasn't started yet! "
                     "You must connect first!")
             return self.connect_new_robot(request)
-        # match started
-        pass
+        else:
+            # match started
+            if 'connect' in request.args:
+                # reunite them with their existing robot.
+                JsonResource(self.robot).render(request)
+                return server.NOT_DONE_YET
+        raise KeyError, "Invalid Command"
         return server.NOT_DONE_YET

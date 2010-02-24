@@ -74,7 +74,8 @@ class Game(object):
     def on_remove_slot(self, f):
         """
         runs f when a robot is removed from the game. the client should just
-        take it out of its robot list.
+        take it out of its robot list, we will ALWAYS disconnect the robot
+        first.
         """
         self.on_remove_slot_cb = f
 
@@ -155,6 +156,9 @@ class Game(object):
         defr = game.robot_action('foo', 'scan', size=23)
         defr.addCallback(lambda result: request.send(result))
         (keep in mind that deferreds are chained)
+        You'd probably want to render it in a JSON resource of course.
+        HOWEVER. Keep in mind two things: 1. that sometimes this can fail (be
+        sure to set errbacks!) and 2. don't actually set this; subclass it.
         """
         assert robot_id in self.robots and self.robots[robot_id] ("This robot "
             "doesn't exist!")
@@ -165,6 +169,7 @@ class Game(object):
         """
         Is the game finished?
         """
+        # Subclass this.
         pass
 
 

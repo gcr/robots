@@ -19,11 +19,12 @@ class Match(resource.Resource):
     handles what to do with the client.
     """
     GAME_LOGIC = gamelogic.ATRobotsInspiredGame
+    MIN_MATCH_SPEED = 0.05               # fastest match allowed
 
     def __init__(self, matchlist, speed=5.0, public=True, start_timeout=0,
             lockstep=False):
         """
-        True: whether the match will show up on public listings (still will
+        public: whether the match will show up on public listings (still will
             always grant a slot if someone knows the s33krit match URL)
         Speed: how long to wait for slow robot clients to do something before
             skipping their turn
@@ -76,10 +77,9 @@ class Match(resource.Resource):
         self.game.on_new_robot(on_new_robot)
 
     def start(self, auth_code):
-         # Start the match, but don't do a tick right away. clear game.robots
-         # by removing objects that had None, then set the timer.
-         # If there are no robots connected, then remove
-         # ourselves from the match list.
+         # Start the match. Clear game.robots by removing objects that had
+         # None, then set the timer. If there are no robots connected, then
+         # remove ourselves from the match list.
          assert auth_code == self.auth_code, "Authentication code is incorrect."
          self.started = True
          empty_robots = [rid for rid in self.game.robots if not self.game.robots[rid]]
@@ -118,6 +118,8 @@ class Match(resource.Resource):
         """
         twisted: returns the robot that the client wanted
         """
+        if robot_id == '':
+            return self
         # oh, they want an actual robot? aw. oh well.
         assert robot_id in self.game.robots, "Your robot doesn't exist!"
         # the RoboResource will handle and this request. twisted.web is happy
@@ -155,7 +157,7 @@ class Matches(resource.Resource):
     You can browse the matches by heading to http://server_url/matches and can
     register your own by going to http://server_url/matches/register.
     """
-    MIN_MATCH_SPEED = 0.05               # fastest match allowed
+    MATCH_TYPE = Match
 
     def __init__(self):
         resource.Resource.__init__(self)
@@ -180,7 +182,7 @@ class Matches(resource.Resource):
                 args['public'] = utils.is_trueish(request.args['public'][0]);
             if 'speed' in request.args:
                 assert (float(request.args['speed'][0]) >
-                    self.__class__.MIN_MATCH_SPEED), "Match can't be that fast!"
+                    self.MATCH_TYPE.MIN_MATCH_SPEED), "Match can't be that fast!"
                 args['speed'] = float(request.args['speed'][0])
             if 'start_timeout' in request.args:
                 args['start_timeout'] = float(request.args['start_timeout'][0])
@@ -216,7 +218,7 @@ class Matches(resource.Resource):
         n = utils.random_string(8)
         if n in self.matches:
             return self.register_new(**kwargs)
-        self.matches[n] = Match(self, **kwargs)
+        self.matches[n] = self.MATCH_TYPE(self, **kwargs)
         print "New match registered: %s" % n
         # append to history for long-polling clients
         if self.matches[n].public:
