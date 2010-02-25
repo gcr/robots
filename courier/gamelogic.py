@@ -203,6 +203,11 @@ class ATRobotsInspiredGame(Game):
             d.addCallback(lambda _:
                     self.robots[robot_id].set_throttle(kwargs['amount']))
             return d
+        elif action_str == 'location':
+            d = self.set_future(3, robot_id)
+            d.addCallback(lambda _:
+                    self.robots[robot_id].location)
+            return d
         raise KeyError, "Invalid command!"
 
 

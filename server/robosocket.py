@@ -95,6 +95,8 @@ class RoboResource(resource.Resource):
             elif 'throttle' in request.args:
                 amount = utils.verify_float(request.args, 'amount')
                 return self.dispatch_game_action(request, 'throttle', amount=amount)
+            elif 'location' in request.args:
+                return self.dispatch_game_action(request, 'location')
 
         raise KeyError, "Invalid Command"
         return server.NOT_DONE_YET

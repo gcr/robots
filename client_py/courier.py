@@ -80,6 +80,10 @@ class Robot(object):
         """
         return fetch(self.url, {'throttle': 't', 'amount': amount})
 
+    @property
+    def location(self):
+        return fetch(self.url, {'location': 't'})
+
 class Match(object):
     @classmethod
     def register_new(cls, url, **kwargs):
