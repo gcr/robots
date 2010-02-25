@@ -58,8 +58,6 @@ class Robot(fieldobject.FieldObject):
         Performs time-sensitive actions over a tic.
         - Accelerates or decelerates
         - Rotates self by ever so much
-        - Detects collisions against robots and other walls, stops and hits self
-          if necessary.
         - Reduces heat
         """
         if self.dead or self.heat > 350:
@@ -78,6 +76,10 @@ class Robot(fieldobject.FieldObject):
             self.speed += speed_diff
         else:
             self.speed += accel if speed_diff>0 else -accel
+        # change positions
+        self.location = self.location + vector.Vector(
+                [math.sin(self.rotation),
+                 math.cos(self.rotation)]) * self.speed
 
     def hit(self, damage):
         """
@@ -127,16 +129,13 @@ class Robot(fieldobject.FieldObject):
         self.steer = vector.angle_normalize(self.steer + amount)
         return amount
 
-    def get_throttle(self):
-        return self.throttle
     def set_throttle(self, amount):
         """
         set our throttle to be between -self.engine*5 and self.engine*10
         expects a percentage
         """
-        amount = max(-50, min(amount, 100))
+        amount = max(-.5, min(amount/100., 1))
         self.throttle = 10*self.engine*amount
-    throttle = property(get_throttle, set_throttle)
 
     @property
     def dead(self):

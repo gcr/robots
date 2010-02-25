@@ -44,8 +44,14 @@ class Vector(list):
         return Vector([p+q for p,q in zip(self,other)])
 
     def __mul__(self, other):
-        " Dot product "
-        return sum([p*q for p,q in zip(self, other)])
+        """
+        Dot product unless other is a scalar in which case we return the
+        scalar product
+        """
+        if isinstance(other, Vector):
+            return sum([p*q for p,q in zip(self, other)])
+        else:
+            return Vector([p*other for p in self])
 
     def __div__(self, other):
         pass
