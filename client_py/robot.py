@@ -7,10 +7,6 @@ import urllib
 import socket
 import json
 
-URL_CONFIG = {
-        'matches': 'match',
-}
-
 def fetch_raw(url, kwargs=None):
     """
     Fetch something from a web page, optionally encoding keyword arguments
@@ -57,6 +53,11 @@ class Robot(object):
     """
     A robot held on the client side.
     """
+    @classmethod
+    def connect(self, slot_url, **kwargs):
+        kwargs['connect'] = 't'
+        return Robot(slot_url, fetch_persist(slot_url, kwargs))
+
     def __init__(self, url, data):
         # see: courier/robot.py Robot.__json__
         self.url = url
@@ -73,6 +74,37 @@ class Robot(object):
         """
         return fetch(self.url, {'steer': 't', 'amount': amount})
 
+class Match(object):
+    @classmethod
+    def from_url(cls, url):
+        try:
+            data = fetch(url, {'info': 't'})
+        except RobotException:
+            return False
+        print data
+        if not ('started' in data and 'init_time' in data and 'gametime' in data
+                and 'public' in data):
+            return False
+        return Match(url, data['started'],
+                data['init_time'],
+                data['gametime'],
+                data['public'])
+
+    def __init__(self, url, started, init_time, gametime, public):
+        self.url = url
+        self.started = started
+        self.init_time = init_time
+        self.gametime = gametime
+        self.public = public
+
+    def register_slot(self):
+        print "Connecting..."
+        slot_url = url_concat(self.url, fetch(self.url, {'register': 't'}))
+        print "Here is your robot's slot:\n    %s    \n" % slot_url
+        print ("If your robot crashes, use that URL next time "
+                "you connect to rejoin the match.\n")
+        return slot_url
+
 class RoboLink(object):
     """
     Handles connecting to a match and such.
@@ -86,26 +118,6 @@ class RoboLink(object):
         return raw_input("> ")
 
     @classmethod
-    def register_slot(cls, url):
-        """
-        Returns a URL to a slot in a match.
-        """
-        path = urlparse(url)[2][1:]
-        #                       ^ urlparse returns a path with a leading slash
-        if path.startswith(URL_CONFIG['matches']):
-            path = path[len(URL_CONFIG['matches'])+1:]
-            #                            ^ must account for trailing slash
-        if len(path.split('/')) < 2:
-            print "Registering with match..."
-            slot_url = url_concat(url, fetch(url, {'register': 't'}))
-            print "Here is your robot's slot:\n    %s    \n" % slot_url
-            print ("If your robot crashes, use that URL next time "
-                    "you connect to rejoin the match.\n")
-        else:
-            slot_url = url
-        return slot_url
-
-    @classmethod
     def connect(cls, url=None, **kwargs):
         """
         Returns a robot bound to a slot in a match. This call will likely
@@ -113,12 +125,17 @@ class RoboLink(object):
         """
         if not url:
             url = cls.ask_for_url()
-        # if they already have a url like http://server/matches/aoa/robot_bbb,
-        # then skip the step of registering stuff.
-        kwargs['connect'] = 't'
-        slot_url = cls.register_slot(url)
+        match = Match.from_url(url)
+        if match:
+            # if they already have a url like http://server/matches/aoa/robot_bbb,
+            # then skip the step of registering stuff and just reconnect them.
+            try:
+                url = match.register_slot()
+            except RobotException:
+                print "That's not a match URL!"
+                return False
         print "Waiting for game to start..."
-        return Robot(slot_url, fetch_persist(slot_url, kwargs))
+        return Robot.connect(url)
 
     @classmethod
     def register_match(cls, url, **kwargs):
@@ -126,7 +143,7 @@ class RoboLink(object):
         Register a match, then return a URL of that match.
         """
         kwargs['register'] = 't'
-        result = fetch(url_concat(url, URL_CONFIG['matches']), kwargs)
+        result = fetch(url_concat(url, 'matches'), kwargs)
         return result
 
 class RobotException(Exception):

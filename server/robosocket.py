@@ -64,6 +64,9 @@ class RoboResource(resource.Resource):
 
     def render_GET(self, request):
         " What to do when they connect to our URL "
+        if 'info' in request.args:
+            JsonResource(self.robot).render(request)
+            return server.NOT_DONE_YET
         if not self.match.started:
             assert 'connect' in request.args, ("Match hasn't started yet! "
                     "You must connect first!")
