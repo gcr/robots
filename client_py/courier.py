@@ -161,7 +161,9 @@ class RoboLink(object):
                 print "That's not a match URL!"
                 return False
         print "Waiting for game to start..."
-        return Robot.connect(url, **kwargs)
+        r =  Robot.connect(url, **kwargs)
+        print "Connected."
+        return r
 
 class RobotException(Exception):
     pass

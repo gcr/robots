@@ -126,7 +126,7 @@ class Robot(fieldobject.FieldObject):
         """
         Steers ourselves by rotation.
         """
-        self.steer = vector.angle_normalize(self.steer + amount)
+        self.steer = vector.angle_normalize(self.rotation + amount)
         return amount
 
     def set_throttle(self, amount):
