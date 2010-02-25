@@ -63,12 +63,16 @@ class Robot(fieldobject.FieldObject):
           if necessary.
         - Reduces heat
         """
-        if not self.dead and self.heat < 350:
-            angle_diff = vector.angle_normalize(self.steer - self.rotation)
-            if angle_diff < 0:
-                self.rotation -= min(abs(angle_diff), self.engine/5)
-            elif angle_diff > 0:
-                self.rotation += min(abs(angle_diff), self.engine/5)
+        if self.dead or self.heat > 350:
+            return
+        # change angles
+        bearing = vector.angle_normalize(self.steer - self.rotation)
+        angle_diff = self.engine/5
+        print self.rotation, bearing
+        if abs(bearing) < angle_diff:
+            self.rotation += bearing
+        else:
+            self.rotation += angle_diff if bearing>0 else -angle_diff
 
     def hit(self, damage):
         """
