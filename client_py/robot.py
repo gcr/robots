@@ -1,89 +1,61 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from urlparse import urlparse, urlsplit
+from urlparse import urlparse, urlunparse
 import urllib2
 import urllib
 import socket
 import json
 
-class Server(object):
+URL_CONFIG = {
+        'matches': 'match',
+}
+
+def fetch_raw(url, kwargs=None):
     """
-    This represents a fairly low-level link with a server.
-    With the power of this class, you can talk directly to the server, fetch the
-    results of a web page, etc. You'll likely want to use the higher level
-    RoboLink API instead unless you're doing something really sneaky.
+    Fetch something from a web page, optionally encoding keyword arguments
     """
-    # constants - URL builders
-    MATCH = "matches"
+    urlparsed = urlparse(url)
+    urlparsed = urlparsed[0:4] + tuple([urllib.urlencode(kwargs)]) + urlparsed[5:]
+    return urllib2.urlopen(urlunparse(urlparsed)).read()
 
-    def __init__(self, url="http://localhost:8080"):
-        """
-        Pass in a server URL, get a server object out. This won't work if your
-        server is hosted as a subdirectory e.g.
-        http://foobar:8080/robot_battles/
-        """
-        u = urlsplit(url)
-        self.host = "%s://%s" % (u[0], u[1])
+def fetch(url, kwargs):
+    """
+    Fetch a JSON object from a web page, encoding keyword parameters
+    """
+    result = json.loads(fetch_raw(url, kwargs))
+    # a 'exception' is when the server signals the client that something
+    # went wrong
+    if isinstance(result, dict) and 'exception' in result:
+        raise RobotException(result['exception'])
+    return result
 
-    # useful functions
-    @classmethod
-    def url_concat(cls, *parts):
-        """
-        splice a URL together; just concatenate it really
-        """
-        parts = list(parts)
-        # remove trailing slash
-        for i, path in enumerate(parts):
-            if path.strip().endswith('/'):
-                parts[i] = path.strip()[:-1]
-        return '/'.join(parts)
+def fetch_persist(url, kwargs=None):
+    """
+    Fetch a JSON object from a web page, retrying in case of timeouts
+    """
+    try:
+        return fetch(url, kwargs)
+    except urllib2.URLError, e:
+        if isinstance(e.reason, socket.timeout):
+            return fetch_persist(url, kwargs)
+        else:
+            raise e
 
-    @classmethod
-    def _fetch_raw(cls, url, kwargs=None):
-        """
-        Fetch something from a web page, optionally encoding keyword arguments
-        """
-        if kwargs:
-            url = url + "?" + urllib.urlencode(kwargs)
-        return urllib2.urlopen(url).read()
-
-    @classmethod
-    def _fetch(cls, url, kwargs):
-        """
-        Fetch a JSON object from a web page, encoding keyword parameters
-        """
-        result = json.loads(cls._fetch_raw(url, kwargs))
-        # a 'exception' is when the server signals the client that something
-        # went wrong
-        if isinstance(result, dict) and 'exception' in result:
-            raise RobotException(result['exception'])
-        return result
-
-    @classmethod
-    def _fetch_persist(cls, url, kwargs=None):
-        """
-        Fetch a JSON object from a web page, retrying in case of timeouts
-        """
-        try:
-            return cls._fetch(url, kwargs)
-        except urllib2.URLError, e:
-            if isinstance(e.reason, socket.timeout):
-                return cls._fetch_persist(url, kwargs)
-            else:
-                raise e
-
-    def register_match(self, **kwargs):
-        """
-        Register a match, then return a URL of that match.
-        """
-        kwargs['register'] = 't'
-        result = self._fetch(self.url_concat(self.host, self.MATCH), kwargs)
-        return result
+def url_concat(*parts):
+    """
+    splice a URL together; just concatenate it really
+    """
+    parts = list(parts)
+    # remove trailing slash
+    for i, path in enumerate(parts):
+        if path.strip().endswith('/'):
+            parts[i] = path.strip()[:-1]
+    return '/'.join(parts)
 
 class Robot(object):
     """
-    A robot with things that you can do.
+    A robot held on the client side.
     """
     def __init__(self, url, data):
         # see: courier/robot.py Robot.__json__
@@ -99,7 +71,7 @@ class Robot(object):
         """
         Steer ourselves by amount (relative)
         """
-        return Server._fetch(self.url, {'steer': 't', 'amount': amount})
+        return fetch(self.url, {'steer': 't', 'amount': amount})
 
 class RoboLink(object):
     """
@@ -114,6 +86,26 @@ class RoboLink(object):
         return raw_input("> ")
 
     @classmethod
+    def register_slot(cls, url):
+        """
+        Returns a URL to a slot in a match.
+        """
+        path = urlparse(url)[2][1:]
+        #                       ^ urlparse returns a path with a leading slash
+        if path.startswith(URL_CONFIG['matches']):
+            path = path[len(URL_CONFIG['matches'])+1:]
+            #                            ^ must account for trailing slash
+        if len(path.split('/')) < 2:
+            print "Registering with match..."
+            slot_url = url_concat(url, fetch(url, {'register': 't'}))
+            print "Here is your robot's slot:\n    %s    \n" % slot_url
+            print ("If your robot crashes, use that URL next time "
+                    "you connect to rejoin the match.\n")
+        else:
+            slot_url = url
+        return slot_url
+
+    @classmethod
     def connect(cls, url=None, **kwargs):
         """
         Returns a robot bound to a slot in a match. This call will likely
@@ -123,22 +115,19 @@ class RoboLink(object):
             url = cls.ask_for_url()
         # if they already have a url like http://server/matches/aoa/robot_bbb,
         # then skip the step of registering stuff.
-        path = urlparse(url)[2][1:]
-        #                       ^ urlparse returns a path with a leading slash
-        if path.startswith(Server.MATCH):
-            path = path[len(Server.MATCH)+1:]
-            #                            ^ must account for trailing slash
-        if len(path.split('/')) < 2:
-            print "Registering with match..."
-            slot_url = Server.url_concat(url, Server._fetch(url, {'register': 't'}))
-            print "Here is your robot's slot:\n    %s    \n" % slot_url
-            print ("If your robot crashes, use that URL next time "
-                    "you connect to rejoin the match.\n")
-        else:
-            slot_url = url
         kwargs['connect'] = 't'
+        slot_url = cls.register_slot(url)
         print "Waiting for game to start..."
-        return Robot(slot_url, Server._fetch_persist(slot_url, kwargs))
+        return Robot(slot_url, fetch_persist(slot_url, kwargs))
+
+    @classmethod
+    def register_match(cls, url, **kwargs):
+        """
+        Register a match, then return a URL of that match.
+        """
+        kwargs['register'] = 't'
+        result = fetch(url_concat(url, URL_CONFIG['matches']), kwargs)
+        return result
 
 class RobotException(Exception):
     pass
