@@ -76,7 +76,8 @@ Match.prototype.beginStream = function(time) {
     return null;
   }
   var self = this;
-  this.sh = new courier.core.StreamingHistory(this.url + "?history=t",
+  this.sh = new courier.core.SlowStreamingHistory(10*this.speed, this.speed);
+  this.sh.beginStream(this.url + "?history=t",
       time,
       function(action) {
         // This handles what to do when the server tells us something.

@@ -43,7 +43,8 @@ MatchList.prototype.populate = function(stream, cb) {
 MatchList.prototype.beginStream = function(time) {
   // start streaming since 'time'
   var self = this;
-  this.sh = new courier.core.StreamingHistory("/matches?history=t",
+  this.sh = new courier.core.StreamingHistory();
+  this.sh.beginStream("/matches?history=t",
     time,
     function (action) {
       if ('added' in action) {

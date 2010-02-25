@@ -32,14 +32,17 @@ function ajaxRequest(url, data, cb) {
   });
 }
 
-function StreamingHistory(url, state, cb) {
-  /// This object will run a callback when something on the server changes.
-  /// Give it a URL to ping and a callback to execute whenever that
-  /// happens and it'll go on its way. Whenever the server does something,
-  /// the callback will run with the server's response. This is done in such
-  /// a way so you won't ever skip history you missed.
+function StreamingHistory() {
+  // This object will run a callback when something on the server changes.
+  // Give it a URL to ping and a callback to execute whenever that
+  // happens and it'll go on its way. Whenever the server does something,
+  // the callback will run with the server's response. This is done in such
+  // a way so you won't ever skip history you missed.
+}
+StreamingHistory.prototype.beginStream = function(url, state, cb) {
   this.cb = cb;
   this.url = url;
+  // how far we're going
   this.state = state;
 
   var self = this;
@@ -48,13 +51,13 @@ function StreamingHistory(url, state, cb) {
     // but this is bad because they're going to miss things!
     this.xhr = ajaxRequest(url, {get_state: true}, function(state, textStatus) {
       self.state = state;
-      self.nextHist();
+      self.getNextHist();
     });
   } else {
-    this.nextHist();
+    this.getNextHist();
   }
-}
-StreamingHistory.prototype.nextHist = function() {
+};
+StreamingHistory.prototype.getNextHist = function() {
   /// Carry out the next action in the history, calling callback if we get
   /// anything.
   var self = this;
@@ -64,7 +67,7 @@ StreamingHistory.prototype.nextHist = function() {
         self.cb(actions[i]);
         self.state++;
       }
-      self.nextHist();
+      self.getNextHist();
     });
 };
 StreamingHistory.prototype.stop = function() {
@@ -72,6 +75,55 @@ StreamingHistory.prototype.stop = function() {
     this.xhr.abort();
   }
 };
+
+function SlowStreamingHistory(group_time, trickle_time) {
+  // This object is just like StreamingHistory, but it will group up things
+  // together in a bunch and will trickle them over a period of time. e.g. "Fire
+  // off actions every 0.5 seconds, make a request to the server every 5
+  // seconds"
+
+  // used as a queue; this DOES NOT correspond to this.state (e.g. when
+  // starting out, this.state might be 25, which would correspond to
+  // this.history[0])
+  this.queue = [];
+  this.group_time = group_time;
+  this.trickle_time = trickle_time;
+  StreamingHistory.call(this);
+}
+
+SlowStreamingHistory.prototype = new StreamingHistory();
+
+SlowStreamingHistory.prototype.beginStream = function(url, state, cb) {
+  // Begin our stream
+  var self = this;
+  // run this every self.trickle_time seconds: pop off the history
+  window.setInterval(function() {
+        console.log(self.queue);
+        if (self.queue.length > 0) {
+          self.cb(self.queue.shift());
+        }
+      }, 1000*this.trickle_time);
+  StreamingHistory.prototype.beginStream.call(this, url, state, cb);
+};
+
+SlowStreamingHistory.prototype.getNextHist = function() {
+  /// Carry out the next action in the history, calling callback if we get
+  /// anything.
+  var self = this;
+  this.xhr = ajaxRequest(this.url, {since: this.state},
+    function (actions) {
+      for (var i = 0, l = actions.length; i < l; i++) {
+        self.queue.push(actions[i]);
+        self.state++;
+      }
+      // wait before getting the next history later.
+      self.getNextHistTimer = window.setTimeout(
+        function() {
+          self.getNextHist();
+        }, 1000*self.group_time);
+    });
+};
+
 
 function createPropertySetters(obj, suffix, propList) {
   // assign some property setters for obj
@@ -117,6 +169,7 @@ function eraseCookie(name) {
 return {
   ajaxRequest: ajaxRequest,
   StreamingHistory: StreamingHistory,
+  SlowStreamingHistory: SlowStreamingHistory,
   createPropertySetters: createPropertySetters,
   createCookie: createCookie,
   readCookie: readCookie,
