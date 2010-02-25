@@ -76,12 +76,22 @@ class Robot(object):
 
 class Match(object):
     @classmethod
+    def register_new(cls, url, **kwargs):
+        """
+        Register a match, then return a URL of that match.
+        """
+        kwargs['register'] = 't'
+        new_match = fetch(url_concat(url, 'matches'), kwargs)
+        m = cls.from_url(url_concat(url, 'matches', new_match['match']))
+        m.auth_code = new_match['auth_code']
+        return m
+
+    @classmethod
     def from_url(cls, url):
         try:
             data = fetch(url, {'info': 't'})
         except RobotException:
             return False
-        print data
         if not ('started' in data and 'init_time' in data and 'gametime' in data
                 and 'public' in data):
             return False
@@ -90,12 +100,13 @@ class Match(object):
                 data['gametime'],
                 data['public'])
 
-    def __init__(self, url, started, init_time, gametime, public):
+    def __init__(self, url, started, init_time, gametime, public, auth_code=None):
         self.url = url
         self.started = started
         self.init_time = init_time
         self.gametime = gametime
         self.public = public
+        self.auth_code = auth_code
 
     def register_slot(self):
         print "Connecting..."
@@ -104,6 +115,11 @@ class Match(object):
         print ("If your robot crashes, use that URL next time "
                 "you connect to rejoin the match.\n")
         return slot_url
+
+    def start(self):
+        if not self.started and self.auth_code:
+            fetch(self.url, {'start': 't', 'auth_code': self.auth_code})
+        return True
 
 class RoboLink(object):
     """
@@ -135,16 +151,7 @@ class RoboLink(object):
                 print "That's not a match URL!"
                 return False
         print "Waiting for game to start..."
-        return Robot.connect(url)
-
-    @classmethod
-    def register_match(cls, url, **kwargs):
-        """
-        Register a match, then return a URL of that match.
-        """
-        kwargs['register'] = 't'
-        result = fetch(url_concat(url, 'matches'), kwargs)
-        return result
+        return Robot.connect(url, **kwargs)
 
 class RobotException(Exception):
     pass
