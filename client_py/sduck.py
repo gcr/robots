@@ -12,5 +12,6 @@ if not robot:
     exit(1)
 
 while True:
+    # Just sit here and spin in clockwise circles.
     robot.steer(1)
 

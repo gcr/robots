@@ -82,7 +82,9 @@ courier.drawing = (function() { // begin courier namespace
         });
       window.setInterval(
           function() {
-            f.render(fdat);
+            if (typeof fdat != 'undefined') {
+              f.render(fdat);
+            }
           }, 1000*m.speed);
     }
 

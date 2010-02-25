@@ -74,6 +74,12 @@ class Robot(object):
         """
         return fetch(self.url, {'steer': 't', 'amount': amount})
 
+    def steer_abs(self, angle):
+        """
+        Steer ourselves so that we're facing angle
+        """
+        self.steer(angle - self.compass())
+
     def throttle(self, amount):
         """
         Set our throttle to a percentage between -50 and 100.

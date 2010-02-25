@@ -197,11 +197,11 @@ class ATRobotsInspiredGame(Game):
         try:
             time, callback = {
                 'steer': (0, lambda _: robot.steer_by(kwargs['amount'])),
-                'throttle': (1, lambda _:
+                'throttle': (0, lambda _:
                     self.robots[robot_id].set_throttle(kwargs['amount'])),
                 'location': (3, lambda _:
                     self.robots[robot_id].location),
-                'rotation': (1, lambda _:
+                'rotation': (2, lambda _:
                     self.robots[robot_id].rotation),
             }[action_str]
         except KeyError:
