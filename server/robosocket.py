@@ -3,6 +3,7 @@
 
 from twisted.web import server, resource
 from json_resource import JsonResource, ErrorResource
+import utils
 
 class RoboResource(resource.Resource):
     """
@@ -62,6 +63,17 @@ class RoboResource(resource.Resource):
         print self.game.robots
         return server.NOT_DONE_YET
 
+    def dispatch_game_action(self, req, action, **kwargs):
+        # Ask the game logic to handle this action for us.
+        game_action = self.game.robot_action(self.robot_id, action, **kwargs)
+        def send_result(result):
+            JsonResource(result).render(req)
+        game_action.addCallback(send_result)
+        def on_error(result):
+            ErrorResource(result.value[0]).render(req)
+        game_action.addErrback(on_error)
+        return server.NOT_DONE_YET
+
     def render_GET(self, request):
         " What to do when they connect to our URL "
         if 'info' in request.args:
@@ -78,16 +90,12 @@ class RoboResource(resource.Resource):
                 JsonResource(self.robot).render(request)
                 return server.NOT_DONE_YET
             elif 'steer' in request.args:
-                assert 'amount' in request.args and float(request.args['amount'][0]), "amount must be a float"
-                game_action = self.game.robot_action(self.robot_id, 'steer',
-                        amount=float(request.args['amount'][0]))
-                def steering_result(result):
-                    JsonResource(result).render(request)
-                game_action.addCallback(steering_result)
-                def on_error(result):
-                    ErrorResource(result.value[0]).render(request)
-                game_action.addErrback(on_error)
-                return server.NOT_DONE_YET
+                amount = utils.verify_float(request.args, 'amount')
+                return self.dispatch_game_action(request, 'steer', amount=amount)
+            elif 'throttle' in request.args:
+                amount = utils.verify_float(request.args, 'amount')
+                return self.dispatch_game_action(request, 'throttle', amount=amount)
 
         raise KeyError, "Invalid Command"
         return server.NOT_DONE_YET
+

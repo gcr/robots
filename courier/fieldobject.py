@@ -6,6 +6,7 @@ import vector
 class FieldObject(object):
     def __init__(self, field):
         self.location = vector.Vector([0, 0])
+        self.speed = 0
         self.field = field
 
     def __json__(self):

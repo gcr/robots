@@ -20,3 +20,11 @@ def is_trueish(s):
     if str(s).lower() in ["false", "nil", "null", "0", "no", "f", "n"]:
         return False
     return True
+
+def verify_float(reqargs, key):
+    assert key in reqargs, "Your args must include %s" % key
+    try:
+        return float(reqargs[key][0])
+    except ValueError:
+        raise ValueError, "%s must be a float." % key
+

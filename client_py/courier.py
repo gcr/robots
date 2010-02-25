@@ -74,6 +74,12 @@ class Robot(object):
         """
         return fetch(self.url, {'steer': 't', 'amount': amount})
 
+    def throttle(self, amount):
+        """
+        Set our throttle to a percentage between -50 and 100.
+        """
+        return fetch(self.url, {'throttle': 't', 'amount': amount})
+
 class Match(object):
     @classmethod
     def register_new(cls, url, **kwargs):

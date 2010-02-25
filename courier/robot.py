@@ -66,13 +66,19 @@ class Robot(fieldobject.FieldObject):
         if self.dead or self.heat > 350:
             return
         # change angles
-        bearing = vector.angle_normalize(self.steer - self.rotation)
-        angle_diff = self.engine/5
-        print self.rotation, bearing
-        if abs(bearing) < angle_diff:
-            self.rotation += bearing
+        angle_diff = vector.angle_normalize(self.steer - self.rotation)
+        rot_accel = self.engine/5
+        if abs(angle_diff) < rot_accel:
+            self.rotation += angle_diff
         else:
-            self.rotation += angle_diff if bearing>0 else -angle_diff
+            self.rotation += rot_accel if angle_diff>0 else -rot_accel
+        # change speeds
+        speed_diff = self.throttle - self.speed
+        accel = self.engine * 3
+        if abs(speed_diff) < accel:
+            self.speed += speed_diff
+        else:
+            self.speed += accel if speed_diff>0 else -accel
 
     def hit(self, damage):
         """
@@ -121,6 +127,17 @@ class Robot(fieldobject.FieldObject):
         """
         self.steer = vector.angle_normalize(self.steer + amount)
         return amount
+
+    def get_throttle(self):
+        return self.throttle
+    def set_throttle(self, amount):
+        """
+        set our throttle to be between -self.engine*5 and self.engine*10
+        expects a percentage
+        """
+        amount = max(-50, min(amount, 100))
+        self.throttle = 10*self.engine*amount
+    throttle = property(get_throttle, set_throttle)
 
     @property
     def dead(self):
