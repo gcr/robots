@@ -3,9 +3,6 @@
 
 from twisted.web import server, resource
 from json_resource import JsonResource, ErrorResource
-from twisted.internet import task, reactor
-import utils
-from courier import misc
 
 class RoboResource(resource.Resource):
     """
@@ -21,7 +18,7 @@ class RoboResource(resource.Resource):
         self.robot_id = robot_id
 
     @property
-    def robot(self, request):
+    def robot(self):
         " Which robot are we bound to? "
         try:
             return self.game.robots[self.robot_id]
@@ -77,5 +74,17 @@ class RoboResource(resource.Resource):
                 # reunite them with their existing robot.
                 JsonResource(self.robot).render(request)
                 return server.NOT_DONE_YET
+            elif 'steer' in request.args:
+                assert 'amount' in request.args and float(request.args['amount'][0]), "amount must be a float"
+                game_action = self.game.robot_action(self.robot_id, 'steer',
+                        amount=float(request.args['amount'][0]))
+                def steering_result(result):
+                    JsonResource(result).render(request)
+                game_action.addCallback(steering_result)
+                def on_error(result):
+                    ErrorResource(result.value[0]).render(request)
+                game_action.addErrback(on_error)
+                return server.NOT_DONE_YET
+
         raise KeyError, "Invalid Command"
         return server.NOT_DONE_YET

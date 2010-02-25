@@ -21,7 +21,7 @@ class Match(resource.Resource):
     GAME_LOGIC = gamelogic.ATRobotsInspiredGame
     MIN_MATCH_SPEED = 0.05               # fastest match allowed
 
-    def __init__(self, matchlist, speed=5.0, public=True, start_timeout=0,
+    def __init__(self, matchlist, speed=0.5, public=True, start_timeout=0,
             lockstep=False):
         """
         public: whether the match will show up on public listings (still will

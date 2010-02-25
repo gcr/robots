@@ -134,6 +134,9 @@ class Game(object):
         Will check to ensure that there aren't any actions from this robot
         already.
         """
+
+        # Only allow times in the future; the closest will be on the next pump.
+        time += self.time
         # Make sure there aren't any other robots here. If there are, then fire
         # off their Deferred errbacks and overwrite them.
         for time in self.future:
@@ -161,7 +164,7 @@ class Game(object):
         HOWEVER. Keep in mind two things: 1. that sometimes this can fail (be
         sure to set errbacks!) and 2. don't actually set this; subclass it.
         """
-        assert robot_id in self.robots and self.robots[robot_id] ("This robot "
+        assert robot_id in self.robots and self.robots[robot_id], ("This robot "
             "doesn't exist!")
         pass
 
@@ -176,7 +179,26 @@ class Game(object):
 
 
 class ATRobotsInspiredGame(Game):
-    pass
+    def robot_action(self, robot_id, action_str, **kwargs):
+        """
+        This gets a Deferred from set_history. When called, that Deferred will
+        do an action to the robot. This function will then return that Deferred
+        to you, so you can do
+        defr = game.robot_action('foo', 'scan', size=23)
+        defr.addCallback(lambda result: request.send(result))
+        (keep in mind that deferreds are chained)
+        You'd probably want to render it in a JSON resource of course.
+        HOWEVER. Keep in mind two things: 1. that sometimes this can fail (be
+        sure to set errbacks!) and 2. don't actually set this; subclass it.
+        """
+        assert robot_id in self.robots and self.robots[robot_id], ("This robot "
+            "doesn't exist!")
+        if action_str == 'steer':
+            d = self.set_future(0, robot_id)
+            d.addCallback(lambda _:
+                    self.robots[robot_id].steer_by(kwargs['amount']))
+            return d
+        raise KeyError, "Invalid command!"
 
 
 

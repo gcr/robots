@@ -21,7 +21,7 @@ def angle_normalize(angle):
     Given an angle in radians, will return an equivalent angle between
     [-pi, pi]
     """
-    return angle if -math.pi < angle <= math.pi else angle - 2*math.pi
+    return (angle + math.pi) % (2*math.pi) - math.pi
 
 def rotate(v, a):
     """Rotate a 2D vector by some angle in radians, a.

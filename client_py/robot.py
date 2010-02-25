@@ -61,15 +61,15 @@ class Server(object):
         return result
 
     @classmethod
-    def _fetch_persist(cls, url, kwargs):
+    def _fetch_persist(cls, url, kwargs=None):
         """
         Fetch a JSON object from a web page, retrying in case of timeouts
         """
         try:
-            return cls._fetch(url)
+            return cls._fetch(url, kwargs)
         except urllib2.URLError, e:
             if isinstance(e.reason, socket.timeout):
-                return cls._fetch_persist(url)
+                return cls._fetch_persist(url, kwargs)
             else:
                 raise e
 
@@ -78,8 +78,7 @@ class Server(object):
         Register a match, then return a URL of that match.
         """
         kwargs['register'] = 't'
-        result = self._fetch(self.url_concat(self.host, self.MATCH,
-            self.REGISTER), kwargs)
+        result = self._fetch(self.url_concat(self.host, self.MATCH), kwargs)
         return result
 
 class Robot(object):
@@ -92,10 +91,15 @@ class Robot(object):
         self.name = data['name']
         self.armor = data['armor']
         self.heat = data['heat']
-        print self
 
     def __str__(self):
         return "<Robot '%s' (%s armor)>" % (self.name, self.armor)
+
+    def steer(self, amount):
+        """
+        Steer ourselves by amount (relative)
+        """
+        return Server._fetch(self.url, {'steer': 't', 'amount': amount})
 
 class RoboLink(object):
     """
@@ -134,7 +138,7 @@ class RoboLink(object):
             slot_url = url
         kwargs['connect'] = 't'
         print "Waiting for game to start..."
-        return Robot(url, Server._fetch(slot_url, kwargs))
+        return Robot(slot_url, Server._fetch_persist(slot_url, kwargs))
 
 class RobotException(Exception):
     pass

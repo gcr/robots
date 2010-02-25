@@ -2,11 +2,15 @@
 # -*- coding: utf-8 -*-
 import math
 import random
-import field
 import vector
+# we import field just because
+import field
 import fieldobject
 
 class Robot(fieldobject.FieldObject):
+    """
+    A server-side robot.
+    """
     def __init__(self, name, field, location, scanner=5, weapon=2, armor=2,
             engine=2, heatsink=1,mines=0,shield=0):
         self.name = name
@@ -61,7 +65,11 @@ class Robot(fieldobject.FieldObject):
         - Reduces heat
         """
         if not self.dead and self.heat < 350:
-            pass
+            angle_diff = vector.angle_normalize(self.steer - self.rotation)
+            if angle_diff < 0:
+                self.rotation -= min(abs(angle_diff), self.engine/10)
+            elif angle_diff > 0:
+                self.rotation += min(abs(angle_diff), self.engine/10)
 
     def hit(self, damage):
         """
@@ -103,6 +111,13 @@ class Robot(fieldobject.FieldObject):
                     self.field.other_robots(self), 
                     key=lambda other: (other.location - self.location).dist))
                 - self.rotation)
+
+    def steer_by(self, amount):
+        """
+        Steers ourselves by rotation.
+        """
+        self.steer = vector.angle_normalize(self.steer + amount)
+        return amount
 
     @property
     def dead(self):
