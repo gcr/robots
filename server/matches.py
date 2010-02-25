@@ -143,6 +143,7 @@ class Match(resource.Resource):
             client_info['init_time'] = str(self.init_time)
             client_info['history'] = self.history.time
             client_info['started'] = self.started
+            client_info['speed'] = self.speed
             client_info['public'] = self.public
             return JsonResource(client_info).render(request)
         # redirect to the browser

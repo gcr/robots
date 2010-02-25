@@ -102,8 +102,8 @@ class Match(object):
             data = fetch(url, {'info': 't'})
         except RobotException:
             return False
-        if not ('started' in data and 'init_time' in data and 'gametime' in data
-                and 'public' in data):
+        if not (isinstance(data, dict) and 'started' in data and 'init_time' in
+                data and 'gametime' in data and 'public' in data):
             return False
         return Match(url, data['started'],
                 data['init_time'],
