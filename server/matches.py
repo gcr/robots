@@ -19,9 +19,9 @@ class Match(resource.Resource):
     handles what to do with the client.
     """
     GAME_LOGIC = gamelogic.ATRobotsInspiredGame
-    MIN_MATCH_SPEED = 0.05               # fastest match allowed
+    MIN_MATCH_SPEED = 0.01               # fastest match allowed
 
-    def __init__(self, matchlist, speed=0.5, public=True, start_timeout=0,
+    def __init__(self, matchlist, speed=0.1, public=True, start_timeout=0,
             lockstep=False):
         """
         public: whether the match will show up on public listings (still will
