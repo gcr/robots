@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import vector
-import field
 
 class FieldObject(object):
-    def __init__(self):
+    def __init__(self, field):
         self.location = vector.Vector([0, 0])
+        self.field = field
 
     def __json__(self):
         return {'type': 'object', 'location': self.location}
@@ -41,7 +41,7 @@ class FieldObject(object):
                          ''--b
         Will return a number within [-2pi, 2pi]
         """
-        return field.NORTH.angle - (b.location - self.location).angle
+        return self.field.NORTH.angle - (b.location - self.location).angle
 
     def pump(self):
         pass

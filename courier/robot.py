@@ -4,7 +4,6 @@ import math
 import random
 import vector
 # we import field just because
-import field
 import fieldobject
 
 class Robot(fieldobject.FieldObject):
@@ -67,9 +66,9 @@ class Robot(fieldobject.FieldObject):
         if not self.dead and self.heat < 350:
             angle_diff = vector.angle_normalize(self.steer - self.rotation)
             if angle_diff < 0:
-                self.rotation -= min(abs(angle_diff), self.engine/10)
+                self.rotation -= min(abs(angle_diff), self.engine/5)
             elif angle_diff > 0:
-                self.rotation += min(abs(angle_diff), self.engine/10)
+                self.rotation += min(abs(angle_diff), self.engine/5)
 
     def hit(self, damage):
         """
