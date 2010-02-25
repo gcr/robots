@@ -80,8 +80,10 @@ class Robot(object):
         """
         return fetch(self.url, {'throttle': 't', 'amount': amount})
 
-    @property
-    def location(self):
+    def compass(self):
+        return fetch(self.url, {'rotation': 't'})
+
+    def locate(self):
         return fetch(self.url, {'location': 't'})
 
 class Match(object):

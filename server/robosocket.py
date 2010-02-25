@@ -65,8 +65,9 @@ class RoboResource(resource.Resource):
 
     def dispatch_game_action(self, req, action, **kwargs):
         # Ask the game logic to handle this action for us.
+        # When we're done, render the JSON results.
         game_action = self.game.robot_action(self.robot_id, action, **kwargs)
-        def send_result(result):
+        def send_result(result=None):
             JsonResource(result).render(req)
         game_action.addCallback(send_result)
         def on_error(result):
@@ -97,6 +98,8 @@ class RoboResource(resource.Resource):
                 return self.dispatch_game_action(request, 'throttle', amount=amount)
             elif 'location' in request.args:
                 return self.dispatch_game_action(request, 'location')
+            elif 'rotation' in request.args:
+                return self.dispatch_game_action(request, 'rotation')
 
         raise KeyError, "Invalid Command"
         return server.NOT_DONE_YET

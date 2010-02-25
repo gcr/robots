@@ -193,24 +193,22 @@ class ATRobotsInspiredGame(Game):
         """
         assert robot_id in self.robots and self.robots[robot_id], ("This robot "
             "doesn't exist!")
-        if action_str == 'steer':
-            d = self.set_future(0, robot_id)
-            d.addCallback(lambda _:
-                    self.robots[robot_id].steer_by(kwargs['amount']))
-            return d
-        elif action_str == 'throttle':
-            d = self.set_future(1, robot_id)
-            d.addCallback(lambda _:
-                    self.robots[robot_id].set_throttle(kwargs['amount']))
-            return d
-        elif action_str == 'location':
-            d = self.set_future(3, robot_id)
-            d.addCallback(lambda _:
-                    self.robots[robot_id].location)
-            return d
-        raise KeyError, "Invalid command!"
-
-
+        robot = self.robots[robot_id]
+        try:
+            time, callback = {
+                'steer': (0, lambda _: robot.steer_by(kwargs['amount'])),
+                'throttle': (1, lambda _:
+                    self.robots[robot_id].set_throttle(kwargs['amount'])),
+                'location': (3, lambda _:
+                    self.robots[robot_id].location),
+                'rotation': (1, lambda _:
+                    self.robots[robot_id].rotation),
+            }[action_str]
+        except KeyError:
+            raise KeyError, "Invalid command!"
+        d = self.set_future(time, robot_id)
+        d.addCallback(callback)
+        return d
 
 class CheatingException(Exception):
     pass
