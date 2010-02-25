@@ -61,12 +61,30 @@ class Field:
         if self.on_splash_cb:
             self.on_splash_cb(hit_objs, loc, damage)
 
+    def hit(self, obj, damage):
+        obj.hit(damage);
+        if self.on_hit_cb:
+            self.on_hit_cb(obj, damage)
+
     def add(self, obj):
         self.objects.append(obj)
 
     def pump(self):
         for obj in self.objects:
             obj.pump()
+            x, y = obj.location
+            if 0 > x or self.width < x:
+                # Out of bounds
+                self.hit(obj, obj.speed/30)
+                obj.speed = 0
+                obj.throttle = 0
+                obj.location[0] = max(0, min(x, self.width))
+            if 0 > y or self.height < y:
+                self.hit(obj, obj.speed/30)
+                obj.speed = 0
+                obj.throttle = 0
+                obj.location[1] = max(0, min(y, self.height))
+
         if self.on_pump_cb:
             self.on_pump_cb(self)
 
