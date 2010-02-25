@@ -75,11 +75,15 @@ courier.drawing = (function() { // begin courier namespace
       // We'll set up our field so that when M updates, the <canvas /> in jq
       // will too.
       var f = new Field(m.field_size[0], m.field_size[1], jq);
-      console.log(m.field_size);
+      var fdat;
       m.onFieldUpdate(
         function(field_dat) {
-          f.render(field_dat);
+          fdat = field_dat;
         });
+      window.setInterval(
+          function() {
+            f.render(fdat);
+          }, 1000*m.speed);
     }
 
     return {
