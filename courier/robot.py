@@ -3,7 +3,6 @@
 import math
 import random
 import vector
-# we import field just because
 import fieldobject
 
 class Robot(fieldobject.FieldObject):
