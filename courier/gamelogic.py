@@ -43,6 +43,7 @@ class Game(object):
         """
         Go through the history. Carry out the action on the robot.
         """
+        #print "pump: time: %d futures: %s" % (self.time, self.future)
         if self.time in self.future:
             rids = self.future[self.time].keys()
             random.shuffle(rids)
@@ -144,6 +145,7 @@ class Game(object):
                 print ("Uh oh! Duplicate connections from %s, canceling the "
                        "first") % robot_id
                 self.future[some_time][robot_id].errback(CheatingException("Canceling action"))
+                del self.future[some_time][robot_id]
         # Now assign our Deferred. =3
         d = Deferred()
         if time not in self.future:
