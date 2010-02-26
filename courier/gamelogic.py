@@ -139,11 +139,11 @@ class Game(object):
         time += self.time
         # Make sure there aren't any other robots here. If there are, then fire
         # off their Deferred errbacks and overwrite them.
-        for time in self.future:
-            if robot_id in self.future[time]:
+        for some_time in self.future:
+            if robot_id in self.future[some_time]:
                 print ("Uh oh! Duplicate connections from %s, canceling the "
                        "first") % robot_id
-                self.future[time][robot_id].errback(CheatingException("Canceling action"))
+                self.future[some_time][robot_id].errback(CheatingException("Canceling action"))
         # Now assign our Deferred. =3
         d = Deferred()
         if time not in self.future:
