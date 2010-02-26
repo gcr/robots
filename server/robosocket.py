@@ -3,6 +3,7 @@
 
 from twisted.web import server, resource
 from json_resource import JsonResource, ErrorResource
+from math import pi
 import utils
 
 class RoboResource(resource.Resource):
@@ -100,6 +101,11 @@ class RoboResource(resource.Resource):
                 return self.dispatch_game_action(request, 'location')
             elif 'rotation' in request.args:
                 return self.dispatch_game_action(request, 'rotation')
+            elif 'scan' in request.args:
+                angle = utils.verify_float(request.args, 'angle')
+                assert -pi/2. < angle < pi/2., "Angle must be between -pi/2 and pi/2"
+                self.robot.start_scan(angle)
+                return self.dispatch_game_action(request, 'scan')
 
         raise KeyError, "Invalid Command"
         return server.NOT_DONE_YET

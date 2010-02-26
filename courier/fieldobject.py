@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import vector
+import field
 
 class FieldObject(object):
     def __init__(self, field):
@@ -43,7 +44,7 @@ class FieldObject(object):
                          ''--b
         Will return a number within [-2pi, 2pi]
         """
-        return self.field.NORTH.angle - (b.location - self.location).angle
+        return field.NORTH.angle - (b.location - self.location).angle
 
     def pump(self):
         pass

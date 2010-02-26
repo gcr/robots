@@ -198,11 +198,13 @@ class ATRobotsInspiredGame(Game):
             time, callback = {
                 'steer': (0, lambda _: robot.steer_by(kwargs['amount'])),
                 'throttle': (0, lambda _:
-                    self.robots[robot_id].set_throttle(kwargs['amount'])),
+                    robot.set_throttle(kwargs['amount'])),
                 'location': (3, lambda _:
-                    self.robots[robot_id].location),
+                    robot.location),
                 'rotation': (2, lambda _:
-                    self.robots[robot_id].rotation),
+                    robot.rotation),
+                'scan': (2, lambda _:
+                    robot.end_scan())
             }[action_str]
         except KeyError:
             raise KeyError, "Invalid command!"

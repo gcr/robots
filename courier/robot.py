@@ -20,7 +20,7 @@ class Robot(fieldobject.FieldObject):
                             # relative to self.steer
         self.field = field
         self.location = vector.Vector(location)
-        self.scan_width = math.pi / 2
+        self.scan_width = 0
         self.heat = 0
 
         assert sum([scanner,weapon,armor,engine,heatsink,mines,shield]) <= 12, "You can only have 12 points"
@@ -44,6 +44,8 @@ class Robot(fieldobject.FieldObject):
                 'location': self.location,
                 'rotation': self.rotation,
                 'turret_rot': self.turret_rot,
+                'scan_width': self.scan_width,
+                'scanrange': self.scanrange,
                 'speed': self.speed,
                }
 
@@ -52,7 +54,7 @@ class Robot(fieldobject.FieldObject):
 
     def __repr__(self):
         return str(self)
-             
+
     def pump(self):
         """
         Performs time-sensitive actions over a tic.
@@ -118,7 +120,7 @@ class Robot(fieldobject.FieldObject):
             raise RobotError("%s is too dead to scan!" % self.name)
         return vector.angle_normalize(
                 self.bearing(min(
-                    self.field.other_robots(self), 
+                    self.field.other_robots(self),
                     key=lambda other: (other.location - self.location).dist))
                 - self.rotation)
 
@@ -141,15 +143,45 @@ class Robot(fieldobject.FieldObject):
     def dead(self):
         return self.armor <= 0
 
-    def scan(self):
+    def start_scan(self, angle):
         """
-        Takes a scan of the field. Returns (position, accuracy) to the nearest
-        target where position could be False or a number and accuracy is inside
-        [-2, 2] -- the angle
+        Takes a scan of the field. scan_end returns (distance, accuracy) to the
+        nearest target where position could be False or a number and accuracy is
+        inside [-2, 2] -- the angle
         """
         if self.dead:
             raise RobotError("%s is too dead to scan!" % self.name)
-        pass
+        self.scan_width = angle
+
+    def end_scan(self):
+        """
+        Stops scanning. Return distance, accuracy.
+        """
+        assert self.scan_width, "We weren't scanning!"
+        scan_width = self.scan_width
+        hits = sorted(
+                # Build a tuple of robots and our distances...
+                [(other, (other.location - self.location).dist)
+                    for other in self.field.other_robots(self)
+                    # if they're within range...
+                    if (other.location - self.location).dist < self.scanrange
+                    # ...and if they're within our proper angle.
+                    and abs(vector.angle_normalize(
+                            self.bearing(other) - self.turret_absolute
+                        )) < scan_width],
+                # oh, and sort that by distance.
+                lambda rob, dist: dist)
+        self.scan_width = 0
+        print hits
+        if hits:
+            # return: distance, accuracy
+            return (hits[0][1],
+                    # accuracy: the angle to the other one divided by scan_width
+                    # between negative two and positive two
+                    int(round(
+                        (self.bearing(other) - self.turret_absolute)*2./scan_width)))
+        else:
+            return None
 
     @property
     def turret_absolute(self):

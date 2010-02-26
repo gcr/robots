@@ -6,6 +6,7 @@ import urllib2
 import urllib
 import socket
 import json
+from math import pi
 
 def fetch_raw(url, kwargs=None):
     """
@@ -91,6 +92,10 @@ class Robot(object):
 
     def locate(self):
         return fetch(self.url, {'location': 't'})
+
+    def scan(self, angle):
+        assert pi/-2. < angle < pi/2.
+        return fetch(self.url, {'scan': 't', 'angle': angle})
 
 class Match(object):
     @classmethod

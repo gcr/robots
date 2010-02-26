@@ -43,6 +43,17 @@ courier.drawing = (function() { // begin courier namespace
           ctx.lineTo(0, -10);
           ctx.lineTo(-15, -15);
           ctx.fill();
+          ctx.beginPath();
+          ctx.lineTo(0, 0);
+          if (rob.scan_width) {
+            ctx.arc(0, 0,
+                rob.scanrange, // radius
+                3.14/2-rob.scan_width, // left
+                3.14/2+rob.scan_width, // right
+                false); // anticlockwise?
+          }
+          ctx.lineTo(0, 0);
+          ctx.stroke();
       ctx.restore();
     };
     Field.prototype.render = function(field) {
