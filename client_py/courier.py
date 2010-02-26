@@ -94,7 +94,7 @@ class Robot(object):
         return fetch(self.url, {'location': 't'})
 
     def scan(self, angle):
-        assert pi/-2. < angle < pi/2.
+        assert -pi < angle < pi
         return fetch(self.url, {'scan': 't', 'angle': angle})
 
 class Match(object):
