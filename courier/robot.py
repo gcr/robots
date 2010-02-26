@@ -172,14 +172,14 @@ class Robot(fieldobject.FieldObject):
                 # oh, and sort that by distance.
                 lambda rob, dist: dist)
         self.scan_width = 0
-        print hits
         if hits:
             # return: distance, accuracy
             return (hits[0][1],
                     # accuracy: the angle to the other one divided by scan_width
                     # between negative two and positive two
-                    int(round(
-                        (self.bearing(other) - self.turret_absolute)*2./scan_width)))
+                    round(2*vector.angle_normalize(
+                        self.bearing(other) - self.turret_absolute)/scan_width
+                   )/2)
         else:
             return None
 
@@ -188,7 +188,7 @@ class Robot(fieldobject.FieldObject):
         """
         Return absolute turret location
         """
-        return self.steer + self.turret_rot
+        return self.rotation + self.turret_rot
 
 class RobotError(Exception):
     pass
