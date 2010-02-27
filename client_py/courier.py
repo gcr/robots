@@ -65,6 +65,7 @@ class Robot(object):
         self.name = data['name']
         self.armor = data['armor']
         self.heat = data['heat']
+        self._turret_rotation = None
 
     def __str__(self):
         return "<Robot '%s' (%s armor)>" % (self.name, self.armor)
@@ -104,10 +105,13 @@ class Robot(object):
         return fetch(self.url, {'scan_wall': 't'})
 
     def set_turret_rotation(self, angle):
+        self._turret_rotation = angle
         return fetch(self.url, {'turret_rotate': 't', 'angle':
 			math.radians(angle)})
     def get_turret_rotation(self):
-        return math.degrees(fetch(self.url, {'turret_rotate': 't'}))
+        if self._turret_rotation is None:
+            self._turret_rotation = math.degrees(fetch(self.url, {'turret_rotate': 't'}))
+        return self._turret_rotation
     turret_rotation = property(get_turret_rotation, set_turret_rotation)
 
 class Match(object):

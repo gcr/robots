@@ -204,7 +204,11 @@ class Robot(fieldobject.FieldObject):
         self.scan_mode = "wall"
         def end_scan_wall(*args):
             self.scan_mode = ""
-            return self.field.dist_to_wall(self, self.turret_absolute)
+            dist =  self.field.dist_to_wall(self, self.turret_absolute)
+            if dist < self.scanrange:
+                return dist
+            else:
+                return None
         d = Deferred()
         d.addCallback(end_scan_wall)
         return d
