@@ -97,6 +97,9 @@ class Robot(object):
         assert -pi < angle < pi
         return fetch(self.url, {'scan': 't', 'angle': angle})
 
+    def scan_wall(self):
+        return fetch(self.url, {'scan_wall': 't'})
+
 class Match(object):
     @classmethod
     def register_new(cls, url, **kwargs):

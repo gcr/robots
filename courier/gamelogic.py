@@ -198,15 +198,18 @@ class ATRobotsInspiredGame(Game):
         robot = self.robots[robot_id]
         try:
             time, callback = {
-                'steer': (0, lambda _: robot.steer_by(kwargs['amount'])),
-                'throttle': (0, lambda _:
+                'steer'     : (0, lambda _: robot.steer_by(kwargs['amount'])),
+                'throttle'  : (0, lambda _:
                     robot.set_throttle(kwargs['amount'])),
-                'location': (3, lambda _:
+                'location'  : (3, lambda _:
                     robot.location),
-                'rotation': (2, lambda _:
+                'rotation'  : (2, lambda _:
                     robot.rotation),
-                'scan': (2, lambda _:
-                    robot.end_scan())
+                'scan'      : (2, lambda _:
+                    robot.end_scan()),
+                'scan_wall' : (1, lambda _:
+                    # todo! grab robot.start_scan from robosocket
+                    robot.scan_wall()),
             }[action_str]
         except KeyError:
             raise KeyError, "Invalid command!"

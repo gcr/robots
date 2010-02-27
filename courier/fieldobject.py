@@ -8,6 +8,7 @@ class FieldObject(object):
     def __init__(self, field):
         self.location = vector.Vector([0, 0])
         self.speed = 0
+        self.rotation = 0
         self.throttle = 0
         self.field = field
 
@@ -33,18 +34,21 @@ class FieldObject(object):
 
     def bearing(self, b):
         """
-        Return the bearing from a to b as seen on a's compass.
+        Return the bearing from a to b as seen from a. Always WRT north, noth
+        a's rotation.
 
         |
         |
         |-.  this angle
         |  \ 
-        a--.:___
+        a--.:___      -   -    -    -    - the angle our vector library expects
                 ''---..__
                          ''--b
         Will return a number within [-2pi, 2pi]
         """
         return field.NORTH.angle - (b.location - self.location).angle
+        #                        ^ we're subtracting here because our angles are
+        #      CW but our vector library expects CCW
 
     def pump(self):
         pass

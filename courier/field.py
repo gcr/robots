@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import vector
+import math
 import robot
 
 # NOTE: we're on CARTESIAN coordinates.
@@ -90,6 +91,51 @@ class Field:
 
     def remove(self, obj):
         self.objects.remove(obj)
+
+    def dist_to_wall(self, obj, rotation):
+        """
+        Returns the distance to the closest wall WRT obj's rotation
+
+                (wallx, wally)
+         +---------+-------------+
+         |        /              |
+         |       /               |
+         |      /                |
+         |     / dist            |
+         |    /                  |
+         |   /                   |
+         |  O                    |
+         |                       |
+         +-----------------------+
+        """
+
+        # Do this by building a line. y=mx+b. Find points along x=0 and
+        # x=self.width. Find the distance between the robot and these points.
+        v = vector.Vector([math.sin(rotation), math.cos(rotation)])
+        # Test for left and right walls
+        if v[0] != 0:
+            # assert: we're not facing straight up or down. if we are, by
+            # definition we're not facing the left or right walls
+            m = v[1] / v[0]
+            # m is the slope of our line
+            wallx = 0 if v[0] < 0 else  self.width
+            # are we facing left? if so, test against left wall; else test
+            # against right wall
+            wally = obj.y + m*(wallx-obj.x)
+            # wally is the y-coordinate of the intersection along the wall. we
+            # already know the x-coordinate: wallx
+            if 0 < wally < self.height:
+                # success! the intersect point isn't above the top of the wall
+                # and it isn't below the bottom. return distance.
+                return (vector.Vector([wallx, wally]) - obj.location).dist
+        # no match along left/right walls? test for x then along the top and
+        # bottom walls. This is exactly the opposite as before.
+        m = v[0] / v[1]
+        wally = 0 if v[1] < 0 else self.height
+        wallx = obj.x + m*(wally - obj.y)
+        # if we didn't match a left or right wall, we MUST match along the top
+        # or bottom because we're always inside the square.
+        return (vector.Vector([wallx, wally]) - obj.location).dist
 
     @property
     def robots(self):

@@ -124,6 +124,14 @@ class Robot(fieldobject.FieldObject):
                     key=lambda other: (other.location - self.location).dist))
                 - self.rotation)
 
+    def scan_wall(self):
+        """
+        Returns the distance to the closest wall in the direction the robot's
+        currently heading. A little sonar beacon is mounted on the robot's nose.
+        This is wrt to the robot's rotation, not the turret's rotation.
+        """
+        return self.field.dist_to_wall(self, self.turret_absolute)
+
     def steer_by(self, amount):
         """
         Steers ourselves by rotation.

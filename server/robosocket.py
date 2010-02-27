@@ -101,6 +101,8 @@ class RoboResource(resource.Resource):
                 return self.dispatch_game_action(request, 'location')
             elif 'rotation' in request.args:
                 return self.dispatch_game_action(request, 'rotation')
+            elif 'scan_wall' in request.args:
+                return self.dispatch_game_action(request, 'scan_wall')
             elif 'scan' in request.args:
                 angle = utils.verify_float(request.args, 'angle')
                 assert -pi/2. < angle < pi/2., "Angle must be between -pi/2 and pi/2"
