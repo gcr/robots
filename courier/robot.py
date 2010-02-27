@@ -198,5 +198,11 @@ class Robot(fieldobject.FieldObject):
         """
         return self.rotation + self.turret_rot
 
+    def rotate_turret(self, angle):
+        """
+        Rotate the turret (always relative to self.rotation)
+        """
+        self.turret_rot = vector.angle_normalize(angle)
+
 class RobotError(Exception):
     pass

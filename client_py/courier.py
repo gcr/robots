@@ -100,6 +100,10 @@ class Robot(object):
     def scan_wall(self):
         return fetch(self.url, {'scan_wall': 't'})
 
+    def rotate_turret(self, angle):
+        return fetch(self.url, {'rotate_turret': 't', 'angle': angle})
+
+
 class Match(object):
     @classmethod
     def register_new(cls, url, **kwargs):

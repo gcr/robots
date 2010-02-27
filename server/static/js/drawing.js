@@ -43,17 +43,23 @@ courier.drawing = (function() { // begin courier namespace
           ctx.lineTo(0, -10);
           ctx.lineTo(-15, -15);
           ctx.fill();
+          ctx.rotate(-rob.turret_rot);
           ctx.beginPath();
-          ctx.lineTo(0, 0);
+          ctx.moveTo(0,0);
+          ctx.lineTo(0, 30);
+          ctx.stroke();
           if (rob.scan_width) {
+            ctx.beginPath();
+            ctx.lineTo(0, 0);
             ctx.arc(0, 0,
                 rob.scanrange, // radius
                 3.14/2-rob.scan_width, // left
                 3.14/2+rob.scan_width, // right
                 false); // anticlockwise?
+            ctx.lineTo(0, 0);
+            ctx.stroke();
           }
-          ctx.lineTo(0, 0);
-          ctx.stroke();
+          ctx.rotate(rob.turret_rot);
       ctx.restore();
     };
     Field.prototype.render = function(field) {

@@ -210,11 +210,18 @@ class ATRobotsInspiredGame(Game):
                 'scan_wall' : (1, lambda _:
                     # todo! grab robot.start_scan from robosocket
                     robot.scan_wall()),
+                'rotate_turret' : (-1, lambda _:
+                    robot.rotate_turret(kwargs['angle'])),
             }[action_str]
         except KeyError:
             raise KeyError, "Invalid command!"
-        d = self.set_future(time, robot_id)
-        d.addCallback(callback)
+        if time == -1:
+            # Instant
+            d = Deferred()
+            d.callback(callback(self.time))
+        else:
+            d = self.set_future(time, robot_id)
+            d.addCallback(callback)
         return d
 
 class CheatingException(Exception):
