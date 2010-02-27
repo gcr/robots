@@ -4,6 +4,7 @@ import math
 import random
 import vector
 import fieldobject
+from twisted.internet.defer import Deferred
 
 class Robot(fieldobject.FieldObject):
     """
@@ -126,20 +127,25 @@ class Robot(fieldobject.FieldObject):
                     key=lambda other: (other.location - self.location).dist))
                 - self.rotation)
 
-    def start_scan_wall(self):
+    def scan_wall(self):
         """
-        Starts scanning for walls
+        Starts scanning for walls. Returns a deferred -- call it when you want
+        it.
         """
         self.scan_mode = "wall"
-
-    def end_scan_wall(self):
-        """
-        Returns the distance to the closest wall in the direction the robot's
-        currently heading. A little sonar beacon is mounted on the robot's nose.
-        This is wrt to the robot's rotation, not the turret's rotation.
-        """
-        self.scan_mode = ""
-        return self.field.dist_to_wall(self, self.turret_absolute)
+        def end_scan_wall(*args):
+            """
+            Returns the distance to the closest wall in the direction the
+            robot's currently heading. A little sonar beacon is mounted on the
+            robot's nose. This is wrt to the robot's rotation, not the
+            turret's rotation.
+            """
+            self.scan_mode = ""
+            print self.field.dist_to_wall(self, self.turret_absolute)
+            return self.field.dist_to_wall(self, self.turret_absolute)
+        d = Deferred()
+        d.addCallback(end_scan_wall)
+        return d
 
     def steer_by(self, amount):
         """
@@ -160,47 +166,52 @@ class Robot(fieldobject.FieldObject):
     def dead(self):
         return self.armor <= 0
 
-    def start_scan_robots(self, angle):
+    def scan_robots(self, angle):
         """
         Takes a scan of the field. scan_end returns (distance, accuracy) to the
         nearest target where position could be False or a number and accuracy is
-        inside [-2, 2] -- the angle
+        inside [-2, 2] -- the angle. This returns a deferred; call it when you
+        want to grab the results.
         """
         if self.dead:
             raise RobotError("%s is too dead to scan!" % self.name)
+        assert -math.pi < angle < math.pi, "angle must be between -math.pi and math.pi (90 degrees)!"
         self.scan_width = angle
         self.scan_mode = "robots"
 
-    def end_scan_robots(self):
-        """
-        Stops scanning. Return distance, accuracy.
-        """
-        assert self.scan_width, "We weren't scanning!"
-        scan_width = self.scan_width
-        hits = sorted(
-                # Build a tuple of robots and our distances...
-                [(other, (other.location - self.location).dist)
-                    for other in self.field.other_robots(self)
-                    # if they're within range...
-                    if (other.location - self.location).dist < self.scanrange
-                    # ...and if they're within our proper angle.
-                    and abs(vector.angle_normalize(
-                            self.bearing(other) - self.turret_absolute
-                        )) < scan_width],
-                # oh, and sort that by distance.
-                lambda rob, dist: dist)
-        self.scan_width = 0
-        self.scan_mode = ""
-        if hits:
-            # return: distance, accuracy
-            return (hits[0][1],
-                    # accuracy: the angle to the other one divided by scan_width
-                    # between negative two and positive two
-                    round(2*vector.angle_normalize(
-                        self.bearing(other) - self.turret_absolute)/scan_width
-                   )/2)
-        else:
-            return None
+        def end_scan(*args):
+            """
+            Stops scanning. Return distance, accuracy.
+            """
+            assert self.scan_width, "We weren't scanning!"
+            scan_width = self.scan_width
+            hits = sorted(
+                    # Build a tuple of robots and our distances...
+                    [(other, (other.location - self.location).dist)
+                        for other in self.field.other_robots(self)
+                        # if they're within range...
+                        if (other.location - self.location).dist < self.scanrange
+                        # ...and if they're within our proper angle.
+                        and abs(vector.angle_normalize(
+                                self.bearing(other) - self.turret_absolute
+                            )) < scan_width],
+                    # oh, and sort that by distance.
+                    lambda rob, dist: dist)
+            self.scan_width = 0
+            self.scan_mode = ""
+            if hits:
+                # return: distance, accuracy
+                return (hits[0][1],
+                        # accuracy: the angle to the other one divided by scan_width
+                        # between negative two and positive two
+                        round(2*vector.angle_normalize(
+                            self.bearing(other) - self.turret_absolute)/scan_width
+                       )/2)
+            else:
+                return None
+        d = Deferred()
+        d.addCallback(end_scan)
+        return d
 
     @property
     def turret_absolute(self):

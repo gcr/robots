@@ -156,7 +156,7 @@ class Game(object):
 
     def robot_action(self, robot_id, action_str, **kwargs):
         """
-        This gets a Deferred from set_history. When called, that Deferred will
+        This gets a Deferred from set_future. When called, that Deferred will
         do an action to the robot. This function will then return that Deferred
         to you, so you can do
         defr = game.robot_action('foo', 'scan', size=23)
@@ -183,7 +183,7 @@ class Game(object):
 class ATRobotsInspiredGame(Game):
     def robot_action(self, robot_id, action_str, **kwargs):
         """
-        This gets a Deferred from set_history. When called, that Deferred will
+        This gets a Deferred from set_future. When called, that Deferred will
         do an action to the robot. This function will then return that Deferred
         to you, so you can do
         defr = game.robot_action('foo', 'scan', size=23)
@@ -194,35 +194,77 @@ class ATRobotsInspiredGame(Game):
         sure to set errbacks!) and 2. don't actually set this; subclass it.
         """
         assert robot_id in self.robots and self.robots[robot_id], ("This robot "
-            "doesn't exist!")
+            "is too nonexistant to do that!")
         robot = self.robots[robot_id]
-        try:
-            time, callback = {
-                'steer'     : (0, lambda _: robot.steer_by(kwargs['amount'])),
-                'throttle'  : (0, lambda _:
-                    robot.set_throttle(kwargs['amount'])),
-                'location'  : (3, lambda _:
-                    robot.location),
-                'rotation'  : (2, lambda _:
-                    robot.rotation),
-                'scan_robots': (2, lambda _:
-                    # todo! grab robot.start_scan_robots from robosocket
-                    robot.end_scan_robots()),
-                'scan_wall' : (1, lambda _:
-                    # todo! grab robot.start_scan_wall from robosocket
-                    robot.end_scan_wall()),
-                'rotate_turret' : (-1, lambda _:
-                    robot.rotate_turret(kwargs['angle'])),
-            }[action_str]
-        except KeyError:
-            raise KeyError, "Invalid command!"
-        if time == -1:
-            # Instant
+
+        # These actions should return something to the client instantly. Used
+        # for getting variables, etc.
+        INSTANT = {
+            'rotate_turret': (lambda _:
+                robot.rotate_turret(kwargs['angle']))
+        }
+
+        # The robot returns a deferred for these actions. It does this because
+        # it needs to set up internal state (e.g. asking the client to draw
+        # pretty scan arcs). Ask the robot for a result when we're ready. (See
+        # below)
+        WRAP_DEFERRED = {
+                'scan_robots' : (2, lambda _:
+                    robot.scan_robots(kwargs['angle'])),
+                'scan_wall'   : (1, lambda _:
+                    robot.scan_wall()),
+        }
+
+        # The 'normal' actions -- these should be run in the future. 0 means on
+        # next tic; 1 means one tic after that, etc.
+        LATER = {
+            'steer'     : (0, lambda _: robot.steer_by(kwargs['amount'])),
+            'throttle'  : (0, lambda _:
+                robot.set_throttle(kwargs['amount'])),
+            'location'  : (3, lambda _:
+                robot.location),
+            'rotation'  : (2, lambda _:
+                robot.rotation),
+        }
+
+        if action_str in INSTANT:
+            # we're using deferreds backwards by firing it right away, but
+            # that's OK; when callbacks are added, the result'll be passed right
+            # along.
             d = Deferred()
-            d.callback(callback(self.time))
-        else:
+            d.callback(INSTANT[action_str](self.time))
+        elif action_str in LATER:
+            # Just call the action later.
+            time, cb = LATER[action_str]
             d = self.set_future(time, robot_id)
-            d.addCallback(callback)
+            d.addCallback(cb)
+        elif action_str in WRAP_DEFERRED:
+            # complicated!
+            # basic idea: we're chaining two deferreds together; adding a
+            # callback to one deferred that when run will give us the results of
+            # calling another deferred.
+            time, action = WRAP_DEFERRED[action_str]
+            # Run this action right away. The robot will set up internal state
+            # and this'll return a deferred.
+            robot_defr = action(self.time)
+            # We'll call the robot's deferred back later. When we fire that
+            # deferred, we're asking the robot to return the results of its scan
+            # or whatever it's doing.
+            later_defr = self.set_future(time, robot_id)
+            def when_the_time_is_ripe(time):
+                # Ahh, but there's a catch! robot_defr.callback returns None,
+                # so we have to reach in and grab the result.
+                robot_defr.callback(time)
+                return robot_defr.result
+            # Now, send the CLIENT the RESULT of the ROBOT'S DEFERRED when we
+            # want it.
+            later_defr.addCallback(when_the_time_is_ripe)
+            # ...And robosocket.py or whatever will handle actually sending the
+            # result to the client.
+            # The reason we're going to all this trouble is so WE can decide how
+            # long the robot should take, not the robot.
+        else:
+            raise KeyError, "Invalid command"
         return d
 
 class CheatingException(Exception):
