@@ -205,11 +205,12 @@ class ATRobotsInspiredGame(Game):
                     robot.location),
                 'rotation'  : (2, lambda _:
                     robot.rotation),
-                'scan'      : (2, lambda _:
-                    robot.end_scan()),
+                'scan_robots': (2, lambda _:
+                    # todo! grab robot.start_scan_robots from robosocket
+                    robot.end_scan_robots()),
                 'scan_wall' : (1, lambda _:
-                    # todo! grab robot.start_scan from robosocket
-                    robot.scan_wall()),
+                    # todo! grab robot.start_scan_wall from robosocket
+                    robot.end_scan_wall()),
                 'rotate_turret' : (-1, lambda _:
                     robot.rotate_turret(kwargs['angle'])),
             }[action_str]

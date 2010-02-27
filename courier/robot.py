@@ -21,6 +21,7 @@ class Robot(fieldobject.FieldObject):
         self.field = field
         self.location = vector.Vector(location)
         self.scan_width = 0
+        self.scan_mode = ""
         self.heat = 0
 
         assert sum([scanner,weapon,armor,engine,heatsink,mines,shield]) <= 12, "You can only have 12 points"
@@ -44,6 +45,7 @@ class Robot(fieldobject.FieldObject):
                 'location': self.location,
                 'rotation': self.rotation,
                 'turret_rot': self.turret_rot,
+                'scan_mode': self.scan_mode,
                 'scan_width': self.scan_width,
                 'scanrange': self.scanrange,
                 'speed': self.speed,
@@ -124,12 +126,19 @@ class Robot(fieldobject.FieldObject):
                     key=lambda other: (other.location - self.location).dist))
                 - self.rotation)
 
-    def scan_wall(self):
+    def start_scan_wall(self):
+        """
+        Starts scanning for walls
+        """
+        self.scan_mode = "wall"
+
+    def end_scan_wall(self):
         """
         Returns the distance to the closest wall in the direction the robot's
         currently heading. A little sonar beacon is mounted on the robot's nose.
         This is wrt to the robot's rotation, not the turret's rotation.
         """
+        self.scan_mode = ""
         return self.field.dist_to_wall(self, self.turret_absolute)
 
     def steer_by(self, amount):
@@ -151,7 +160,7 @@ class Robot(fieldobject.FieldObject):
     def dead(self):
         return self.armor <= 0
 
-    def start_scan(self, angle):
+    def start_scan_robots(self, angle):
         """
         Takes a scan of the field. scan_end returns (distance, accuracy) to the
         nearest target where position could be False or a number and accuracy is
@@ -160,8 +169,9 @@ class Robot(fieldobject.FieldObject):
         if self.dead:
             raise RobotError("%s is too dead to scan!" % self.name)
         self.scan_width = angle
+        self.scan_mode = "robots"
 
-    def end_scan(self):
+    def end_scan_robots(self):
         """
         Stops scanning. Return distance, accuracy.
         """
@@ -180,6 +190,7 @@ class Robot(fieldobject.FieldObject):
                 # oh, and sort that by distance.
                 lambda rob, dist: dist)
         self.scan_width = 0
+        self.scan_mode = ""
         if hits:
             # return: distance, accuracy
             return (hits[0][1],

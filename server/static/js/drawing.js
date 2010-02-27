@@ -48,7 +48,8 @@ courier.drawing = (function() { // begin courier namespace
           ctx.moveTo(0,0);
           ctx.lineTo(0, 30);
           ctx.stroke();
-          if (rob.scan_width) {
+          if (rob.scan_mode == "robots") {
+            // Scanning for robots
             ctx.beginPath();
             ctx.lineTo(0, 0);
             ctx.arc(0, 0,
@@ -58,6 +59,13 @@ courier.drawing = (function() { // begin courier namespace
                 false); // anticlockwise?
             ctx.lineTo(0, 0);
             ctx.stroke();
+          } else if (rob.scan_mode == "wall") {
+            // Sonar ping for wall
+            for (var i = 5; i>0; i--) {
+              ctx.beginPath();
+              ctx.arc(0, 0, rob.scanrange*i/5, 3.14/2+0.2, 3.14/2-0.2, true);
+              ctx.stroke();
+            }
           }
           ctx.rotate(rob.turret_rot);
       ctx.restore();

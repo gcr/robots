@@ -102,6 +102,7 @@ class RoboResource(resource.Resource):
             elif 'rotation' in request.args:
                 return self.dispatch_game_action(request, 'rotation')
             elif 'scan_wall' in request.args:
+                self.robot.start_scan_wall()
                 return self.dispatch_game_action(request, 'scan_wall')
             elif 'rotate_turret' in request.args:
                 angle = utils.verify_float(request.args, 'angle')
@@ -110,9 +111,9 @@ class RoboResource(resource.Resource):
             elif 'scan' in request.args:
                 angle = utils.verify_float(request.args, 'angle')
                 assert -pi/2. < angle < pi/2., "Angle must be between -pi/2 and pi/2"
-                self.robot.start_scan(angle)
+                self.robot.start_scan_robots(angle)
                 # todo: put that in the game logic
-                return self.dispatch_game_action(request, 'scan')
+                return self.dispatch_game_action(request, 'scan_robots')
 
         raise KeyError, "Invalid Command"
         return server.NOT_DONE_YET
