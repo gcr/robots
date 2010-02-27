@@ -63,18 +63,6 @@ class RoboResource(resource.Resource):
         print self.game.robots
         return server.NOT_DONE_YET
 
-    def dispatch_game_action(self, req, action, **kwargs):
-        # Ask the game logic to handle this action for us.
-        # When we're done, render the JSON results.
-        game_action = self.game.robot_action(self.robot_id, action, **kwargs)
-        def send_result(result=None):
-            JsonResource(result).render(req)
-        game_action.addCallback(send_result)
-        def on_error(result):
-            ErrorResource(result.value[0]).render(req)
-        game_action.addErrback(on_error)
-        return server.NOT_DONE_YET
-
     def render_GET(self, request):
         " What to do when they connect to our URL "
         if 'info' in request.args:
@@ -90,26 +78,43 @@ class RoboResource(resource.Resource):
                 # reunite them with their existing robot.
                 JsonResource(self.robot).render(request)
                 return server.NOT_DONE_YET
-            elif 'steer' in request.args:
-                amount = utils.verify_float(request.args, 'amount')
-                return self.dispatch_game_action(request, 'steer', amount=amount)
-            elif 'throttle' in request.args:
-                amount = utils.verify_float(request.args, 'amount')
-                return self.dispatch_game_action(request, 'throttle', amount=amount)
-            elif 'location' in request.args:
-                return self.dispatch_game_action(request, 'location')
-            elif 'rotation' in request.args:
-                return self.dispatch_game_action(request, 'rotation')
-            elif 'scan_wall' in request.args:
-                return self.dispatch_game_action(request, 'scan_wall')
-            elif 'rotate_turret' in request.args:
-                angle = utils.verify_float(request.args, 'angle')
-                return self.dispatch_game_action(request, 'rotate_turret',
-                        angle=angle)
-            elif 'scan' in request.args:
-                angle = utils.verify_float(request.args, 'angle')
-                return self.dispatch_game_action(request, 'scan_robots',
-                        angle=angle)
+
+            # written like this.
+            # {
+            #   'request': (
+            #               ('game_logic_string', 'extra_arguments_to_verify'),
+            #               ...
+            #              )
+            # e.g. http://.../robot_xxx?request=t&extra_arguments=25
+            ACTIONS = {
+                'steer': [['steer', 'amount']],
+                'throttle': [['throttle', 'amount']],
+                'location': [['location']],
+                'rotation': [['rotation']],
+                'scan_wall': [['scan_wall']],
+                'rotate_turret':  [['rotate_turret', 'angle']],
+                'scan': [['scan_robots', 'angle']],
+            }
+            for action in ACTIONS:
+                if action in request.args:
+                    for overloaded_function in ACTIONS[action]:
+                        arguments = overloaded_function[1:]
+                        action_str = overloaded_function[0]
+                        kwargs = {}
+                        # verify the rest of the arguments
+                        for arg in arguments:
+                            kwargs[arg] = utils.verify_float(request.args, arg)
+                        # Ask the game logic to handle this action for us.
+                        # When we're done, render the JSON results.
+                        game_action = self.game.robot_action(self.robot_id,
+                                action_str, **kwargs)
+                        def send_result(result=None):
+                            JsonResource(result).render(request)
+                        game_action.addCallback(send_result)
+                        def on_error(result):
+                            ErrorResource(result.value[0]).render(request)
+                        game_action.addErrback(on_error)
+                        return server.NOT_DONE_YET
 
         raise KeyError, "Invalid Command"
         return server.NOT_DONE_YET

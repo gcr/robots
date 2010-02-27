@@ -250,7 +250,7 @@ class ATRobotsInspiredGame(Game):
             # We'll call the robot's deferred back later. When we fire that
             # deferred, we're asking the robot to return the results of its scan
             # or whatever it's doing.
-            later_defr = self.set_future(time, robot_id)
+            d = self.set_future(time, robot_id)
             def when_the_time_is_ripe(time):
                 # Ahh, but there's a catch! robot_defr.callback returns None,
                 # so we have to reach in and grab the result.
@@ -258,7 +258,7 @@ class ATRobotsInspiredGame(Game):
                 return robot_defr.result
             # Now, send the CLIENT the RESULT of the ROBOT'S DEFERRED when we
             # want it.
-            later_defr.addCallback(when_the_time_is_ripe)
+            d.addCallback(when_the_time_is_ripe)
             # ...And robosocket.py or whatever will handle actually sending the
             # result to the client.
             # The reason we're going to all this trouble is so WE can decide how

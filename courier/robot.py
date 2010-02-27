@@ -141,7 +141,6 @@ class Robot(fieldobject.FieldObject):
             turret's rotation.
             """
             self.scan_mode = ""
-            print self.field.dist_to_wall(self, self.turret_absolute)
             return self.field.dist_to_wall(self, self.turret_absolute)
         d = Deferred()
         d.addCallback(end_scan_wall)
