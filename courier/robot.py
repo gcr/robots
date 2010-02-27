@@ -12,6 +12,14 @@ class Robot(fieldobject.FieldObject):
     """
     def __init__(self, name, field, location, scanner=5, weapon=2, armor=2,
             engine=2, heatsink=1,mines=0,shield=0):
+        assert sum([scanner,weapon,armor,engine,heatsink,mines,shield]) <= 12, "You can only have 12 points"
+        self.scanrange = [250,  350, 500, 700, 1000, 1500][scanner]
+        self.weapon =    [0.5,  0.8,  1., 1.2, 1.35,  1.5][weapon]
+        self.armor =     [ 50,   66, 100, 120,  130,  150][armor]
+        self.engine = (  [0.5,  0.8,  1., 1.2, 1.35,  1.5][engine]
+                       * [1.33, 1.2,  1., 0.8, 0.75, 0.66][armor])
+        self.heatsink = [0.75, 1.0, 1.125, 1.25, 1.33, 1.5][heatsink]
+
         self.name = name
         self.throttle = 0 # How fast we WANT to go
         self.speed = 0 # How fast we're ACTUALLY going
@@ -24,14 +32,6 @@ class Robot(fieldobject.FieldObject):
         self.scan_width = 0
         self.scan_mode = ""
         self.heat = 0
-
-        assert sum([scanner,weapon,armor,engine,heatsink,mines,shield]) <= 12, "You can only have 12 points"
-        self.scanrange = [250,  350, 500, 700, 1000, 1500][scanner]
-        self.weapon =    [0.5,  0.8,  1., 1.2, 1.35,  1.5][weapon]
-        self.armor =     [ 50,   66, 100, 120,  130,  150][armor]
-        self.engine = (  [0.5,  0.8,  1., 1.2, 1.35,  1.5][engine]
-                       * [1.33, 1.2,  1., 0.8, 0.75, 0.66][armor])
-        self.heatsink = [0.75, 1.0, 1.125, 1.25, 1.33, 1.5][heatsink]
 
     def __json__(self):
         return {'name': self.name,
@@ -117,7 +117,7 @@ class Robot(fieldobject.FieldObject):
     def sonar(self):
         """
         Does sonar. This takes a scan of the field and returns the bearing to
-        the nearest target. Computed relative to the tank's steering.
+        the nearest target. Computed relative to the robot's steering.
         """
         if self.dead:
             raise RobotError("%s is too dead to scan!" % self.name)
@@ -127,26 +127,7 @@ class Robot(fieldobject.FieldObject):
                     key=lambda other: (other.location - self.location).dist))
                 - self.rotation)
 
-    def scan_wall(self):
-        """
-        Starts scanning for walls. Returns a deferred -- call it when you want
-        it.
-        """
-        self.scan_mode = "wall"
-        def end_scan_wall(*args):
-            """
-            Returns the distance to the closest wall in the direction the
-            robot's currently heading. A little sonar beacon is mounted on the
-            robot's nose. This is wrt to the robot's rotation, not the
-            turret's rotation.
-            """
-            self.scan_mode = ""
-            return self.field.dist_to_wall(self, self.turret_absolute)
-        d = Deferred()
-        d.addCallback(end_scan_wall)
-        return d
-
-    def steer_by(self, amount):
+    def turn(self, amount):
         """
         Steers ourselves by rotation.
         """
@@ -210,6 +191,22 @@ class Robot(fieldobject.FieldObject):
                 return None
         d = Deferred()
         d.addCallback(end_scan)
+        return d
+
+    def scan_wall(self):
+        """
+        Starts scanning for walls. Returns a deferred -- call it when you want
+        the result.
+        The deferred returns the distance to the closest wall in the direction
+        the robot's currently heading. A little sonar beacon is mounted on the
+        robot's nose. This is wrt to the turret's rotation.
+        """
+        self.scan_mode = "wall"
+        def end_scan_wall(*args):
+            self.scan_mode = ""
+            return self.field.dist_to_wall(self, self.turret_absolute)
+        d = Deferred()
+        d.addCallback(end_scan_wall)
         return d
 
     @property

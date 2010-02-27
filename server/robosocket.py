@@ -87,13 +87,15 @@ class RoboResource(resource.Resource):
             #              )
             # e.g. http://.../robot_xxx?request=t&extra_arguments=25
             ACTIONS = {
-                'steer': [['steer', 'amount']],
-                'throttle': [['throttle', 'amount']],
+                'turn': [['turn', 'amount']],
+                'throttle': [['set_throttle', 'amount'],
+                             ['get_throttle']],
                 'location': [['location']],
                 'rotation': [['rotation']],
                 'scan_wall': [['scan_wall']],
-                'rotate_turret':  [['rotate_turret', 'angle']],
-                'scan': [['scan_robots', 'angle']],
+                'turret_rotate':  [['set_turret_rotate', 'angle'],
+                                   ['get_turret_rotate']],
+                'scan_robots': [['scan_robots', 'angle']],
             }
             for action in ACTIONS:
                 if action in request.args:
@@ -101,20 +103,22 @@ class RoboResource(resource.Resource):
                         arguments = overloaded_function[1:]
                         action_str = overloaded_function[0]
                         kwargs = {}
-                        # verify the rest of the arguments
-                        for arg in arguments:
-                            kwargs[arg] = utils.verify_float(request.args, arg)
-                        # Ask the game logic to handle this action for us.
-                        # When we're done, render the JSON results.
-                        game_action = self.game.robot_action(self.robot_id,
-                                action_str, **kwargs)
-                        def send_result(result=None):
-                            JsonResource(result).render(request)
-                        game_action.addCallback(send_result)
-                        def on_error(result):
-                            ErrorResource(result.value[0]).render(request)
-                        game_action.addErrback(on_error)
-                        return server.NOT_DONE_YET
+                        # which overloaded 'action' to call?
+                        if all([arg in request.args for arg in arguments]):
+                            # verify the rest of the arguments
+                            for arg in arguments:
+                                kwargs[arg] = utils.verify_float(request.args, arg)
+                            # Ask the game logic to handle this action for us.
+                            # When we're done, render the JSON results.
+                            game_action = self.game.robot_action(self.robot_id,
+                                    action_str, **kwargs)
+                            def send_result(result=None):
+                                JsonResource(result).render(request)
+                            game_action.addCallback(send_result)
+                            def on_error(result):
+                                ErrorResource(result.value[0]).render(request)
+                            game_action.addErrback(on_error)
+                            return server.NOT_DONE_YET
 
         raise KeyError, "Invalid Command"
         return server.NOT_DONE_YET

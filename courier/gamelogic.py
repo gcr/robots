@@ -200,8 +200,12 @@ class ATRobotsInspiredGame(Game):
         # These actions should return something to the client instantly. Used
         # for getting variables, etc.
         INSTANT = {
-            'rotate_turret': (lambda _:
-                robot.rotate_turret(kwargs['angle']))
+            'get_throttle': (lambda _:
+                robot.throttle),
+            'get_turret_rotate': (lambda _:
+                robot.turret_rot),
+            'set_turret_rotate': (lambda _:
+                robot.rotate_turret(kwargs['angle'])),
         }
 
         # The robot returns a deferred for these actions. It does this because
@@ -218,12 +222,12 @@ class ATRobotsInspiredGame(Game):
         # The 'normal' actions -- these should be run in the future. 0 means on
         # next tic; 1 means one tic after that, etc.
         LATER = {
-            'steer'     : (0, lambda _: robot.steer_by(kwargs['amount'])),
-            'throttle'  : (0, lambda _:
+            'turn'        : (0, lambda _: robot.turn(kwargs['amount'])),
+            'set_throttle': (0, lambda _:
                 robot.set_throttle(kwargs['amount'])),
-            'location'  : (3, lambda _:
+            'location'    : (3, lambda _:
                 robot.location),
-            'rotation'  : (2, lambda _:
+            'rotation'    : (2, lambda _:
                 robot.rotation),
         }
 

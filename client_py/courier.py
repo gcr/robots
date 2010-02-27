@@ -6,7 +6,7 @@ import urllib2
 import urllib
 import socket
 import json
-from math import pi
+import math
 
 def fetch_raw(url, kwargs=None):
     """
@@ -55,7 +55,7 @@ class Robot(object):
     A robot held on the client side.
     """
     @classmethod
-    def connect(self, slot_url, **kwargs):
+    def connect(cls, slot_url, **kwargs):
         kwargs['connect'] = 't'
         return Robot(slot_url, fetch_persist(slot_url, kwargs))
 
@@ -69,39 +69,46 @@ class Robot(object):
     def __str__(self):
         return "<Robot '%s' (%s armor)>" % (self.name, self.armor)
 
-    def steer(self, amount):
+    def turn(self, amount):
         """
         Steer ourselves by amount (relative)
         """
-        return fetch(self.url, {'steer': 't', 'amount': amount})
+        return fetch(self.url, {'turn': 't', 'amount': math.radians(amount)})
 
-    def steer_abs(self, angle):
+    def turn_abs(self, angle):
         """
-        Steer ourselves so that we're facing angle
+        Steer ourselves so that we're facing the given angle
         """
-        self.steer(angle - self.compass())
+        self.turn(math.radians(angle - self.compass()))
 
-    def throttle(self, amount):
+    def get_throttle(self):
+        return fetch(self.url, {'throttle': 't'})
+    def set_throttle(self, amount):
         """
         Set our throttle to a percentage between -50 and 100.
         """
         return fetch(self.url, {'throttle': 't', 'amount': amount})
+    throttle = property(get_throttle, set_throttle)
 
     def compass(self):
-        return fetch(self.url, {'rotation': 't'})
+        return math.degrees(fetch(self.url, {'rotation': 't'}))
 
     def locate(self):
         return fetch(self.url, {'location': 't'})
 
     def scan(self, angle):
-        assert -pi < angle < pi
-        return fetch(self.url, {'scan': 't', 'angle': angle})
+        assert -90 <= angle <= 90
+        return fetch(self.url, {'scan_robots': 't', 'angle': math.radians(angle)})
 
     def scan_wall(self):
         return fetch(self.url, {'scan_wall': 't'})
 
-    def rotate_turret(self, angle):
-        return fetch(self.url, {'rotate_turret': 't', 'angle': angle})
+    def set_turret_rotation(self, angle):
+        return fetch(self.url, {'turret_rotate': 't', 'angle':
+			math.radians(angle)})
+    def get_turret_rotation(self):
+        return math.degrees(fetch(self.url, {'turret_rotate': 't'}))
+    turret_rotation = property(get_turret_rotation, set_turret_rotation)
 
 class Match(object):
     @classmethod
