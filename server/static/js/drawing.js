@@ -61,9 +61,10 @@ courier.drawing = (function() { // begin courier namespace
             ctx.stroke();
           } else if (rob.scan_mode == "wall") {
             // Sonar ping for wall
-            for (var i = 5; i>0; i--) {
+            for (var i = 5,r; i>0; i--) {
+              r = Math.random()/2 + 0.5;
               ctx.beginPath();
-              ctx.arc(0, 0, rob.scanrange*i/5, 3.14/2+0.2, 3.14/2-0.2, true);
+              ctx.arc(0, 0, rob.scanrange*i/5*r, 3.14/2+0.2, 3.14/2-0.2, true);
               ctx.stroke();
             }
           }
