@@ -12,6 +12,7 @@ class Game(object):
     """
     Represents the logic for this game.
     """
+    FIELD = field.Field()
     def __init__(self):
         """
         create a field, history, and robots
@@ -21,7 +22,7 @@ class Game(object):
         # {25: {1: defr, 2: defr, 3: defr}} means three actions will be
         # carried out at time=25
         self.future = {}
-        self.field = field.Field()
+        self.field = self.FIELD
         # maps unique IDs to robots
         self.robots = {}
         # callbacks
@@ -177,8 +178,6 @@ class Game(object):
         """
         # Subclass this.
         pass
-
-
 
 class ATRobotsInspiredGame(Game):
     def robot_action(self, robot_id, action_str, **kwargs):
