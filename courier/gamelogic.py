@@ -18,8 +18,8 @@ class Game(object):
         """
         self.time = 0
         # maps time to a list of actions
-        # {25: {1: defr, 2: defr, 3: defr}} means three actions will be carried out
-        # should be executed at time=25
+        # {25: {1: defr, 2: defr, 3: defr}} means three actions will be
+        # carried out at time=25
         self.future = {}
         self.field = field.Field()
         # maps unique IDs to robots

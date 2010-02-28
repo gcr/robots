@@ -136,8 +136,8 @@ class Robot(fieldobject.FieldObject):
 
     def set_throttle(self, amount):
         """
-        set our throttle to be between -self.engine*5 and self.engine*10
-        expects a percentage
+        Set our throttle to be between -self.engine*5 and self.engine*10
+        This function expects a percentage.
         """
         amount = max(-.5, min(amount/100., 1))
         self.throttle = 10*self.engine*amount
@@ -158,7 +158,6 @@ class Robot(fieldobject.FieldObject):
         assert -math.pi < angle < math.pi, "angle must be between -math.pi and math.pi (90 degrees)!"
         self.scan_width = angle
         self.scan_mode = "robots"
-
         def end_scan(*args):
             """
             Stops scanning. Return distance, accuracy.
@@ -166,27 +165,27 @@ class Robot(fieldobject.FieldObject):
             assert self.scan_width, "We weren't scanning!"
             scan_width = self.scan_width
             hits = sorted(
-                    # Build a tuple of robots and our distances...
-                    [(other, (other.location - self.location).dist)
-                        for other in self.field.other_robots(self)
-                        # if they're within range...
-                        if (other.location - self.location).dist < self.scanrange
-                        # ...and if they're within our proper angle.
-                        and abs(vector.angle_normalize(
-                                self.bearing(other) - self.turret_absolute
-                            )) < scan_width],
-                    # oh, and sort that by distance.
-                    lambda rob, dist: dist)
+                # Build a tuple of robots and our distances...
+                [(other, (other.location - self.location).dist)
+                    for other in self.field.other_robots(self)
+                    # if they're within range...
+                    if (other.location - self.location).dist < self.scanrange
+                    # ...and if they're within our proper angle.
+                    and abs(vector.angle_normalize(
+                            self.bearing(other) - self.turret_absolute
+                        )) < scan_width],
+                # oh, and sort that by distance.
+                lambda rob, dist: dist)
             self.scan_width = 0
             self.scan_mode = ""
             if hits:
                 # return: distance, accuracy
                 return (hits[0][1],
-                        # accuracy: the angle to the other one divided by scan_width
-                        # between negative two and positive two
-                        round(2*vector.angle_normalize(
-                            self.bearing(other) - self.turret_absolute)/scan_width
-                       )/2)
+                    # accuracy: the angle to the other one divided by scan_width
+                    # between negative two and positive two
+                    round(2*vector.angle_normalize(
+                        self.bearing(other) - self.turret_absolute)/scan_width
+                   )/2)
             else:
                 return None
         d = Deferred()

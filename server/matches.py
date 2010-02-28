@@ -19,7 +19,7 @@ class Match(resource.Resource):
     handles what to do with the client.
     """
     GAME_LOGIC = gamelogic.ATRobotsInspiredGame
-    MIN_MATCH_SPEED = 0.05               # fastest match allowed
+    MIN_MATCH_SPEED = 0.01               # fastest match allowed
 
     def __init__(self, matchlist, speed=0.2, public=True, start_timeout=0,
             lockstep=False):
@@ -182,7 +182,7 @@ class Matches(resource.Resource):
             if 'public' in request.args:
                 args['public'] = utils.is_trueish(request.args['public'][0]);
             if 'speed' in request.args:
-                assert (float(request.args['speed'][0]) >
+                assert (float(request.args['speed'][0]) >=
                     self.MATCH_TYPE.MIN_MATCH_SPEED), "Match can't be that fast!"
                 args['speed'] = float(request.args['speed'][0])
             if 'start_timeout' in request.args:

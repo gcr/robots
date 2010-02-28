@@ -74,7 +74,7 @@ class Robot(object):
         """
         Steer ourselves by amount (relative)
         """
-        return fetch(self.url, {'turn': 't', 'amount': math.radians(amount)})
+        return fetch_persist(self.url, {'turn': 't', 'amount': math.radians(amount)})
 
     def turn_abs(self, angle):
         """
@@ -83,34 +83,34 @@ class Robot(object):
         self.turn(math.radians(angle - self.compass()))
 
     def get_throttle(self):
-        return fetch(self.url, {'throttle': 't'})
+        return fetch_persist(self.url, {'throttle': 't'})
     def set_throttle(self, amount):
         """
         Set our throttle to a percentage between -50 and 100.
         """
-        return fetch(self.url, {'throttle': 't', 'amount': amount})
+        return fetch_persist(self.url, {'throttle': 't', 'amount': amount})
     throttle = property(get_throttle, set_throttle)
 
     def compass(self):
-        return math.degrees(fetch(self.url, {'rotation': 't'}))
+        return math.degrees(fetch_persist(self.url, {'rotation': 't'}))
 
     def locate(self):
-        return fetch(self.url, {'location': 't'})
+        return fetch_persist(self.url, {'location': 't'})
 
     def scan(self, angle):
         assert -90 <= angle <= 90
-        return fetch(self.url, {'scan_robots': 't', 'angle': math.radians(angle)})
+        return fetch_persist(self.url, {'scan_robots': 't', 'angle': math.radians(angle)})
 
     def scan_wall(self):
-        return fetch(self.url, {'scan_wall': 't'})
+        return fetch_persist(self.url, {'scan_wall': 't'})
 
     def set_turret_rotation(self, angle):
         self._turret_rotation = angle
-        return fetch(self.url, {'turret_rotate': 't', 'angle':
+        return fetch_persist(self.url, {'turret_rotate': 't', 'angle':
 			math.radians(angle)})
     def get_turret_rotation(self):
         if self._turret_rotation is None:
-            self._turret_rotation = math.degrees(fetch(self.url, {'turret_rotate': 't'}))
+            self._turret_rotation = math.degrees(fetch_persist(self.url, {'turret_rotate': 't'}))
         return self._turret_rotation
     turret_rotation = property(get_turret_rotation, set_turret_rotation)
 
@@ -150,7 +150,7 @@ class Match(object):
 
     def register_slot(self):
         print "Connecting..."
-        slot_url = url_concat(self.url, fetch(self.url, {'register': 't'}))
+        slot_url = url_concat(self.url, fetch_persist(self.url, {'register': 't'}))
         print "Here is your robot's slot:\n    %s    \n" % slot_url
         print ("If your robot crashes, use that URL next time "
                 "you connect to rejoin the match.\n")
@@ -158,7 +158,7 @@ class Match(object):
 
     def start(self):
         if not self.started and self.auth_code:
-            fetch(self.url, {'start': 't', 'auth_code': self.auth_code})
+            fetch_persist(self.url, {'start': 't', 'auth_code': self.auth_code})
         return True
 
 class RoboLink(object):
