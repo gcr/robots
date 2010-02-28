@@ -4,7 +4,7 @@
 from twisted.web import server, resource, error, http, static
 from twisted.internet import reactor
 from server.custom_factories import JsonTracebackSite
-from server.matches import Matches, Match
+from server.matches import MatchList, Match
 from server import jinja_resource
 
 # Which port to run on?
@@ -16,7 +16,7 @@ ROUTES = {
             'js':      static.File("server/static/js"),
             'css':     static.File("server/static/css"),
             'img':     static.File("server/static/img"),
-            'matches': Matches(),
+            'matches': MatchList(),
 }
 
 
