@@ -86,6 +86,11 @@ class RoboResource(resource.Resource):
             #               ...
             #              )
             # e.g. http://.../robot_xxx?request=t&extra_arguments=25
+
+            # The below is just *aching* to be rewritten in lisp. Or Ruby. My
+            # apologies for this mess and the other one in
+            # ATRobotsInspiredGame.robot_action. Guess I'm stuck with Python
+            # for now; ah well.
             ACTIONS = {
                 'turn': [['turn', 'amount']],
                 'throttle': [['set_throttle', 'amount'],
