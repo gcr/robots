@@ -7,9 +7,6 @@ import field
 class FieldObject(object):
     def __init__(self, field):
         self.location = vector.Vector([0, 0])
-        self.speed = 0
-        self.rotation = 0
-        self.throttle = 0
         self.field = field
 
     def __json__(self):
@@ -22,6 +19,10 @@ class FieldObject(object):
 
     def hit(self, damage):
         print str(self) + " hit"
+        pass
+
+    def collide_with_boundary(self):
+        print str(self) + " collided"
         pass
 
     @property

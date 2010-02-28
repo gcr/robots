@@ -74,17 +74,13 @@ class Field:
         for obj in self.objects:
             obj.pump()
             x, y = obj.location
-            if 0 > x or self.width < x:
+            if not (0 <= x <= self.width and 0 <= y <= self.height):
                 # Out of bounds
-                self.hit(obj, obj.speed/30)
-                obj.speed = 0
-                obj.throttle = 0
-                obj.location[0] = max(0, min(x, self.width))
-            if 0 > y or self.height < y:
-                self.hit(obj, obj.speed/30)
-                obj.speed = 0
-                obj.throttle = 0
-                obj.location[1] = max(0, min(y, self.height))
+                obj.collide_with_boundary()
+                # ...and move it out of the way.
+                obj.location = vector.Vector(
+                        [max(0, min(x, self.width)),
+                         max(0, min(y, self.height))])
 
         if self.on_pump_cb:
             self.on_pump_cb(self)

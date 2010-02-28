@@ -212,6 +212,14 @@ class Robot(fieldobject.FieldObject):
         d.addCallback(end_scan_wall)
         return d
 
+    def collide_with_boundary(self):
+        """
+        What happens when our robot collides with the outer edge of the map.
+        (Note that the field will handle relocating our object.)
+        """
+        self.field.hit(self, self.speed/30)
+        self.speed, self.throttle = 0, 0
+
     @property
     def turret_absolute(self):
         """
