@@ -6,8 +6,7 @@ var sys         = require('sys'),
     routes      = require('routes');
 
 http.createServer(function (req, res) {
-    switchboard.dispatch(req,
-      res,
+    switchboard.dispatch(req, res,
       url.parse(req.url).pathname,
       routes.routingTable);
 }).listen(8080);
