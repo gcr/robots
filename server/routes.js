@@ -5,7 +5,10 @@ var
   log    = require('log'),
   views  = require('views'),
   url    = require('url'),
+  mlist  = require('matchlist'),
   routes = exports;
+
+var matches = routes.matches = new mlist.MatchList();
 
 exports.routingTable = {
   // Default page.
