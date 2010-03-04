@@ -1,6 +1,7 @@
 // Switchboard: Handles handing off requests
 var
   switchboard = exports,
+  log         = require('log'),
   sys         = require('sys'),
   assert      = require('assert'),
   url         = require('url');
@@ -9,7 +10,7 @@ switchboard.notFound = function(req, res) {
   res.writeHeader(404, {"Content-Type": "text/plain"});
   res.write("Not found\n");
   res.close();
-  sys.puts("/!\\ URL not found: " + req.url);
+  log.error("URL not found: " + req.url + "\n" + sys.inspect(req));
   return false;
 };
 

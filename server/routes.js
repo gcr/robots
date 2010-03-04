@@ -2,7 +2,7 @@
 //              handle which URLs
 var
   sb     = require('switchboard'),
-  sys    = require('sys'),
+  log    = require('log'),
   views  = require('views'),
   url    = require('url'),
   routes = exports;
@@ -41,7 +41,7 @@ exports.routingTable = {
 
   // This logs stuff when you go into it. A function that dispatches stuff.
   'log' : function(req, res, path) {
-    sys.puts("OHNOES: Somebody is going to " + req.url);
+    log.warn("OHNOES: Somebody is going to " + req.url);
     return sb.dispatch(req, res, path, {
       'foo': function(req, res) {
         res.writeHeader(200, {"Content-Type": "text/plain"});
