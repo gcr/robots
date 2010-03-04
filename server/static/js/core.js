@@ -46,7 +46,7 @@ function StreamingHistory(url, state, cb) {
   if (this.state == -1) {
     // they don't know what state they're at? uh oh! we'd best tell them,
     // but this is bad because they're going to miss things!
-    this.xhr = ajaxRequest(url, {get_state: true}, function(state, textStatus) {
+    this.xhr = ajaxRequest(url, {}, function(state, textStatus) {
       self.state = state;
       self.nextHist();
     });
