@@ -1,4 +1,9 @@
-var sb = require('switchboard'), sys = require('sys');
+// routes.js -- what should go where and when. Which parts of the code should
+//              handle which URLs
+var
+  sb    = require('switchboard'),
+  sys   = require('sys'),
+  views = require('views');
 
 exports.routingTable = {
   // Default page.
@@ -8,6 +13,8 @@ exports.routingTable = {
       res.write("Welcome!\n");
       res.close();
     },
+
+  'jsontest': views.respondWith({"Foo": 25}),
 
   'test': {
     // http://localhost:8080/test/a

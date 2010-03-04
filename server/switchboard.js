@@ -1,8 +1,9 @@
 // Switchboard: Handles handing off requests
-var switchboard = exports,
-    sys = require('sys'),
-    assert = require('assert'),
-    url = require('url');
+var
+  switchboard = exports,
+  sys         = require('sys'),
+  assert      = require('assert'),
+  url         = require('url');
 
 switchboard.notFound = function(req, res) {
   res.writeHeader(404, {"Content-Type": "text/plain"});
