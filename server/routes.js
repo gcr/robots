@@ -1,9 +1,11 @@
 // routes.js -- what should go where and when. Which parts of the code should
 //              handle which URLs
 var
-  sb    = require('switchboard'),
-  sys   = require('sys'),
-  views = require('views');
+  sb     = require('switchboard'),
+  sys    = require('sys'),
+  views  = require('views'),
+  url    = require('url'),
+  routes = exports;
 
 exports.routingTable = {
   // Default page.
@@ -79,4 +81,12 @@ exports.routingTable = {
       res.close();
     })
 
+};
+
+
+// Use this function to do things from our HTTP server.
+routes.dispatch = function(req, res) {
+  sb.dispatch(req, res,
+    url.parse(req.url).pathname,
+    routes.routingTable);
 };

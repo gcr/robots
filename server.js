@@ -2,19 +2,21 @@ require.paths.push("./server");
 var
   sys         = require('sys'),
   http        = require('http'),
-  url         = require('url'),
-  switchboard = require('switchboard'),
   routes      = require('routes'),
+  repl        = require('repl'),
 
   PORT        = 8080;
 
 
 ////////////////////////////////////////////////////
-http.createServer(function (req, res) {
-    switchboard.dispatch(req, res,
-      url.parse(req.url).pathname,
-      routes.routingTable);
-}).listen(PORT);
+http.createServer(routes.dispatch).listen(PORT);
 sys.puts('Server running at http://127.0.0.1:' + PORT + '/');
 
-require('repl').start();
+// Help our repl out.
+repl.scope.routes = routes.routingTable;
+repl.scope.views = require('views');
+repl.start();
+process.stdio.addListener("close", function() {
+    sys.puts("\nLeaving so soon?");
+    process.exit(0);
+  });
