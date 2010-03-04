@@ -7,7 +7,7 @@ var
 
 switchboard.notFound = function(req, res) {
   res.writeHeader(404, {"Content-Type": "text/plain"});
-  res.write("Not found");
+  res.write("Not found\n");
   res.close();
   sys.puts("/!\\ URL not found: " + req.url);
   return false;
