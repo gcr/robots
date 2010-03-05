@@ -3,7 +3,6 @@
 //             neckties.
 
 var
-  matchlist   = require('matchlist'),
   switchboard = require('switchboard'),
   url         = require('url'),
   hist        = require('history'),
@@ -11,12 +10,7 @@ var
   renderJson  = require('misc').renderJson,
   respondWith = require('misc').respondWith,
   log         = require('log'),
-  sys         = require('sys'),
-  views       = exports,
-  matches     = new matchlist.MatchList();
-exports.matches = matches;
-
-
+  matches     = new require('matchlist').MatchList();
 
 /////// INITIALIZATION ////////
 // Duck punching!
@@ -27,7 +21,7 @@ matches.addListener("newMatch", function(match) {
 
 
 /////// ROUTING TABLE ///////
-exports.routingTable = {
+var routes = {
   // Default page.
   // http://localhost:8080/
   '': function(req, res) {
@@ -112,8 +106,14 @@ exports.routingTable = {
 
 
 // Use this function to do things from our HTTP server.
-exports.dispatch = function(req, res) {
+function dispatch(req, res) {
   switchboard.dispatch(req, res,
     url.parse(req.url).pathname,
-    exports.routingTable);
-};
+    routes);
+}
+
+process.mixin(exports, {
+  matches: matches,
+  routes: routes,
+  dispatch: dispatch
+});

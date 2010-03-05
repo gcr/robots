@@ -1,18 +1,16 @@
 // History -- adds objects that can store things and you can retrieve stuff
 //            from them, blocking as needed until the objects are available.
 
-var hist = exports;
-
-hist.History = function() {
+function History() {
   this.futures = {};
   this.history = [];
-};
+}
 
-hist.History.prototype.time = function() {
+History.prototype.time = function() {
   return this.history.length;
 };
 
-hist.History.prototype.add = function(obj) {
+History.prototype.add = function(obj) {
   var now = this.time();
   if (now in this.futures) {
     // If people are waiting for us, then give them stuff.
@@ -24,7 +22,7 @@ hist.History.prototype.add = function(obj) {
   this.history.push(obj);
 };
 
-hist.History.prototype.after = function(time, cb) {
+History.prototype.after = function(time, cb) {
   // Run the callback with all the actions that happened after the given time.
   // Block to wait for them if necessary.
 
@@ -41,3 +39,7 @@ hist.History.prototype.after = function(time, cb) {
     }
   }
 };
+
+process.mixin(exports, {
+  History: History
+});

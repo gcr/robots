@@ -1,16 +1,19 @@
 // Match list
 //
 var
-  mlist  = exports,
   hist   = require('history'),
   sys    = require('sys'),
   events = require('events');
 
-mlist.MatchList = function() {
+function MatchList() {
   this.matches = {};
-};
-sys.inherits(mlist.MatchList, events.EventEmitter);
+}
+sys.inherits(MatchList, events.EventEmitter);
 
-mlist.MatchList.prototype.registerNew = function(mid) {
+MatchList.prototype.registerNew = function(mid) {
   this.emit("newMatch", mid);
 };
+
+process.mixin(exports, {
+  MatchList: MatchList
+});

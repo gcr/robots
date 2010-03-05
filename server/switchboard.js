@@ -1,18 +1,17 @@
 // Switchboard: Handles handing off requests
 var
-  switchboard = exports,
   log         = require('log'),
   sys         = require('sys'),
   assert      = require('assert'),
   url         = require('url');
 
-switchboard.notFound = function(req, res) {
+function notFound(req, res) {
   res.writeHeader(404, {"Content-Type": "text/plain"});
   res.write("Not found\n");
   res.close();
   log.error("URL not found: " + req.url + "\n" + sys.inspect(req));
   return false;
-};
+}
 
 // Dispatch a request into a series of paths.
 // Use it thusly: switchboard.dispatch(req, res, path, {
@@ -23,7 +22,7 @@ switchboard.notFound = function(req, res) {
 //        },
 //      'dir3': ...
 //  }
-switchboard.dispatch = function(req, res, path, routingTable) {
+function dispatch(req, res, path, routingTable) {
   var pname;
   if (typeof routingTable == 'function') {
     return routingTable(req, res, path);
@@ -40,28 +39,28 @@ switchboard.dispatch = function(req, res, path, routingTable) {
     if ('' in routingTable) {
         return routingTable[''](req, res);
     }
-    return switchboard.notFound(req,res);
+    return notFound(req,res);
   }
 
   if (pname == '') {
     // Oops, the client asked for a path like http://host// which is silly, so
     // we'll just try again and strip that blank path off.
-    return switchboard.dispatch(req, res, path, routingTable);
+    return dispatch(req, res, path, routingTable);
   }
 
   // Loop through the routing table, finding the proper function to use.
   for (var entry in routingTable) { if (routingTable.hasOwnProperty(entry)) {
     if (entry == pname) {
       // Ha! Found it. Send it on down the tubes.
-      return switchboard.dispatch(
+      return dispatch(
         req, res, path, routingTable[entry]);
     }
   }}
 
   // Didn't find any? OHNOES
-  return switchboard.notFound(req, res);
+  return notFound(req, res);
 
-};
+}
 
 // Dispatch a request based on signatures into query strings sorta like method
 // overloading except for JavaScript. Kinda insane. I don't know who wrote this,
@@ -77,7 +76,7 @@ switchboard.dispatch = function(req, res, path, routingTable) {
 //  or the first if you do http://.../something?a=something&b=something&c=t
 //  or the last if you do http://.../something with no queries. Protip: Be sure
 //  to keep that default case at the end there!
-switchboard.dispatchQueryOverloadMega = function() {
+function dispatchQueryOverloadMega() {
   function extractParams(query, sig) {
     // Returns an array that contains all the properties in query from all the
     // slots in sig. Or undefined if there's a mismatch. "Is sig a subset of
@@ -111,7 +110,11 @@ switchboard.dispatchQueryOverloadMega = function() {
     }
 
     // Nothing found?
-    return switchboard.notFound(req, res);
+    return notFound(req, res);
   };
-};
+}
 
+process.mixin(exports, {
+  notFound: notFound,
+  dispatch: dispatch,
+  dispatchQueryOverloadMega: dispatchQueryOverloadMega});

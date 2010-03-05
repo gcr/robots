@@ -14,8 +14,8 @@ log.debug("Started courier on " + Date() + "\nListening on port " + PORT);
 log.info("This server's URL is http://localhost:" + PORT + "/\nGlobals: routes, views, matches, sys\n\nAt your command.");
 
 // Help our repl out.
-repl.scope.routes = views.routingTable;
-repl.scope.views = require('views');
+repl.scope.routes = views.routes;
+repl.scope.views = views;
 repl.scope.matches = views.matches;
 repl.scope.sys = require('sys');
 repl.start();

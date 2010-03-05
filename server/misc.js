@@ -3,29 +3,29 @@ var
 switchboard = require('switchboard');
 
 // Auxilary functions
-exports.renderJson = function(req, res, obj) {
+function renderJson(req, res, obj) {
   var json = JSON.stringify(obj) + "\n";
   res.writeHeader(200, {"Content-Type": "text/plain",
                         "Content-Length": json.length});
   res.write(json);
   res.close();
-};
+}
 
 // Want to just plug something into your switchboard and be off straightaway?
-exports.respondWith = function(obj) {
+function respondWith(obj) {
   return function(req, res) {
-    exports.renderJson(req, res, obj);
+    renderJson(req, res, obj);
   };
-};
+}
 
 // This renders a history object.
-exports.renderHistory = function(hist) {
+function renderHistory(hist) {
   return switchboard.dispatchQueryOverloadMega(
     // call it like http://whatever/history/?since=...
     ['since'],
     function(req, res, since) {
       hist.after(since, function(actions) {
-        exports.renderJson(req, res, actions);
+        renderJson(req, res, actions);
       });
     },
 
@@ -34,7 +34,13 @@ exports.renderHistory = function(hist) {
     function(req, res) {
       // we can't just do views.respondWith here because that would always
       // return 0 -- we've already evaluated hist.time()
-      exports.renderJson(req, res, hist.time());
+      renderJson(req, res, hist.time());
     }
   );
-};
+}
+
+process.mixin(exports, {
+  renderJson: renderJson,
+  respondWith: respondWith,
+  renderHistory: renderHistory
+});

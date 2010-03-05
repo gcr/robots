@@ -1,6 +1,5 @@
 // Logging utilities.
 var sys = require('sys'),
-    log = exports,
     begin_bracket = "\u23a1 ",
     mid_bracket   = "\u23a2 ",
     end_bracket   = "\u23a3 ",
@@ -24,7 +23,9 @@ function makeLogger(esc_code) {
   };
 }
 
-log.debug = makeLogger('\x1b[32;1m'); // Green
-log.info = makeLogger('\x1b[34;1m'); // Blue
-log.warn = makeLogger('\x1b[33;1m'); // Yellow
-log.error = makeLogger('\x1b[31;1m'); // Red
+process.mixin(exports, {
+  debug:  makeLogger('\x1b[32;1m'), // Green
+  info:  makeLogger('\x1b[34;1m'), // Blue
+  warn:  makeLogger('\x1b[33;1m'), // Yellow
+  error:  makeLogger('\x1b[31;1m') // Red
+});
