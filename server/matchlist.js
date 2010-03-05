@@ -4,7 +4,8 @@ var
   hist   = require('history'),
   sys    = require('sys'),
   events = require('events'),
-  assert = require('assert');
+  assert = require('assert'),
+  log    = require('log');
 
 function MatchList() {
   this.matches = {};

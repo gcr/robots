@@ -18,6 +18,7 @@ var
 // Duck punching!
 matches.history = new hist.History();
 matches.addListener("newMatch", function(match) {
+  log.info("Added match " + match);
   matches.history.add({"added": match});
 });
 
@@ -37,8 +38,8 @@ var routes = {
       renderHistory(matches.history),
       ['register'],
       function(req, res) {
-        renderJson(req, res, matches.registerNew("hello"));
-        //renderJson(req, res, matches.registerNew(buildUuid(15)));
+        //renderJson(req, res, matches.registerNew("hello"));
+        renderJson(req, res, matches.registerNew(buildUuid(15)));
       }
     )
 
