@@ -37,7 +37,8 @@ var routes = {
       renderHistory(matches.history),
       ['register'],
       function(req, res) {
-        renderJson(req, res, matches.registerNew(buildUuid(15)));
+        renderJson(req, res, matches.registerNew("hello"));
+        //renderJson(req, res, matches.registerNew(buildUuid(15)));
       }
     )
 
@@ -109,9 +110,14 @@ var routes = {
 
 // Use this function to do things from our HTTP server.
 function dispatch(req, res) {
-  switchboard.dispatch(req, res,
-    url.parse(req.url).pathname,
-    routes);
+  try {
+    switchboard.dispatch(req, res,
+      url.parse(req.url).pathname,
+      routes);
+  } catch(err) {
+    log.error("URL: " + req.url + "\n\n" + err.stack);
+    renderJson(req, res, {'exception': err.message});
+  }
 }
 
 process.mixin(exports, {
