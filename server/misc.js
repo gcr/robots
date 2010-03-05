@@ -39,8 +39,24 @@ function renderHistory(hist) {
   );
 }
 
+function randChoice(arr) {
+  // Return something random out of us
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function buildUuid(size) {
+  // Builds a unique string of length size
+  var result = [];
+  for (var i=0; i<size; i++) {
+    result.push(randChoice("bcdfghjklmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ0123456789"));
+  }
+  return result.join("");
+}
+
 process.mixin(exports, {
   renderJson: renderJson,
   respondWith: respondWith,
-  renderHistory: renderHistory
+  renderHistory: renderHistory,
+  buildUuid: buildUuid,
+  randChoice: randChoice
 });

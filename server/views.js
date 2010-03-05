@@ -8,9 +8,11 @@ var
   hist        = require('history'),
   renderHistory = require('misc').renderHistory,
   renderJson  = require('misc').renderJson,
+  buildUuid   = require('misc').buildUuid,
   respondWith = require('misc').respondWith,
   log         = require('log'),
-  matches     = new require('matchlist').MatchList();
+  mlist       = require('matchlist'),
+  matches     = new mlist.MatchList();
 
 /////// INITIALIZATION ////////
 // Duck punching!
@@ -35,7 +37,7 @@ var routes = {
       renderHistory(matches.history),
       ['register'],
       function(req, res) {
-        renderJson(req, res, matches.registerNew("testmid"));
+        renderJson(req, res, matches.registerNew(buildUuid(15)));
       }
     )
 
