@@ -18,6 +18,8 @@ MatchList.prototype.registerNew = function(mid) {
   this.emit("newMatch", mid);
 };
 
-process.mixin(exports, {
-  MatchList: MatchList
-});
+process.mixin(exports,
+  {
+    MatchList: MatchList
+  }
+);

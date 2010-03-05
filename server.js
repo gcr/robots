@@ -19,7 +19,8 @@ repl.scope.views = views;
 repl.scope.matches = views.matches;
 repl.scope.sys = require('sys');
 repl.start();
-process.stdio.addListener("close", function() {
+process.stdio.addListener("close",
+  function() {
     log.info("Server shutting down.\nLeaving so soon?");
     process.exit(0);
   });

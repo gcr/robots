@@ -40,6 +40,8 @@ History.prototype.after = function(time, cb) {
   }
 };
 
-process.mixin(exports, {
-  History: History
-});
+process.mixin(exports,
+  {
+    History: History
+  }
+);

@@ -49,13 +49,15 @@ function dispatch(req, res, path, routingTable) {
   }
 
   // Loop through the routing table, finding the proper function to use.
-  for (var entry in routingTable) { if (routingTable.hasOwnProperty(entry)) {
-    if (entry == pname) {
-      // Ha! Found it. Send it on down the tubes.
-      return dispatch(
+  for (var entry in routingTable) {
+    if (routingTable.hasOwnProperty(entry)) {
+      if (entry == pname) {
+        // Ha! Found it. Send it on down the tubes.
+        return dispatch(
         req, res, path, routingTable[entry]);
+      }
     }
-  }}
+  }
 
   // Didn't find any? OHNOES
   return notFound(req, res);
@@ -114,7 +116,10 @@ function dispatchQueryOverloadMega() {
   };
 }
 
-process.mixin(exports, {
-  notFound: notFound,
-  dispatch: dispatch,
-  dispatchQueryOverloadMega: dispatchQueryOverloadMega});
+process.mixin(exports,
+  {
+    notFound: notFound,
+    dispatch: dispatch,
+    dispatchQueryOverloadMega: dispatchQueryOverloadMega
+  }
+);

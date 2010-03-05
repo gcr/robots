@@ -1,6 +1,6 @@
 // utils.js -- extra utilities
 var 
-switchboard = require('switchboard');
+  switchboard = require('switchboard');
 
 // Auxilary functions
 function renderJson(req, res, obj) {
@@ -53,10 +53,12 @@ function buildUuid(size) {
   return result.join("");
 }
 
-process.mixin(exports, {
-  renderJson: renderJson,
-  respondWith: respondWith,
-  renderHistory: renderHistory,
-  buildUuid: buildUuid,
-  randChoice: randChoice
-});
+process.mixin(exports,
+  {
+    renderJson: renderJson,
+    respondWith: respondWith,
+    renderHistory: renderHistory,
+    buildUuid: buildUuid,
+    randChoice: randChoice
+  }
+);

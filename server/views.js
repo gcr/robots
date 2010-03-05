@@ -3,24 +3,25 @@
 //             neckties.
 
 var
-  switchboard = require('switchboard'),
-  url         = require('url'),
-  hist        = require('history'),
+  switchboard   = require('switchboard'),
+  url           = require('url'),
+  hist          = require('history'),
   renderHistory = require('misc').renderHistory,
-  renderJson  = require('misc').renderJson,
-  buildUuid   = require('misc').buildUuid,
-  respondWith = require('misc').respondWith,
-  log         = require('log'),
-  mlist       = require('matchlist'),
-  matches     = new mlist.MatchList();
+  renderJson    = require('misc').renderJson,
+  buildUuid     = require('misc').buildUuid,
+  respondWith   = require('misc').respondWith,
+  log           = require('log'),
+  mlist         = require('matchlist'),
+  matches       = new mlist.MatchList();
 
 /////// INITIALIZATION ////////
 // Duck punching!
 matches.history = new hist.History();
-matches.addListener("newMatch", function(match) {
-  log.info("Added match " + match);
-  matches.history.add({"added": match});
-});
+matches.addListener("newMatch",
+  function(match) {
+    log.info("Added match " + match);
+    matches.history.add({"added": match});
+  });
 
 
 /////// ROUTING TABLE ///////
@@ -121,8 +122,10 @@ function dispatch(req, res) {
   }
 }
 
-process.mixin(exports, {
-  matches: matches,
-  routes: routes,
-  dispatch: dispatch
-});
+process.mixin(exports,
+  {
+    matches: matches,
+    routes: routes,
+    dispatch: dispatch
+  }
+);
