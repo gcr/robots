@@ -53,12 +53,21 @@ function buildUuid(size) {
   return result.join("");
 }
 
+function booleanize(m) {
+  if (typeof m == 'string') {
+    return (["", "n", "nil", "null", "undefined", "no"].indexOf(m.toLowerCase()) != -1);
+  } else {
+    return Boolean(m);
+  }
+}
+
 process.mixin(exports,
   {
     renderJson: renderJson,
     respondWith: respondWith,
     renderHistory: renderHistory,
     buildUuid: buildUuid,
-    randChoice: randChoice
+    randChoice: randChoice,
+    booleanize: booleanize
   }
 );

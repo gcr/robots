@@ -9,8 +9,10 @@ var
   renderHistory = require('misc').renderHistory,
   renderJson    = require('misc').renderJson,
   buildUuid     = require('misc').buildUuid,
+  booleanize    = require('misc').booleanize,
   respondWith   = require('misc').respondWith,
   log           = require('log'),
+  sys           = require('sys'),
   mlist         = require('matchlist'),
   matches       = new mlist.MatchList();
 
@@ -19,8 +21,13 @@ var
 matches.history = new hist.History();
 matches.addListener("newMatch",
   function(match) {
-    log.info("Added match " + match);
-    matches.history.add({"added": match});
+    log.info("Added match " + match.mid + "(auth " + match.authCode + ")");
+    matches.history.add({"added": match.mid});
+  });
+matches.addListener("removeMatch",
+  function(match) {
+    log.info("Removed match " + match.mid);
+    matches.history.add({"removed": match.mid});
   });
 
 
@@ -40,7 +47,12 @@ var routes = {
       ['register'],
       function(req, res) {
         //renderJson(req, res, matches.registerNew("hello"));
-        renderJson(req, res, matches.registerNew(buildUuid(15)));
+        var query =  url.parse(req.url, true).query || {};
+        var m = matches.registerNew(
+          buildUuid(15), // mid
+          buildUuid(15), // auth
+          !booleanize(query['public']));
+        renderJson(req, res, {'match': m.mid, 'auth_code': m.authCode});
       }
     )
 
