@@ -2,7 +2,7 @@ require.paths.push("./server");
 var
   log         = require('log'),
   http        = require('http'),
-  views       = require('views'),
+  site       = require('site'),
   ears        = require('ears'),
   matchlist   = require('matchlist'),
   repl        = require('repl'),
@@ -15,18 +15,18 @@ var
 var mlist = new matchlist.MatchList();
 
 // this function adds all the URLs and whatever else we need.
-views.genMatchListSite(mlist);
+site.genMatchListSite(mlist);
 
 
 // Add all the ears you need above this line
 ears.addEars('MatchList', mlist);
-http.createServer(views.dispatch).listen(PORT);
+http.createServer(site.dispatch).listen(PORT);
 log.debug("Started courier on " + Date() + "\nListening on port " + PORT);
-log.info("This server's URL is http://localhost:" + PORT + "/\nGlobals: routes, views, matches, sys\n\nAt your command.");
+log.info("This server's URL is http://localhost:" + PORT + "/\nGlobals: routes, site, matches, sys\n\nAt your command.");
 
 // Help our repl out.
-repl.scope.routes = views.routes;
-repl.scope.views = views;
+repl.scope.routes = site.routes;
+repl.scope.site = site;
 repl.scope.matches = mlist;
 repl.scope.sys = require('sys');
 repl.start();

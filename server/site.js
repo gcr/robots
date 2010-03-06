@@ -1,6 +1,7 @@
-// views.js -- almost exclusively called by routes.js, views.js describes how
+// site.js -- almost exclusively called by server.js, site.js describes how
 //             to render requests that we grab, except without all the
-//             neckties.
+//             neckties that come in a normal enterprise-y URL dispatch system.
+//             Note that we also add a few ears for trapping events as well.
 
 var
   switchboard   = require('switchboard'),
@@ -33,7 +34,7 @@ function genMatchListSite(matches) {
           log.info("Added match " + match.mid + "(auth " + match.authCode + ")");
           matches.history.add({"added": match.mid});
         },
-      'removeMatch': 
+      'removeMatch':
         function(match) {
           log.info("Removed match " + match.mid);
           matches.history.add({"removed": match.mid});

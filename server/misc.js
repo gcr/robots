@@ -32,7 +32,7 @@ function renderHistory(hist) {
     // else just do http://whatever/...
     [],
     function(req, res) {
-      // we can't just do views.respondWith here because that would always
+      // we can't just do switchboard.respondWith here because that would always
       // return 0 -- we've already evaluated hist.time()
       renderJson(req, res, hist.time());
     }
