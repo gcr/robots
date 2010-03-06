@@ -5,6 +5,7 @@
 var
   switchboard   = require('switchboard'),
   url           = require('url'),
+  ears          = require('ears'),
   hist          = require('history'),
   renderHistory = require('misc').renderHistory,
   renderJson    = require('misc').renderJson,
@@ -12,20 +13,20 @@ var
   booleanize    = require('misc').booleanize,
   respondWith   = require('misc').respondWith,
   log           = require('log'),
-  routes        = {},
-  events        = {};
+  routes        = {};
 
-
+function addRoutes(newRoutes) {
+  return process.mixin(routes, newRoutes);
+}
 
 
 // Which match list will we do? (set from server.js)
-function setMatchList(mlist) {
-  var matches = mlist;
+function genMatchListSite(matches) {
   // Duck punching!
   matches.history = new hist.History();
 
   /////// EVENTS ///////
-  process.mixin(events, {
+  ears.listenFor({
     'MatchList': {
       'newMatch':
         function(match) {
@@ -41,7 +42,7 @@ function setMatchList(mlist) {
   });
 
   /////// ROUTING TABLE ///////
-  process.mixin(routes, {
+  return addRoutes({
     // Default page.
     // http://localhost:8080/
     '': function(req, res) {
@@ -147,8 +148,8 @@ function dispatch(req, res) {
 process.mixin(exports,
   {
     routes: routes,
+    addRoutes: addRoutes,
     dispatch: dispatch,
-    setMatchList: setMatchList,
-    events: events
+    genMatchListSite: genMatchListSite
   }
 );

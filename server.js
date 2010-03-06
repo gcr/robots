@@ -13,10 +13,9 @@ var
 ////////////////////////////////////////////////////
 // Make a match list
 var mlist = new matchlist.MatchList();
-// we need to call this function here because our routing table doesn't exist
-// before that.
-views.setMatchList(mlist);
-ears.listenFor(views.events);
+
+// this function adds all the URLs and whatever else we need.
+views.genMatchListSite(mlist);
 
 
 // Add all the ears you need above this line
