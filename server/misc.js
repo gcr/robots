@@ -5,7 +5,7 @@ var
 // Auxilary functions
 function renderJson(req, res, obj) {
   var json;
-  if ('toJson' in obj) {
+  if (typeof obj == 'object' && 'toJson' in obj) {
     json = JSON.stringify(obj.toJson()) + "\n";
   } else {
     json = JSON.stringify(obj) + "\n";

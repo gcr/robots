@@ -64,6 +64,24 @@ function dispatch(req, res, path, routingTable) {
 
 }
 
+// Just pass the current path name into the next function. If this is the end
+// of the path, then just use default.
+function dispatchOnePath(nextPathCb, defaultCb) {
+  return function(req, res, path) {
+    var pname;
+    if (path.length) {
+      pname = path.shift();
+    } else {
+      return defaultCb(req, res);
+    }
+    if (pname === '') {
+      // No path? Recurse with the path stripped off.
+      return arguments.callee.apply(this, arguments);
+    }
+    return nextPathCb(req, res, pname);
+  };
+}
+
 // Dispatch a request based on signatures into query strings sorta like method
 // overloading except for JavaScript. Kinda insane. I don't know who wrote this,
 // don't ask me.
@@ -120,6 +138,7 @@ process.mixin(exports,
   {
     notFound: notFound,
     dispatch: dispatch,
-    dispatchQueryOverloadMega: dispatchQueryOverloadMega
+    dispatchQueryOverloadMega: dispatchQueryOverloadMega,
+    dispatchOnePath: dispatchOnePath
   }
 );

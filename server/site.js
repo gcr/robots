@@ -55,43 +55,40 @@ function genMatchListSite(matches) {
         res.close();
       },
 
-      'matches': function (req, res, path) {
-        if (path.length > 0) {
-          // http://localhost:8080/matches/foo
-          var pname = path.shift();
-          if (pname === '') {
-            // No path? Recurse with the path stripped off.
-            return arguments.callee.apply(this, arguments);
-          }
-          assert.ok(pname in matches.matches, "That match doesn't exist!");
-          // Render the match
-          // TODO
-        } else {
-          // http://localhost:8080/matches/?register=t
-          return (switchboard.dispatchQueryOverloadMega(
-            ['history'],
-            renderHistory(matches.history),
-            ['register'],
-            function(req, res) {
-              //renderJson(req, res, matches.registerNew("hello"));
-              var query =  url.parse(req.url, true).query || {};
-              var m = matches.registerNew(
-                buildUuid(15), // mid
-                buildUuid(15), // auth
-                !booleanize(query['public']));
-              renderJson(req, res, {'match': m.mid, 'auth_code': m.authCode});
-            },
-            [],
-            // http://localhost:8080/matches/
-            function(req, res) {
-              // Render information on the match list
-              var mjson = matches.toJson();
-              mjson.history = matches.history.time();
-              return renderJson(req, res, mjson);
-            }
-          ))(req, res);
+    'matches': switchboard.dispatchOnePath(
+      function (req, res, matchName) {
+        // http://localhost:8080/matches/foo
+        assert.ok(matchName in matches.matches, "That match doesn't exist!");
+        // Render the match
+        // TODO
+      },
+      // http://localhost:8080/matches/?register=t
+      switchboard.dispatchQueryOverloadMega(
+        ['history'],
+        renderHistory(matches.history),
+        ['register'],
+        function(req, res) {
+          //renderJson(req, res, matches.registerNew("hello"));
+          var query =  url.parse(req.url, true).query || {};
+          var m = matches.registerNew(
+            buildUuid(15), // mid
+            buildUuid(15), // auth
+            !booleanize(query['public']));
+          renderJson(req, res, {'match': m.mid, 'auth_code': m.authCode});
+        },
+        [],
+        // http://localhost:8080/matches/
+        function(req, res) {
+          // Render information on the match list
+          var mjson = matches.toJson();
+          mjson.history = matches.history.time();
+          return renderJson(req, res, mjson);
         }
-      }
+      )
+    ) // end matches/
+  }); // end addRoutes
+
+} // end function
 
     /*//////////// v¯¯ TESTING ¯¯v //////////
     'test': {
@@ -156,8 +153,6 @@ function genMatchListSite(matches) {
         res.close();
       })
       */
-  });
-}
 
 
 // Use this function to do things from our HTTP server.
