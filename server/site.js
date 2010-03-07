@@ -31,12 +31,10 @@ function genMatchListSite(matches) {
     'MatchList': {
       'newMatch':
         function(match) {
-          log.info("Added match " + match.mid + "(auth " + match.authCode + ")");
           matches.history.add({"added": match.mid});
         },
       'removeMatch':
         function(match) {
-          log.info("Removed match " + match.mid);
           matches.history.add({"removed": match.mid});
         }
     }

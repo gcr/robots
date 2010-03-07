@@ -16,7 +16,7 @@ var mlist = new matchlist.MatchList();
 
 // this function adds all the URLs and whatever else we need.
 site.genMatchListSite(mlist);
-
+log.beginLogging();
 
 // Add all the ears you need above this line
 ears.addEars('MatchList', mlist);
