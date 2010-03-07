@@ -56,7 +56,8 @@ function genMatchListSite(matches) {
       },
 
       'matches': function (req, res, path) {
-        if (path.length > 1) {
+        if (path.length > 0) {
+          // http://localhost:8080/matches/foo
           var pname = path.shift();
           if (pname === '') {
             // No path? Recurse with the path stripped off.
@@ -66,6 +67,7 @@ function genMatchListSite(matches) {
           // Render the match
           // TODO
         } else {
+          // http://localhost:8080/matches/?register=t
           return (switchboard.dispatchQueryOverloadMega(
             ['history'],
             renderHistory(matches.history),
@@ -80,6 +82,7 @@ function genMatchListSite(matches) {
               renderJson(req, res, {'match': m.mid, 'auth_code': m.authCode});
             },
             [],
+            // http://localhost:8080/matches/
             function(req, res) {
               // Render information on the match list
               var mjson = matches.toJson();

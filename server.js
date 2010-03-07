@@ -22,12 +22,12 @@ log.beginLogging();
 ears.addEars('MatchList', mlist);
 http.createServer(site.dispatch).listen(PORT);
 log.debug("Started courier on " + Date() + "\nListening on port " + PORT);
-log.info("This server's URL is http://localhost:" + PORT + "/\nGlobals: routes, site, matches, sys\n\nAt your command.");
+log.info("This server's URL is http://localhost:" + PORT + "/\nGlobals: routes, site, mlist, sys\n\nAt your command.");
 
 // Help our repl out.
 repl.scope.routes = site.routes;
 repl.scope.site = site;
-repl.scope.matches = mlist;
+repl.scope.mlist = mlist;
 repl.scope.sys = require('sys');
 repl.start();
 process.stdio.addListener("close",

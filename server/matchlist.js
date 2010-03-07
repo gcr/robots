@@ -17,7 +17,7 @@ MatchList.prototype.toJson = function() {
   var matches = [];
   for (var m in this.matches) {
     if (this.matches.hasOwnProperty(m) && this.matches[m].pub) {
-      matches.push(this.matches[m].toJson());
+      matches.push(m);
     }
   }
   return {'matches': matches};
