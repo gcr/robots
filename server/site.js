@@ -8,6 +8,7 @@ var
   url           = require('url'),
   ears          = require('ears'),
   hist          = require('history'),
+  assert        = require('assert'),
   renderHistory = require('misc').renderHistory,
   renderJson    = require('misc').renderJson,
   buildUuid     = require('misc').buildUuid,
@@ -31,11 +32,15 @@ function genMatchListSite(matches) {
     'MatchList': {
       'newMatch':
         function(match) {
-          matches.history.add({"added": match.mid});
+          if (match.pub) {
+            matches.history.add({"added": match.mid});
+          }
         },
       'removeMatch':
         function(match) {
-          matches.history.add({"removed": match.mid});
+          if (match.pub) {
+            matches.history.add({"removed": match.mid});
+          }
         }
     }
   });
@@ -50,20 +55,40 @@ function genMatchListSite(matches) {
         res.close();
       },
 
-    'matches': switchboard.dispatchQueryOverloadMega(
-        ['history'],
-        renderHistory(matches.history),
-        ['register'],
-        function(req, res) {
-          //renderJson(req, res, matches.registerNew("hello"));
-          var query =  url.parse(req.url, true).query || {};
-          var m = matches.registerNew(
-            buildUuid(15), // mid
-            buildUuid(15), // auth
-            !booleanize(query['public']));
-          renderJson(req, res, {'match': m.mid, 'auth_code': m.authCode});
+      'matches': function (req, res, path) {
+        if (path.length > 1) {
+          var pname = path.shift();
+          if (pname === '') {
+            // No path? Recurse with the path stripped off.
+            return arguments.callee.apply(this, arguments);
+          }
+          assert.ok(pname in matches.matches, "That match doesn't exist!");
+          // Render the match
+          // TODO
+        } else {
+          return (switchboard.dispatchQueryOverloadMega(
+            ['history'],
+            renderHistory(matches.history),
+            ['register'],
+            function(req, res) {
+              //renderJson(req, res, matches.registerNew("hello"));
+              var query =  url.parse(req.url, true).query || {};
+              var m = matches.registerNew(
+                buildUuid(15), // mid
+                buildUuid(15), // auth
+                !booleanize(query['public']));
+              renderJson(req, res, {'match': m.mid, 'auth_code': m.authCode});
+            },
+            [],
+            function(req, res) {
+              // Render information on the match list
+              var mjson = matches.toJson();
+              mjson.history = matches.history.time();
+              return renderJson(req, res, mjson);
+            }
+          ))(req, res);
         }
-      )
+      }
 
     /*//////////// v¯¯ TESTING ¯¯v //////////
     'test': {

@@ -11,6 +11,18 @@ function MatchList() {
 }
 sys.inherits(MatchList, events.EventEmitter);
 
+MatchList.prototype.toJson = function() {
+  // Returns a JSON representation of us.
+  // Just a list of matches, please.
+  var matches = [];
+  for (var m in this.matches) {
+    if (this.matches.hasOwnProperty(m) && this.matches[m].pub) {
+      matches.push(this.matches[m].toJson());
+    }
+  }
+  return {'matches': matches};
+};
+
 MatchList.prototype.registerNew = function(mid, authCode, pub) {
   assert.ok(!(mid in this.matches), "This match already exists!");
   var m = this.matches[mid] = new match.Match(mid, authCode, pub);

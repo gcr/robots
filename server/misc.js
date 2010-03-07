@@ -4,7 +4,12 @@ var
 
 // Auxilary functions
 function renderJson(req, res, obj) {
-  var json = JSON.stringify(obj) + "\n";
+  var json;
+  if ('toJson' in obj) {
+    json = JSON.stringify(obj.toJson()) + "\n";
+  } else {
+    json = JSON.stringify(obj) + "\n";
+  }
   res.writeHeader(200, {"Content-Type": "text/plain",
                         "Content-Length": json.length});
   res.write(json);

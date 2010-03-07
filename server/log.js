@@ -36,7 +36,7 @@ function beginLogging() {
     'MatchList': {
       'newMatch':
         function(match) {
-          info("Added match " + match.mid + "(auth " + match.authCode + ")");
+          info("Added match " + match.mid + " (auth " + match.authCode + ")");
         },
       'removeMatch':
         function(match) {
