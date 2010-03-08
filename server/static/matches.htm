@@ -1,20 +1,27 @@
-{% extends 'base.htm' %}
-
-{% block content %}
-<a href="/matches/" class='matchlist_refresh'>Refresh</a>
-<div id='matchlist'>
-    <ul>
-        {% for match in matches %}
-        <li><a href="matches/{{ match }}">{{ match }}</a></li>
-        {% endfor %}
-    </ul>
-</div>
-<a class="register" href="/matches?register=true">Register match </a>
-<br />
-<a class="register private_button" href="/matches?register=t&public=f">Register private match </a>
-{% endblock %}
-
-{% block script %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <script type="text/javascript" charset="utf-8" src="/js/jquery-1.4.1.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/js/core.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/js/match.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/js/matchlist.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/js/drawing.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/js/ui.js"></script>
+    <!--[if IE]>
+        <script type="text/javascript" charset="utf-8" src="/js/excanvas.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" href="/css/master.css" type="text/css" media="screen" charset="utf-8">
+    <title>Match list - Courier</title>
+</head>
+<body>
+    <a href="/matches/" class='matchlist_refresh'>Refresh</a>
+    <div id='matchlist'>
+        ...
+    </div>
+    <a class="register" href="/matches?register=true">Register match </a>
+    <br />
+    <a class="register private_button" href="/matches?register=t&public=f">Register private match </a>
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function() {
             courier.ui.RenderMatchList($("#matchlist"));
@@ -31,4 +38,5 @@
             });
         });
     </script>
-{% endblock %}
+</body>
+</html>

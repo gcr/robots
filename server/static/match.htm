@@ -1,19 +1,35 @@
-{% extends 'base.htm' %}
-
-{% block content %}
-oh hello, welcome!
-<a href="#" id="startmatch">Start match</a>
-<div class="robotlist"></div>
-<canvas id='field' width='500' height='500'></canvas>
-{% endblock %}
-
-{% block script %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <script type="text/javascript" charset="utf-8" src="/js/jquery-1.4.1.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/js/core.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/js/match.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/js/matchlist.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/js/drawing.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/js/ui.js"></script>
+    <!--[if IE]>
+        <script type="text/javascript" charset="utf-8" src="/js/excanvas.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" href="/css/master.css" type="text/css" media="screen" charset="utf-8">
+    <title>Match - Courier</title>
+</head>
+<body>
+    oh hello, welcome!
+    <a href="#" id="startmatch">Start match</a>
+    <div class="robotlist"></div>
+    <canvas id='field' width='500' height='500'></canvas>
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function() {
             // this is written through template substitution on the server.
             //             |
             //             v
-            var matchId = "{{ match_id }}";
+            function getMatchId(wp) {
+                if (wp.length) {
+                    return wp.pop() || getMatchId(wp)
+                }
+            }
+            var matchId = getMatchId(window.location.pathname.split("/");
             var authCode = courier.core.readCookie(matchId);
             var m = new courier.match.Match(matchId, courier.core.readCookie(matchId));
             courier.ui.WatchMatchRobots(m, $(".robotlist"));
@@ -34,4 +50,5 @@ oh hello, welcome!
                 });
         });
     </script>
-{% endblock %}
+</body>
+</html>
