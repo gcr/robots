@@ -1,18 +1,11 @@
 // site.js -- almost exclusively called by server.js, site.js describes how
 //             to render requests that we grab, except without all the
 //             neckties that come in a normal enterprise-y URL dispatch system.
-//             Note that we also add a few ears for trapping events as well.
 var
-  assert        = require('assert'),
   url           = require('url'),
   switchboard   = require('./switchboard'),
-  ears          = require('../ears'),
-  hist          = require('../history'),
-  renderHistory = require('./view_helpers').renderHistory,
+  matchViews    = require('./match_list_views'),
   renderJson    = require('./view_helpers').renderJson,
-  buildUuid     = require('./view_helpers').buildUuid,
-  booleanize    = require('./view_helpers').booleanize,
-  respondWith   = require('./view_helpers').respondWith,
   log           = require('../log'),
   staticFiles   = require('./static'),
   routes        = {};
@@ -24,26 +17,6 @@ function addRoutes(newRoutes) {
 
 // Which match list will we do? (set from server.js)
 function genMatchListSite(matches) {
-  // Duck punching!
-  matches.history = new hist.History();
-
-  /////// EVENTS ///////
-  ears.listenFor({
-    'MatchList': {
-      'newMatch':
-        function(match) {
-          if (match.pub) {
-            matches.history.add({"added": match.mid});
-          }
-        },
-      'removeMatch':
-        function(match) {
-          if (match.pub) {
-            matches.history.add({"removed": match.mid});
-          }
-        }
-    }
-  });
 
   /////// ROUTING TABLE ///////
   return addRoutes({
@@ -53,48 +26,8 @@ function genMatchListSite(matches) {
     'css': staticFiles.makeFileServer("server/static/css"),
     'js': staticFiles.makeFileServer("server/static/js"),
 
-    'test': staticFiles.makeFileServer("server/static/"),
+    'matches': matchViews.makeMatchListSite(matches)
 
-    'matches': switchboard.dispatchOnePath(
-      function (req, res, matchName) {
-        // http://localhost:8080/matches/foo
-        assert.ok(matchName in matches.matches, "That match doesn't exist!");
-        // Render the match
-        // TODO
-        renderJson(req, res, matches.matches[matchName]);
-      },
-
-      // no path
-      switchboard.makeDispatchQueryOverloader(
-        // http://localhost:8080/matches/?register=t
-        ['history'],
-        renderHistory(matches.history),
-
-        ['register'],
-        function(req, res) {
-          //renderJson(req, res, matches.registerNew("hello"));
-          var query =  url.parse(req.url, true).query || {};
-          var m = matches.registerNew(
-            buildUuid(15), // mid
-            buildUuid(15), // auth
-            !booleanize(query['public']));
-          renderJson(req, res, {'match': m.mid, 'auth_code': m.authCode});
-        },
-
-        ['list'],
-        // http://localhost:8080/matches?list
-        function(req, res) {
-          // Render information on the match list
-          var mjson = matches.toJson();
-          mjson.history = matches.history.time();
-          return renderJson(req, res, mjson);
-        },
-
-        // http://localhost:8080/matches
-        [],
-        staticFiles.makeFileServer("server/static/matches.htm")
-      )
-    ) // end matches/
   }); // end addRoutes
 
 } // end function
