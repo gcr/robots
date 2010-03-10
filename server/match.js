@@ -23,7 +23,10 @@ Match.prototype.toJson = function() {
   return {
     started: this.started,
     init_time: this.initTime,
-    'public': this.pub
+    'public': this.pub,
+    field_size: [5, 5],
+    speed: 5,
+    robots: []
 
   };
 };

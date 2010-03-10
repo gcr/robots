@@ -71,7 +71,7 @@ MatchList.prototype.removeMatch = function(match) {
   if (typeof this.matchDelCb[match.mid] == 'function') {
     this.matchDelCb[match.mid](match);
   }
-  this.matches.splice(match.mid, 1);
+  delete this.matches[match.mid];
 };
 MatchList.prototype.onNewMatch = function(cb) {
   // run the specified callback when a new match appears!

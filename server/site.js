@@ -49,11 +49,9 @@ function genMatchListSite(matches) {
   return addRoutes({
     // Default page.
     // http://localhost:8080/
-    '': function(req, res) {
-        res.writeHeader(200, {"Content-Type": "text/plain"});
-        res.write("Welcome!\n");
-        res.close();
-      },
+    '': staticFiles.makeFileServer("server/static/index.htm"),
+    'css': staticFiles.makeFileServer("server/static/css"),
+    'js': staticFiles.makeFileServer("server/static/js"),
 
     'test': staticFiles.makeFileServer("server/static/"),
 
@@ -63,6 +61,7 @@ function genMatchListSite(matches) {
         assert.ok(matchName in matches.matches, "That match doesn't exist!");
         // Render the match
         // TODO
+        renderJson(req, res, matches.matches[matchName]);
       },
 
       // no path
@@ -80,14 +79,16 @@ function genMatchListSite(matches) {
             !booleanize(query['public']));
           renderJson(req, res, {'match': m.mid, 'auth_code': m.authCode});
         },
-        [],
+        ['list'],
         // http://localhost:8080/matches/
         function(req, res) {
           // Render information on the match list
           var mjson = matches.toJson();
           mjson.history = matches.history.time();
           return renderJson(req, res, mjson);
-        }
+        },
+        [],
+        staticFiles.makeFileServer("server/static/matches.htm")
       )
     ) // end matches/
   }); // end addRoutes

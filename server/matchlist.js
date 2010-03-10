@@ -43,7 +43,7 @@ MatchList.prototype.remove = function(mid) {
   assert.ok(mid in this.matches, "This match doesn't exist!");
   var m = this.matches[mid];
   delete this.matches[mid];
-  this.emit("removeMatch", mid);
+  this.emit("removeMatch", m);
 };
 
 process.mixin(exports,

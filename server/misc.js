@@ -1,14 +1,21 @@
 // utils.js -- extra utilities
 var 
-  switchboard = require('switchboard');
+  switchboard = require('switchboard'),
+  url         = require('url');
 
 // Auxilary functions
 function renderJson(req, res, obj) {
   var json;
+  var query = url.parse(req.url, true).query || {};
   if (typeof obj == 'object' && 'toJson' in obj) {
-    json = JSON.stringify(obj.toJson()) + "\n";
+    json = JSON.stringify(obj.toJson());
   } else {
-    json = JSON.stringify(obj) + "\n";
+    json = JSON.stringify(obj);
+  }
+  if ('jsonp' in query || 'callback' in query) {
+      json = (query.jsonp || query.callback) + "(" + json + ")\n";
+  } else {
+    json = json + "\n";
   }
   res.writeHeader(200, {"Content-Type": "text/plain",
                         "Content-Length": json.length});

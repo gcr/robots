@@ -158,9 +158,7 @@ function beginsWith(a, b) {
 }
 
 function serveFile(webroot, urlPath, req, res) {
-  var filePath = path.normalize(
-    path.join(webroot, urlPath.join("/"))
-  );
+  var filePath = urlPath? path.normalize(path.join(webroot, urlPath.join("/"))) : webroot;
   assert.ok(beginsWith(filePath, webroot), "Tried to serve a file outside the web root folder");
 
   path.exists(filePath,
