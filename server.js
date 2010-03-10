@@ -1,7 +1,7 @@
 var
   http        = require('http'),
   log         = require('./server/log'),
-  site        = require('./server/site'),
+  site        = require('./server/views/site'),
   ears        = require('./server/ears'),
   matchlist   = require('./server/matchlist'),
   repl        = require('./server/courier_repl'),

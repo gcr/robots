@@ -6,8 +6,8 @@ var
   fs          = require('fs'),
   path        = require('path'),
   assert      = require('assert'),
-  misc        = require('./misc'),
-  log         = require('./log'),
+  misc        = require('./view_helpers'),
+  log         = require('../log'),
   switchboard = require('./switchboard'),
 
   // My dearest thanks goes to paperboy.js which provided the following two

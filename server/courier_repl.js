@@ -1,7 +1,7 @@
 var
   repl        = require('repl'),
   ears        = require('./ears'),
-  site        = require('./site'),
+  site        = require('./views/site'),
   log         = require('./log');
 
 function start(mlist) {

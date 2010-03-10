@@ -1,6 +1,6 @@
 // Switchboard: Handles handing off requests
 var
-  log         = require('./log'),
+  log         = require('../log'),
   sys         = require('sys'),
   assert      = require('assert'),
   url         = require('url');
