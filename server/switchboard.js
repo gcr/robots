@@ -85,7 +85,7 @@ function dispatchOnePath(nextPathCb, defaultCb) {
 // Dispatch a request based on signatures into query strings sorta like method
 // overloading except for JavaScript. Kinda insane. I don't know who wrote this,
 // don't ask me.
-// queryOverload(
+// dispatchQueryOverload(req, res,
 //    ['a', 'b', 'c'],
 //    function (req, res, a, b, c) {...},
 //    ['a'],
@@ -96,7 +96,7 @@ function dispatchOnePath(nextPathCb, defaultCb) {
 //  or the first if you do http://.../something?a=something&b=something&c=t
 //  or the last if you do http://.../something with no queries. Protip: Be sure
 //  to keep that default case at the end there!
-function dispatchQueryOverloadMega() {
+function dispatchQueryOverload(req, res) {
   function extractParams(query, sig) {
     // Returns an array that contains all the properties in query from all the
     // slots in sig. Or undefined if there's a mismatch. "Is sig a subset of
@@ -114,23 +114,29 @@ function dispatchQueryOverloadMega() {
   }
   // now, back to your originally scheduled program...
   assert.equal(arguments.length % 2, 0, "You must have one function for every signature.");
-  var declarations = arguments;
-  return function(req, res) {
-    var sig, fun, args, query = url.parse(req.url, true).query || {};
-    // Which function do we dispatch to?
-    for (var i=0, l=declarations.length; i<l; i+=2) {
-      sig = declarations[i];
-      fun = declarations[i+1];
-      // Are all the elements of sig in req.queryargs?
-      args = extractParams(query, sig);
-      if (args !== undefined) {
-        // Ha! Found the method signature. Now send 'er straight on through.
-        return fun.apply(req, [req, res].concat(args));
-      }
+  var sig, fun, args, query = url.parse(req.url, true).query || {};
+  // Which function do we dispatch to?
+  // (gotta start at i=2 here because req, res will come first)
+  //       vvv
+  for (var i=2, l=arguments.length; i<l; i+=2) {
+    sig = arguments[i];
+    fun = arguments[i+1];
+    // Are all the elements of sig in req.queryargs?
+    args = extractParams(query, sig);
+    if (args !== undefined) {
+      // Ha! Found the method signature. Now send 'er straight on through.
+      return fun.apply(req, [req, res].concat(args));
     }
+  }
 
-    // Nothing found?
-    return notFound(req, res);
+  // Nothing found?
+  return notFound(req, res);
+}
+
+function makeDispatchQueryOverloader() {
+  var declarations = Array.prototype.slice.call(arguments);
+  return function(req, res) {
+    return dispatchQueryOverload.apply(this, [req, res].concat(declarations));
   };
 }
 
@@ -138,7 +144,8 @@ process.mixin(exports,
   {
     notFound: notFound,
     dispatch: dispatch,
-    dispatchQueryOverloadMega: dispatchQueryOverloadMega,
+    dispatchQueryOverload: dispatchQueryOverload,
+    makeDispatchQueryOverloader: makeDispatchQueryOverloader,
     dispatchOnePath: dispatchOnePath
   }
 );

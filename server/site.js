@@ -66,7 +66,7 @@ function genMatchListSite(matches) {
       },
 
       // no path
-      switchboard.dispatchQueryOverloadMega(
+      switchboard.makeDispatchQueryOverloader(
       // http://localhost:8080/matches/?register=t
         ['history'],
         renderHistory(matches.history),

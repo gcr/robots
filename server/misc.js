@@ -25,7 +25,7 @@ function respondWith(obj) {
 
 // This renders a history object.
 function renderHistory(hist) {
-  return switchboard.dispatchQueryOverloadMega(
+  return switchboard.makeDispatchQueryOverloader(
     // call it like http://whatever/history/?since=...
     ['since'],
     function(req, res, since) {

@@ -24,6 +24,7 @@ MatchList.prototype.toJson = function() {
 };
 
 MatchList.prototype.registerNew = function(mid, authCode, pub) {
+  pub = (typeof pub == 'undefined')? true : pub;
   assert.ok(!(mid in this.matches), "This match already exists!");
   var m = this.matches[mid] = new match.Match(mid, authCode, pub);
   this.emit("newMatch", m);
