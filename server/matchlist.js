@@ -2,7 +2,7 @@
 //
 var
   sys    = require('sys'),
-  match  = require('match'),
+  match  = require('./match'),
   events = require('events'),
   assert = require('assert');
 

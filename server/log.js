@@ -1,6 +1,6 @@
 // Logging utilities.
-var sys = require('sys'),
-    ears = require('ears'),
+var sys  = require('sys'),
+    ears = require('./ears'),
     begin_bracket = "\u23a1 ",
     mid_bracket   = "\u23a2 ",
     end_bracket   = "\u23a3 ",

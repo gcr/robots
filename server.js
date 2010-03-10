@@ -1,11 +1,10 @@
-require.paths.push("./server");
 var
-  log         = require('log'),
   http        = require('http'),
-  site       = require('site'),
-  ears        = require('ears'),
-  matchlist   = require('matchlist'),
-  repl        = require('courier_repl'),
+  log         = require('./server/log'),
+  site        = require('./server/site'),
+  ears        = require('./server/ears'),
+  matchlist   = require('./server/matchlist'),
+  repl        = require('./server/courier_repl'),
   PORT        = 8080;
 
 

@@ -1,8 +1,8 @@
 var
   repl        = require('repl'),
-  ears        = require('ears'),
-  site        = require('site'),
-  log         = require('log');
+  ears        = require('./ears'),
+  site        = require('./site'),
+  log         = require('./log');
 
 function start(mlist) {
   // Help our repl out.

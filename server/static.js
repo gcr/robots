@@ -5,9 +5,10 @@ var
   url         = require('url'),
   fs          = require('fs'),
   path        = require('path'),
-  misc        = require('misc'),
-  switchboard = require('switchboard'),
   assert      = require('assert'),
+  misc        = require('./misc'),
+  log         = require('./log'),
+  switchboard = require('./switchboard'),
 
   // My dearest thanks goes to paperboy.js which provided the following two
   // lists (also under BSD license). Get the source here:
@@ -169,7 +170,7 @@ function serveFile(webroot, urlPath, req, res) {
       fs.readFile(filePath,
         function(err, contents) {
           if (err) {
-            require('log').error("URL: " + req.url + "\n\n" + err.stack);
+            log.error("URL: " + req.url + "\n\n" + err.stack);
             return misc.renderJson(req, res, {'exception': err.message});
           }
           // Play nice by telling what kinds of files these are.

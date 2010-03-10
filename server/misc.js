@@ -1,6 +1,6 @@
 // utils.js -- extra utilities
 var 
-  switchboard = require('switchboard'),
+  switchboard = require('./switchboard'),
   url         = require('url');
 
 // Auxilary functions

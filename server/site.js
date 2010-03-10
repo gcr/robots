@@ -3,18 +3,18 @@
 //             neckties that come in a normal enterprise-y URL dispatch system.
 //             Note that we also add a few ears for trapping events as well.
 var
-  switchboard   = require('switchboard'),
-  url           = require('url'),
-  ears          = require('ears'),
-  hist          = require('history'),
   assert        = require('assert'),
-  renderHistory = require('misc').renderHistory,
-  renderJson    = require('misc').renderJson,
-  buildUuid     = require('misc').buildUuid,
-  booleanize    = require('misc').booleanize,
-  respondWith   = require('misc').respondWith,
-  log           = require('log'),
-  staticFiles   = require('static'),
+  url           = require('url'),
+  switchboard   = require('./switchboard'),
+  ears          = require('./ears'),
+  hist          = require('./history'),
+  renderHistory = require('./misc').renderHistory,
+  renderJson    = require('./misc').renderJson,
+  buildUuid     = require('./misc').buildUuid,
+  booleanize    = require('./misc').booleanize,
+  respondWith   = require('./misc').respondWith,
+  log           = require('./log'),
+  staticFiles   = require('./static'),
   routes        = {};
 
 function addRoutes(newRoutes) {
@@ -66,9 +66,10 @@ function genMatchListSite(matches) {
 
       // no path
       switchboard.makeDispatchQueryOverloader(
-      // http://localhost:8080/matches/?register=t
+        // http://localhost:8080/matches/?register=t
         ['history'],
         renderHistory(matches.history),
+
         ['register'],
         function(req, res) {
           //renderJson(req, res, matches.registerNew("hello"));
@@ -79,14 +80,17 @@ function genMatchListSite(matches) {
             !booleanize(query['public']));
           renderJson(req, res, {'match': m.mid, 'auth_code': m.authCode});
         },
+
         ['list'],
-        // http://localhost:8080/matches/
+        // http://localhost:8080/matches?list
         function(req, res) {
           // Render information on the match list
           var mjson = matches.toJson();
           mjson.history = matches.history.time();
           return renderJson(req, res, mjson);
         },
+
+        // http://localhost:8080/matches
         [],
         staticFiles.makeFileServer("server/static/matches.htm")
       )
