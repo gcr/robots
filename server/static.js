@@ -157,7 +157,6 @@ function beginsWith(a, b) {
   return a.slice(0, b.length) == b;
 }
 
-
 function serveFile(webroot, urlPath, req, res) {
   var filePath = path.normalize(
     path.join(webroot, urlPath.join("/"))
@@ -195,8 +194,15 @@ function serveFile(webroot, urlPath, req, res) {
   );
 }
 
+function makeFileServer(webroot) {
+  return function(req, res, path) {
+    return serveFile(webroot, path, req, res);
+  };
+}
+
 process.mixin(exports,
   {
-    serveFile: serveFile
+    serveFile: serveFile,
+    makeFileServer: makeFileServer
   }
 );

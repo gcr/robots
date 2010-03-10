@@ -55,9 +55,7 @@ function genMatchListSite(matches) {
         res.close();
       },
 
-    'test': function(req, res, path) {
-      staticFiles.serveFile("server/static/", path, req, res);
-    },
+    'test': staticFiles.makeFileServer("server/static/"),
 
     'matches': switchboard.dispatchOnePath(
       function (req, res, matchName) {
