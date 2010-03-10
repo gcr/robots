@@ -24,5 +24,5 @@ repl.start(mlist);
 ears.addEars('MatchList', mlist);
 http.createServer(site.dispatch).listen(PORT);
 log.debug("Started courier on " + Date() + "\nListening on port " + PORT);
-log.info("This server's URL is http://localhost:" + PORT + "/\nGlobals: routes, site, mlist, sys\n\nAt your command.");
+log.info("This server's URL is http://localhost:" + PORT + "/\nGlobals: routes, site, mlist, matches, sys\n\nAt your command.");
 
