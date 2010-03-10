@@ -2,7 +2,6 @@
 //             to render requests that we grab, except without all the
 //             neckties that come in a normal enterprise-y URL dispatch system.
 //             Note that we also add a few ears for trapping events as well.
-
 var
   switchboard   = require('switchboard'),
   url           = require('url'),
@@ -15,6 +14,7 @@ var
   booleanize    = require('misc').booleanize,
   respondWith   = require('misc').respondWith,
   log           = require('log'),
+  staticFiles   = require('static'),
   routes        = {};
 
 function addRoutes(newRoutes) {
@@ -54,6 +54,10 @@ function genMatchListSite(matches) {
         res.write("Welcome!\n");
         res.close();
       },
+
+    'test': function(req, res, path) {
+      staticFiles.serveFile("server/static/", path, req, res);
+    },
 
     'matches': switchboard.dispatchOnePath(
       function (req, res, matchName) {
