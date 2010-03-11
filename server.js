@@ -20,7 +20,7 @@ log.beginLogging();
 repl.start(mlist);
 
 // Add all the ears you need above this line
-ears.addEars('MatchList', mlist);
+ears.shout('Server', 'newMatchList', mlist);
 http.createServer(site.dispatch).listen(PORT);
 log.debug("Started courier on " + Date() + "\nListening on port " + PORT);
 log.info("This server's URL is http://localhost:" + PORT + "/\nGlobals: routes, site, mlist, matches, sys\n\nAt your command.");

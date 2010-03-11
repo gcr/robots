@@ -73,24 +73,40 @@ function addEars(objType, obj) {
 var allEars = {
   // Just the defaults. This variable should contain just enough ears to ensure
   // that all future objects will grab ears too when created.
-  'MatchList':
+  'Server':
     {
       // 'something': [function, function, function, ...]
       // remember to put these in lists!
+      'newMatchList': [function(mlist) {
+        addEars('MatchList', mlist);
+      }]
+    },
+  'MatchList':
+    {
+      // 'something': [function, function, function, ...]
       'newMatch': [function(mlist, match) {
         addEars('Match', match);
         addEars('GameLogic', match.game);
       }]
-      // 'something': [function, function, function, ...]
     }
 };
 
-// but who sets off the first chain of events? match_list_site.js does!
+// but who sets off the first chain of events? server.js will manually trigger
+// this. Don't use this method if you can't help it!
+function shout(type, event) {
+  if (type in allEars && event in allEars[type]) {
+    var events = allEars[type][event];
+    for (var i=0, l=events.length; i<l; i++) {
+      events[i].apply(this, Array.prototype.slice.call(arguments, 2));
+    }
+  }
+}
 
 process.mixin(exports,
   {
     //allEars: allEars,
     listenFor: listenFor,
-    addEars: addEars
+    addEars: addEars,
+    shout: shout
   }
 );

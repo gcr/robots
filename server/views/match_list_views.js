@@ -14,28 +14,30 @@ var
   booleanize    = require('./view_helpers').booleanize,
   staticFiles   = require('./static');
 
-function makeMatchListViews(matches) {
-  // Duck punching!
-  matches.history = new hist.History();
 
-  /////// EVENTS ///////
-  // technically we don't really need to add it here, but it's nice knowing
-  // that a matchlist will always have matches.history
-  ears.listenFor({
-    'MatchList': {
-      'newMatch': function(mlist, match) {
-        if (match.pub) {
-          matches.history.add({"added": match.mid});
-        }
-      },
-      'removeMatch': function(mlist, match) {
-        if (match.pub) {
-          matches.history.add({"removed": match.mid});
-        }
+/////// EVENTS ///////
+// technically we don't really need to add it here, but it's nice knowing
+// that a matchlist will always have matches.history
+ears.listenFor({
+  'MatchList': {
+    'newMatch': function(matches, match) {
+      if (match.pub && matches.history) {
+        matches.history.add({"added": match.mid});
+      }
+    },
+    'removeMatch': function(matches, match) {
+      if (match.pub && matches.history) {
+        matches.history.add({"removed": match.mid});
       }
     }
-  });
+  }
+});
 
+function makeMatchListViews(matches) {
+  // Just giving the machine some vicodin...
+  // we can't do this in our ears because the below (renderHistory) expects
+  // matches.history to already exist.
+  matches.history = new hist.History();
 
   // This will get plugged into site.js
   return switchboard.dispatchOnePath(
