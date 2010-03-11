@@ -41,7 +41,11 @@ function listenFor(newEars) {
 }
 
 function addEars(objType, obj) {
-  // Add event handlers for an obj of type objType.
+  // Add all the ears from allEars to an obj of type objType.
+
+  // Don't get the above confused with this one! This function adds the ears to
+  // an object. The above function ensures that future objects (when tampered
+  // with by this function) will get your handlers.
 
   // ...But which ears should we add?
   var objEvents = allEars[objType];
@@ -65,16 +69,23 @@ function addEars(objType, obj) {
 // These ears contain objects.
 // These objects contain events that are emitted with eventEmitter.event and
 // listened for with eventEmitter.addListener.
-// these events contain lists of functions.
+// These events contain lists of functions.
 var allEars = {
+  // Just the defaults. This variable should contain just enough ears to ensure
+  // that all future objects will grab ears too when created.
   'MatchList':
     {
+      // 'something': [function, function, function, ...]
       // remember to put these in lists!
       'newMatch': [function(match) {
         addEars('Match', match);
+        addEars('GameLogic', match.game);
       }]
+      // 'something': [function, function, function, ...]
     }
 };
+
+// but who sets off the first chain of events? match_list_site.js does!
 
 process.mixin(exports,
   {
