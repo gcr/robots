@@ -27,7 +27,7 @@ MatchList.prototype.registerNew = function(mid, authCode, pub) {
   pub = (typeof pub == 'undefined')? true : pub;
   assert.ok(!(mid in this.matches), "This match already exists!");
   var m = this.matches[mid] = new match.Match(mid, authCode, pub);
-  this.emit("newMatch", m);
+  this.emit("newMatch", this, m);
   return m;
 };
 
@@ -43,7 +43,7 @@ MatchList.prototype.remove = function(mid) {
   assert.ok(mid in this.matches, "This match doesn't exist!");
   var m = this.matches[mid];
   delete this.matches[mid];
-  this.emit("removeMatch", m);
+  this.emit("removeMatch", this, m);
 };
 
 process.mixin(exports,

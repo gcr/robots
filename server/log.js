@@ -34,14 +34,20 @@ var
 function beginLogging() {
   ears.listenFor({
     'MatchList': {
-      'newMatch':
-        function(match) {
+      'newMatch': function(mlist, match) {
           info("Added match " + match.mid + " (auth " + match.authCode + ")");
         },
-      'removeMatch':
-        function(match) {
+      'removeMatch': function(mlist, match) {
           info("Removed match " + match.mid);
         }
+    },
+    'Match': {
+      'newSlot': function(match, slotId) {
+        info("Match " + match.mid + " has new slot " + slotId);
+      },
+      'removeSlot': function(match, slotId) {
+        info("Match " + match.mid + " removed slot " + slotId);
+      }
     }
   });
 }

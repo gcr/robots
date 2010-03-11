@@ -28,7 +28,7 @@ function start(mlist) {
   ears.listenFor(
     {'MatchList':
       {'newMatch':
-        function (match) {
+        function (mlist, match) {
           repl.scope.newMatch = match;
         }
       }

@@ -4,28 +4,31 @@
 var
   assert        = require('assert'),
   url           = require('url'),
-  switchboard   = require('./switchboard'),
   ears          = require('../ears'),
   hist          = require('../history'),
+  matchViews    = require('./match_views'),
+  switchboard   = require('./switchboard'),
   renderHistory = require('./view_helpers').renderHistory,
   renderJson    = require('./view_helpers').renderJson,
   buildUuid     = require('./view_helpers').buildUuid,
   booleanize    = require('./view_helpers').booleanize,
   staticFiles   = require('./static');
 
-function makeMatchListSite(matches) {
+function makeMatchListViews(matches) {
   // Duck punching!
   matches.history = new hist.History();
 
   /////// EVENTS ///////
+  // technically we don't really need to add it here, but it's nice knowing
+  // that a matchlist will always have matches.history
   ears.listenFor({
     'MatchList': {
-      'newMatch': function(match) {
+      'newMatch': function(mlist, match) {
         if (match.pub) {
           matches.history.add({"added": match.mid});
         }
       },
-      'removeMatch': function(match) {
+      'removeMatch': function(mlist, match) {
         if (match.pub) {
           matches.history.add({"removed": match.mid});
         }
@@ -36,12 +39,10 @@ function makeMatchListSite(matches) {
 
   // This will get plugged into site.js
   return switchboard.dispatchOnePath(
-    function (req, res, matchName) {
-      // http://localhost:8080/matches/foo
+    // has a match (eg http://localhost:8080/matches/foo)
+    function(req, res, matchName, path) {
       assert.ok(matchName in matches.matches, "That match doesn't exist!");
-      // Render the match
-      // TODO
-      renderJson(req, res, matches.matches[matchName]);
+      return matchViews.dispatchMatchViews(req, res, matches.matches[matchName], path);
     },
 
     // no path
@@ -83,6 +84,6 @@ function makeMatchListSite(matches) {
 
 process.mixin(exports,
   {
-    makeMatchListSite: makeMatchListSite
+    makeMatchListViews: makeMatchListViews
   }
 );

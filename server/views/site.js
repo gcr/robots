@@ -26,7 +26,7 @@ function genMatchListSite(matches) {
     'css': staticFiles.makeFileServer("server/static/css"),
     'js': staticFiles.makeFileServer("server/static/js"),
 
-    'matches': matchViews.makeMatchListSite(matches)
+    'matches': matchViews.makeMatchListViews(matches)
 
   }); // end addRoutes
 

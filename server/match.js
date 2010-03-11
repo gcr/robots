@@ -4,6 +4,7 @@ var
   sys       = require('sys'),
   events    = require('events'),
   assert    = require('assert'),
+  log       = require('./log'),
   gamelogic = require('./gamelogic');
 
 function Match(mid, authCode, pub) {
@@ -29,25 +30,28 @@ Match.prototype.toJson = function() {
   );
 };
 
-Match.prototype.requestSlot = function(slot_id) {
+Match.prototype.requestSlot = function(slotId) {
   // set this.game.robots[slot_id] to null and emit an event. Only if we're
   // not started.
   assert.ok(!this.game.started, "You cannot join a started match.");
-  if (slot_id in this.game.robots) {
+  if (slotId in this.game.robots) {
+    log.warn("Match " + this.mid + " tried to request " + slotId + ", a taken slot");
     return false;
   }
-  this.game.robots[slot_id] = null;
-  this.emit("newSlot", slot_id);
+  this.game.robots[slotId] = null;
+  this.emit("newSlot", this, slotId);
 };
 
-Match.prototype.removeSlot = function(slot_id) {
-  // remove this.game.robots[slot_id], but ONLEH if we're not started. Emit an
+Match.prototype.removeSlot = function(slotId) {
+  // remove this.game.robots[slotId], but ONLEH if we're not started. Emit an
   // event. gamelogic will call us.
-  assert.ok(not this.game.started, "You cannot leave a started match.");
-  if (!slot_id in this.game.robots) {
+  assert.ok(!this.game.started, "You cannot leave a started match.");
+  if (!(slotId in this.game.robots)) {
+    log.warn("Match " + this.mid + " tried to remove " + slotId + ", a nonexistent slot");
     return false;
   }
-  delete this.game.robots[slot_id];
+  delete this.game.robots[slotId];
+  this.emit("removeSlot", this, slotId);
 };
 
 

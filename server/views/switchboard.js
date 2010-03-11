@@ -78,7 +78,7 @@ function dispatchOnePath(nextPathCb, defaultCb) {
       // No path? Recurse with the path stripped off.
       return arguments.callee.apply(this, arguments);
     }
-    return nextPathCb(req, res, pname);
+    return nextPathCb(req, res, pname, path);
   };
 }
 
