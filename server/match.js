@@ -32,13 +32,22 @@ Match.prototype.toJson = function() {
 Match.prototype.requestSlot = function(slot_id) {
   // set this.game.robots[slot_id] to null and emit an event. Only if we're
   // not started.
-
+  assert.ok(!this.game.started, "You cannot join a started match.");
+  if (slot_id in this.game.robots) {
+    return false;
+  }
+  this.game.robots[slot_id] = null;
+  this.emit("newSlot", slot_id);
 };
 
 Match.prototype.removeSlot = function(slot_id) {
   // remove this.game.robots[slot_id], but ONLEH if we're not started. Emit an
   // event. gamelogic will call us.
-
+  assert.ok(not this.game.started, "You cannot leave a started match.");
+  if (!slot_id in this.game.robots) {
+    return false;
+  }
+  delete this.game.robots[slot_id];
 };
 
 
