@@ -31,8 +31,8 @@ function respondWith(obj) {
 }
 
 // This renders a history object.
-function renderHistory(hist) {
-  return switchboard.makeDispatchQueryOverloader(
+function renderHistory(req, res, hist) {
+  return switchboard.dispatchQueryOverload(req, res,
     // call it like http://whatever/history/?since=...
     ['since'],
     function(req, res, since) {
@@ -49,6 +49,12 @@ function renderHistory(hist) {
       renderJson(req, res, hist.time());
     }
   );
+}
+
+function makeHistoryRenderer(hist) {
+  return function(req, res) {
+    return renderHistory(req, res, hist);
+  };
 }
 
 function randChoice(arr) {
@@ -80,6 +86,7 @@ process.mixin(exports,
     renderHistory: renderHistory,
     buildUuid: buildUuid,
     randChoice: randChoice,
-    booleanize: booleanize
+    booleanize: booleanize,
+    makeHistoryRenderer: makeHistoryRenderer
   }
 );
