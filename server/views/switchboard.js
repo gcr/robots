@@ -66,19 +66,23 @@ function dispatch(req, res, path, routingTable) {
 
 // Just pass the current path name into the next function. If this is the end
 // of the path, then just use default.
-function dispatchOnePath(nextPathCb, defaultCb) {
+function dispatchOnePath(req, res, path, nextPathCb, defaultCb) {
+  var pname;
+  if (path.length) {
+    pname = path.shift();
+  } else {
+    return defaultCb(req, res);
+  }
+  if (pname === '') {
+    // No path? Recurse with the path stripped off.
+    return arguments.callee.apply(this, arguments);
+  }
+  return nextPathCb(req, res, pname, path);
+}
+
+function makeOnePathDispatcher(nextPathCb, defaultCb) {
   return function(req, res, path) {
-    var pname;
-    if (path.length) {
-      pname = path.shift();
-    } else {
-      return defaultCb(req, res);
-    }
-    if (pname === '') {
-      // No path? Recurse with the path stripped off.
-      return arguments.callee.apply(this, arguments);
-    }
-    return nextPathCb(req, res, pname, path);
+    return dispatchOnePath(req, res, path, nextPathCb, defaultCb);
   };
 }
 
@@ -146,6 +150,7 @@ process.mixin(exports,
     dispatch: dispatch,
     dispatchQueryOverload: dispatchQueryOverload,
     makeDispatchQueryOverloader: makeDispatchQueryOverloader,
-    dispatchOnePath: dispatchOnePath
+    dispatchOnePath: dispatchOnePath,
+    makeOnePathDispatcher: makeOnePathDispatcher
   }
 );

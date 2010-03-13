@@ -42,7 +42,7 @@ ears.listenFor({
 function makeMatchListViews(matches) {
 
   // This will get plugged into site.js
-  return switchboard.dispatchOnePath(
+  return switchboard.makeOnePathDispatcher(
     // has a match (eg http://localhost:8080/matches/foo)
     function(req, res, matchName, path) {
       assert.ok(matchName in matches.matches, "That match doesn't exist!");

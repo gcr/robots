@@ -6,6 +6,7 @@ var
   switchboard   = require('./switchboard'),
   matchViews    = require('./match_list_views'),
   renderJson    = require('./view_helpers').renderJson,
+  renderError   = require('./view_helpers').renderError,
   log           = require('../log'),
   staticFiles   = require('./static'),
   routes        = {};
@@ -40,8 +41,7 @@ function dispatch(req, res) {
       url.parse(req.url).pathname,
       routes);
   } catch(err) {
-    log.error("URL: " + req.url + "\n\n" + err.stack);
-    renderJson(req, res, {'exception': err.message});
+    return renderError(req, res, err);
   }
 }
 

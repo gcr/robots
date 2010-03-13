@@ -82,11 +82,29 @@ GameLogic.prototype.setFuture = function(time, robotId, cb) {
 };
 
 GameLogic.prototype.makeRobot = function(robotId, name) {
+  // Connects the robot with the given ID to the game. The slot must already
+  // exist (Match will take care of that).
   assert.ok(robotId in this.robots, "This robot doesn't exist!");
-  assert.ok(this.robots[robotId] === null, "This robot is already connected!");
-  this.robots[robotId] = name;
+  if (this.robots[robotId]) {
+    this.disconnectRobot(robotId);
+  }
 
-  this.emit("connectedRobot", this, name);
+  // todo: maybe this should be an actual robot and not just a string. i dunno
+  // you guys.
+  var robot = name;
+  this.robots[robotId] = robot;
+  this.emit("connectedRobot", this, robot);
+  return robot;
+};
+
+GameLogic.prototype.disconnectRobot = function(robotId) {
+  // Disconnects the given robot ID from the game. There must be a robot in
+  // the given slot (eg you must have makeRobot'd before).
+  assert.ok(robotId in this.robots, "This robot doesn't exist!");
+  assert.ok(this.robots[robotId], "This robot is already disconnected!");
+  var robot = this.robots[robotId];
+  this.robots[robotId] = null;
+  this.emit("disconnectedRobot", this, robot);
 };
 
 process.mixin(exports,

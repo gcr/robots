@@ -1,7 +1,9 @@
 // utils.js -- extra utilities
 var 
   switchboard = require('./switchboard'),
-  url         = require('url');
+  url         = require('url'),
+  sys         = require('sys'),
+  log         = require('../log');
 
 // Auxilary functions
 function renderJson(req, res, obj) {
@@ -28,6 +30,11 @@ function makeJsonRenderer(obj) {
   return function(req, res) {
     renderJson(req, res, obj);
   };
+}
+
+function renderError(req, res, err) {
+  log.error("URL: " + req.url + "\n\n" + (err.stack || sys.inspect(err)));
+  renderJson(req, res, {'exception': err.message || err});
 }
 
 // This renders a history object.
@@ -82,6 +89,7 @@ function booleanize(m) {
 process.mixin(exports,
   {
     renderJson: renderJson,
+    renderError: renderError,
     makeJsonRenderer: makeJsonRenderer,
     renderHistory: renderHistory,
     buildUuid: buildUuid,
