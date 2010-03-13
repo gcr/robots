@@ -20,13 +20,6 @@ var
 //   def on_splash(obj, location, damage):
 //       self.history.add({"splash_damage":
 //           {"objects": obj, "location": location, "damage": damage}})
-// there's also one for on_new_slot
-//   def on_remove_slot():
-//       self.history.add({"remove_slot": True})
-//   def on_disconnect_robot(robot):
-//       self.history.add({"disconnect_robot": robot})
-//   def on_new_robot(robot):
-//       self.history.add({"connected_robot": robot})
 
 ears.listenFor({
   'MatchList': {
