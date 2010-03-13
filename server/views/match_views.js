@@ -3,10 +3,12 @@
 
 var
   assert           = require('assert'),
+  url              = require('url'),
   ears             = require('../ears'),
   hist             = require('../history'),
   log              = require('../log'),
   switchboard      = require('./switchboard'),
+  pickCoolName     = require('./robot_naming').pickCoolName,
   renderJson       = require('./view_helpers').renderJson,
   renderError      = require('./view_helpers').renderError,
   makeJsonRenderer = require('./view_helpers').makeJsonRenderer,
@@ -61,6 +63,8 @@ function dispatchMatchViews(req, res, match, path) {
         // http://localhost:8080/matches/mid/robot_id?connect=t
         ['connect'],
         function(req, res) {
+          var query = url.parse(req.url, true).query || {};
+
           match.game.setFuture(0, robotId, function(err, time) {
             // What happens when the match starts?
             // Render the robot. BUT don't render just 'var robot'; maybe it
@@ -74,7 +78,8 @@ function dispatchMatchViews(req, res, match, path) {
           });
 
           log.info("Match: " + match.mid + " robot: " + robotId + " connected");
-          var robot = match.game.makeRobot(robotId, "foo");
+
+          var robot = match.game.makeRobot(robotId, query.name || pickCoolName());
 
           req.connection.setTimeout(300000); // 5min
           req.connection.addListener("close", function() {
