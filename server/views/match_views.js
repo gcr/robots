@@ -82,6 +82,11 @@ function dispatchMatchViews(req, res, match, path) {
           var robot = match.game.makeRobot(robotId, query.name || pickCoolName());
 
           req.connection.setTimeout(300000); // 5min
+          req.connection.addListener("end", function() {
+            // sometimes if the kind fellow on the other end exits his client,
+            // he doesn't actually *close* the connection.
+            req.connection.close();
+          });
           req.connection.addListener("close", function() {
             // Remove the robot, but only if the match didn't start.
             if (!match.game.started && match.game.robots[robotId] === robot) {
