@@ -24,7 +24,7 @@ function renderJson(req, res, obj) {
 }
 
 // Want to just plug something into your switchboard and be off straightaway?
-function respondWith(obj) {
+function makeJsonRenderer(obj) {
   return function(req, res) {
     renderJson(req, res, obj);
   };
@@ -82,7 +82,7 @@ function booleanize(m) {
 process.mixin(exports,
   {
     renderJson: renderJson,
-    respondWith: respondWith,
+    makeJsonRenderer: makeJsonRenderer,
     renderHistory: renderHistory,
     buildUuid: buildUuid,
     randChoice: randChoice,

@@ -3,30 +3,18 @@
 
 var
   sys    = require('sys'),
+  assert = require('assert'),
   events = require('events');
 
-// here's the python code for all these callbacks. we'll need ears for all these.
-//   def on_pump(field):
-//       self.history.add({"field": field})
-//   def on_hit(obj, location):
-//       self.history.add({"hit": {'obj': obj, 'location': location}})
-//   def on_splash(obj, location, damage):
-//       self.history.add({"splash_damage":
-//           {"objects": obj, "location": location, "damage": damage}})
-//   def on_remove_slot():
-//       self.history.add({"remove_slot": True})
-//   def on_disconnect_robot(robot):
-//       self.history.add({"disconnect_robot": robot})
-//   def on_new_robot(robot):
-//       self.history.add({"connected_robot": robot})
+function GameLogic(match) {
+  this.match = match;
 
-function GameLogic() {
   // A mapping.
-  // this.future = {
+  // this.futures = {
   //   time: [ [Function], [Function], ... ],
   //   time: [ [Function], ... ]
   // }
-  this.future = {};
+  this.futures = {};
   this.time = 0;
 
   this.started = false;
@@ -59,6 +47,47 @@ GameLogic.prototype.toJson = function() {
   };
 };
 
+GameLogic.prototype.pump = function() {
+  // First. go through and carry out all these wonderful callbacks.
+  for (var rid in this.futures[this.time]) {
+    if (this.futures[this.time].hasOwnProperty(rid)) {
+      this.futures[this.time][rid](this.time);
+    }
+  }
+  delete this.futures[this.time];
+  // this.field.pump() // NotImplementedError
+  this.emit("pump", this, this.time);
+  this.time += 1;
+};
+
+GameLogic.prototype.setFuture = function(time, robotId, cb) {
+  // Rigs callback (cb) to be executed at time (time). The callback should
+  // (should!) expect two arguments: a possible error, and the actual results of
+  // the callback. By convention, of course; GameLogic.prototype.pump won't
+  // care.
+  assert.ok(time >= this.time, "That already happened!");
+
+  // But first, we should go through our futures and ensure that no other
+  // actions are pending for this robot.
+  for (var ftime in this.futures) {
+    if (this.futures.hasOwnProperty(ftime)) {
+      if (robotId in this.futures[ftime]) {
+        // Cancel that! First argument is a callback.
+        this.futures[ftime][robotId]("Canceling action");
+      }
+    }
+  }
+  this.futures[time] = this.futures[time] || {};
+  this.futures[time][robotId] = cb;
+};
+
+GameLogic.prototype.makeRobot = function(robotId, name) {
+  assert.ok(robotId in this.robots, "This robot doesn't exist!");
+  assert.ok(this.robots[robotId] === null, "This robot is already connected!");
+  this.robots[robotId] = name;
+
+  this.emit("connectedRobot", this, name);
+};
 
 process.mixin(exports,
   {

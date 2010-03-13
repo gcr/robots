@@ -12,7 +12,7 @@ function Match(mid, authCode, pub) {
   this.mid = mid;
   this.authCode = authCode;
   this.pub = pub;
-  this.game = new gamelogic.GameLogic();
+  this.game = new gamelogic.GameLogic(this);
   // field_size
   // speed
   // robots
@@ -40,6 +40,7 @@ Match.prototype.requestSlot = function(slotId) {
   }
   this.game.robots[slotId] = null;
   this.emit("newSlot", this, slotId);
+  return slotId;
 };
 
 Match.prototype.removeSlot = function(slotId) {
