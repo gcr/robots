@@ -5,9 +5,10 @@ var
   assert           = require('assert'),
   ears             = require('../ears'),
   hist             = require('../history'),
+  log              = require('../log'),
   switchboard      = require('./switchboard'),
   renderJson       = require('./view_helpers').renderJson,
-  renderError       = require('./view_helpers').renderError,
+  renderError      = require('./view_helpers').renderError,
   makeJsonRenderer = require('./view_helpers').makeJsonRenderer,
   buildUuid        = require('./view_helpers').buildUuid;
 
@@ -61,7 +62,6 @@ function dispatchMatchViews(req, res, match, path) {
   return switchboard.dispatchOnePath(req, res, path,
     // http://localhost:8080/matches/mid/robot_id
     function(req, res, robotId) {
-      require('../log').debug("Tried to access robot: " + robotId);
       assert.ok(robotId in match.game.robots, "This robot doesn't exist!");
       var robot = match.game.robots[robotId];
       return switchboard.dispatchQueryOverload(req, res,
@@ -80,13 +80,14 @@ function dispatchMatchViews(req, res, match, path) {
             return renderJson(req, res, match.game.robots[robotId]);
           });
 
+          log.info("Match: " + match.mid + " robot: " + robotId + " connected");
           var robot = match.game.makeRobot(robotId, "foo");
 
           req.connection.setTimeout(300000); // 5min
-
           req.connection.addListener("close", function() {
             // Remove the robot, but only if the match didn't start.
             if (!match.game.started && match.game.robots[robotId] === robot) {
+              log.warn("Lost connection with match: " + match.mid + " robot: " + robotId);
               match.game.disconnectRobot(robotId);
             }
           });
@@ -97,7 +98,6 @@ function dispatchMatchViews(req, res, match, path) {
     // they just want the match.
     // http://localhost:8080/matches/mid
     function(req, res) {
-      require('../log').debug("Just a match");
       return switchboard.dispatchQueryOverload(req, res,
         ['register'],
         function(req, res) {
