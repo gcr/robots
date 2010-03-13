@@ -107,7 +107,7 @@ class Robot(object):
     def set_turret_rotation(self, angle):
         self._turret_rotation = angle
         return fetch_persist(self.url, {'turret_rotate': 't', 'angle':
-			math.radians(angle)})
+            math.radians(angle)})
     def get_turret_rotation(self):
         if self._turret_rotation is None:
             self._turret_rotation = math.degrees(fetch_persist(self.url, {'turret_rotate': 't'}))
