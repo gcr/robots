@@ -73,7 +73,7 @@ GameLogic.prototype.setFuture = function(time, robotId, cb) {
     if (this.futures.hasOwnProperty(ftime)) {
       if (robotId in this.futures[ftime]) {
         // Cancel that! First argument is a callback.
-        this.futures[ftime][robotId]("Canceling action");
+        this.futures[ftime][robotId]("Tried to do two things at once!");
       }
     }
   }
