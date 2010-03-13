@@ -51,6 +51,9 @@ Match.prototype.removeSlot = function(slotId) {
     log.warn("Match " + this.mid + " tried to remove " + slotId + ", a nonexistent slot");
     return false;
   }
+  if (this.game.robots[slotId] !== null) {
+    this.game.disconnectRobot(slotId);
+  }
   delete this.game.robots[slotId];
   this.emit("removeSlot", this, slotId);
 };

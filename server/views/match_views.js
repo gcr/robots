@@ -73,6 +73,7 @@ function dispatchMatchViews(req, res, match, path) {
             // Render the robot. BUT don't render just 'var robot'; maybe it
             // changed.
             if (err) {
+              // This part will get run whenever we get duplicate connections.
               match.game.disconnectRobot(robotId);
               return renderError(req, res, err);
             }
@@ -80,6 +81,15 @@ function dispatchMatchViews(req, res, match, path) {
           });
 
           var robot = match.game.makeRobot(robotId, "foo");
+
+          req.connection.setTimeout(300000); // 5min
+
+          req.connection.addListener("close", function() {
+            // Remove the robot, but only if the match didn't start.
+            if (!match.game.started && match.game.robots[robotId] === robot) {
+              match.game.disconnectRobot(robotId);
+            }
+          });
         }
       );
     },

@@ -84,6 +84,7 @@ GameLogic.prototype.setFuture = function(time, robotId, cb) {
 GameLogic.prototype.makeRobot = function(robotId, name) {
   // Connects the robot with the given ID to the game. The slot must already
   // exist (Match will take care of that).
+  assert.ok(!this.started, "You can't connect to a started match!");
   assert.ok(robotId in this.robots, "This robot doesn't exist!");
   if (this.robots[robotId]) {
     this.disconnectRobot(robotId);
@@ -100,8 +101,12 @@ GameLogic.prototype.makeRobot = function(robotId, name) {
 GameLogic.prototype.disconnectRobot = function(robotId) {
   // Disconnects the given robot ID from the game. There must be a robot in
   // the given slot (eg you must have makeRobot'd before).
+  assert.ok(!this.started, "You mustn't leave a started match!");
   assert.ok(robotId in this.robots, "This robot doesn't exist!");
-  assert.ok(this.robots[robotId], "This robot is already disconnected!");
+  if (this.robots[robotId] === null) {
+    // already disconnected
+    return false;
+  }
   var robot = this.robots[robotId];
   this.robots[robotId] = null;
   this.emit("disconnectedRobot", this, robot);
