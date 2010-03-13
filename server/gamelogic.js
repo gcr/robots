@@ -43,7 +43,7 @@ GameLogic.prototype.toJson = function() {
     speed: 5,
     started: false,
     robots: this.robotArray(),
-    time: this.time
+    gametime: this.time
   };
 };
 

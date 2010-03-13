@@ -4,6 +4,7 @@
 from urlparse import urlparse, urlunparse
 import urllib2
 import urllib
+import httplib
 import socket
 import json
 import math
@@ -33,8 +34,9 @@ def fetch_persist(url, kwargs=None):
     """
     try:
         return fetch(url, kwargs)
-    except urllib2.URLError, e:
-        if isinstance(e.reason, socket.timeout):
+    except (urllib2.URLError, httplib.BadStatusLine), e:
+        if (isinstance(e, httplib.BadStatusLine) or
+            isinstance(e.reason, socket.timeout)):
             return fetch_persist(url, kwargs)
         else:
             raise e
