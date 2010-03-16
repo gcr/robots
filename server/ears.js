@@ -93,7 +93,7 @@ var allEars = {
 };
 
 // but who sets off the first chain of events? server.js will manually trigger
-// this. Don't use this method if you can't help it!
+// this. Don't usually use this method! Instead, call someObject.emit(event)!
 function shout(type, event) {
   if (type in allEars && event in allEars[type]) {
     var events = allEars[type][event];
