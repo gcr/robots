@@ -98,6 +98,7 @@ GameLogic.prototype.makeRobot = function(robotId, name) {
   // you guys.
   var robot = name;
   this.robots[robotId] = robot;
+  this.field.addObject(robot);
   this.emit("connectedRobot", this, robot);
   return robot;
 };
@@ -113,6 +114,7 @@ GameLogic.prototype.disconnectRobot = function(robotId) {
   }
   var robot = this.robots[robotId];
   this.robots[robotId] = null;
+  this.field.removeObject(robot);
   this.emit("disconnectedRobot", this, robot);
 };
 
