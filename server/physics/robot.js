@@ -26,6 +26,10 @@ Robot.prototype.toJson = function() {
   };
 };
 
+Robot.prototype.pump = function() {
+
+};
+
 process.mixin(exports,
   {
     Robot: Robot

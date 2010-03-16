@@ -86,6 +86,7 @@ var allEars = {
       // 'something': [function, function, function, ...]
       'newMatch': [function(mlist, match) {
         addEars('Match', match);
+        addEars('Field', match.game.field);
         addEars('GameLogic', match.game);
       }]
     }

@@ -5,10 +5,13 @@ var
   sys    = require('sys'),
   assert = require('assert'),
   robot  = require('./physics/robot'),
+  field  = require('./physics/field'),
   events = require('events');
 
 function GameLogic(match) {
   this.match = match;
+
+  this.field = field.Field(1024, 1024);
 
   // A mapping.
   // this.futures = {
@@ -56,7 +59,7 @@ GameLogic.prototype.pump = function() {
     }
   }
   delete this.futures[this.time];
-  // this.field.pump() // NotImplementedError
+  this.field.pump();
   this.emit("pump", this, this.time);
   this.time += 1;
 };

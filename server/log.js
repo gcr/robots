@@ -48,6 +48,11 @@ function beginLogging() {
       'removeSlot': function(match, slotId) {
         info("Match " + match.mid + " removed slot " + slotId);
       }
+    },
+    'Field': {
+      'pump': function() {
+        info("pump");
+      }
     }
   });
 }
