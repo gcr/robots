@@ -4,7 +4,7 @@
 var
   sys    = require('sys'),
   assert = require('assert'),
-  robot  = require('./robot'),
+  robot  = require('./physics/robot'),
   events = require('events');
 
 function GameLogic(match) {
