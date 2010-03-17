@@ -21,6 +21,8 @@ function GameLogic(match) {
   this.futures = {};
   this.time = 0;
 
+  this.speed = 5;
+
   this.started = false;
 
   // A mapping.
@@ -43,9 +45,9 @@ GameLogic.prototype.robotArray = function() {
 
 GameLogic.prototype.toJson = function() {
   return {
-    field_size: [5, 5],
-    speed: 5,
-    started: false,
+    field_size: [this.field.width, this.field.height],
+    speed: this.speed,
+    started: this.started,
     robots: this.robotArray(),
     gametime: this.time
   };
