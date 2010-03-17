@@ -2,17 +2,19 @@
 //
 
 var
-  assert           = require('assert'),
-  url              = require('url'),
-  ears             = require('../ears'),
-  hist             = require('../history'),
-  log              = require('../log'),
-  switchboard      = require('./switchboard'),
-  pickCoolName     = require('./robot_naming').pickCoolName,
-  renderJson       = require('./view_helpers').renderJson,
-  renderError      = require('./view_helpers').renderError,
-  makeJsonRenderer = require('./view_helpers').makeJsonRenderer,
-  buildUuid        = require('./view_helpers').buildUuid;
+  assert              = require('assert'),
+  url                 = require('url'),
+  ears                = require('../ears'),
+  hist                = require('../history'),
+  log                 = require('../log'),
+  switchboard         = require('./switchboard'),
+  pickCoolName        = require('./robot_naming').pickCoolName,
+  renderJson          = require('./view_helpers').renderJson,
+  renderError         = require('./view_helpers').renderError,
+  makeHistoryRenderer = require('./view_helpers').makeHistoryRenderer,
+  makeJsonRenderer    = require('./view_helpers').makeJsonRenderer,
+  buildUuid           = require('./view_helpers').buildUuid,
+  staticFiles         = require('./static');
 
 // here's the python code for all these callbacks. we'll need ears for all these.
 //   def on_pump(field):
@@ -110,7 +112,20 @@ function dispatchMatchViews(req, res, match, path) {
         },
 
         ['info'],
-        makeJsonRenderer(match)
+        function(req, res) {
+          // Render information on the match
+          return renderJson(req, res, process.mixin(match.toJson(),
+            {
+              history: match.history.time()
+            }
+          ));
+        },
+
+        ['history'],
+        makeHistoryRenderer(match.history),
+
+        [],
+        staticFiles.makeFileServer("server/static/match.htm")
       );
     }
   );

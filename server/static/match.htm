@@ -29,7 +29,7 @@
                     return wp.pop() || getMatchId(wp)
                 }
             }
-            var matchId = getMatchId(window.location.pathname.split("/");
+            var matchId = getMatchId(window.location.pathname.split("/"));
             var authCode = courier.core.readCookie(matchId);
             var m = new courier.match.Match(matchId, courier.core.readCookie(matchId));
             courier.ui.WatchMatchRobots(m, $(".robotlist"));
