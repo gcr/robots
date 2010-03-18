@@ -34,7 +34,7 @@ function pickCoolName() {
       // take random member of each set
       return set[Math.floor(Math.random() * set.length)];
     }
-  ).join(' ');
+  ).join(' ').replace(/_/g, ' ');
 }
 
 process.mixin(exports,
