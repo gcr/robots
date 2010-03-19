@@ -30,6 +30,10 @@ Match.prototype.toJson = function() {
   );
 };
 
+Match.prototype.start = function() {
+  this.emit("started", this);
+};
+
 Match.prototype.requestSlot = function(slotId) {
   // set this.game.robots[slot_id] to null and emit an event. Only if we're
   // not started.

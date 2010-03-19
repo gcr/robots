@@ -36,6 +36,9 @@ ears.listenFor({
     },
     'removeSlot': function(match) {
       match.history.add({'remove_slot': true});
+    },
+    'started': function(match) {
+      match.history.add({'match_started': true});
     }
   },
   'Field': {
