@@ -2,26 +2,34 @@
 
 var
   sys         = require('sys'),
-  fieldobject = require('./fieldobject');
+  fieldobject = require('./fieldobject'),
+  vec         = require('./vector');
 
-function Robot(name) {
-
+function Robot(name, location) {
+  this.name = name;
+  this.location = new vec.Vector(location[0], location[1]);
+  this.turretRot = vec.normalizeAngle(Math.random() * 2 * Math.PI);
+  this.scanMode = "";
+  this.scanWidth = Math.PI / 6;
+  this.scanRange = 500;
+  this.speed = 0;
 }
 sys.inherits(Robot, fieldobject.FieldObject);
 
-// def renderInfo(self):
-//   # return enough information for the client to draw on the screen. This
-//   # should usually be kept secret (ie not in self.__json__).
-//   return {'type': 'robot',
-//           'name': self.name,
-//           'location': self.location,
-//           'rotation': self.rotation,
-//           'turret_rot': self.turret_rot,
-//           'scan_mode': self.scan_mode,
-//           'scan_width': self.scan_width,
-//           'scanrange': self.scanrange,
-//           'speed': self.speed}
-//
+// Return enough information for a client to draw us on the screen.
+Robot.prototype.renderInfo = function() {
+  return {
+    type: 'robot',
+    name: this.name,
+    location: [this.location.x, this.location.y],
+    turret_rot: this.turretRot,
+    scan_mode: this.scanMode,
+    scan_width: this.scanWidth,
+    scanrange: this.scanRange,
+    speed: this.speed
+  };
+};
+
 Robot.prototype.toJson = function() {
   return {
     name: this.name,

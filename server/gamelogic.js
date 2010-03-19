@@ -96,13 +96,14 @@ GameLogic.prototype.makeRobot = function(robotId, name) {
     this.disconnectRobot(robotId);
   }
 
-  // todo: maybe this should be an actual robot and not just a string. i dunno
-  // you guys.
-  var robot = name;
-  this.robots[robotId] = robot;
-  this.field.addObject(robot);
-  this.emit("connectedRobot", this, robot);
-  return robot;
+  // Time to actually make the robot.
+  var rob = new robot.Robot(name,
+    [Math.random() * this.field.width, Math.random() * this.field.height]);
+
+  this.robots[robotId] = rob;
+  this.field.addObject(rob);
+  this.emit("connectedRobot", this, rob);
+  return rob;
 };
 
 GameLogic.prototype.disconnectRobot = function(robotId) {

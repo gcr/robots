@@ -40,7 +40,7 @@ Field.prototype.pump = function() {
 
 Field.prototype.toJson = function() {
   return {
-    objects: this.objects.map(function(obj) { obj.toJson(); }),
+    objects: this.objects.map(function(obj) { return obj.renderInfo(); }),
     width: this.width,
     height: this.height
   };

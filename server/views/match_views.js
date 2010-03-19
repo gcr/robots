@@ -17,8 +17,6 @@ var
   staticFiles         = require('./static');
 
 // here's the python code for all these callbacks. we'll need ears for all these.
-//   def on_pump(field):
-//       self.history.add({"field": field})
 //   def on_hit(obj, location):
 //       self.history.add({"hit": {'obj': obj, 'location': location}})
 //   def on_splash(obj, location, damage):
@@ -62,14 +60,15 @@ function dispatchMatchViews(req, res, match, path) {
   // so. two possibilities. one: they wanted the robot in the match. two: they
   // just wanted the match. we'll handle the former first.
   return switchboard.dispatchOnePath(req, res, path,
-    // http://localhost:8080/matches/mid/robot_id
+    // http://localhost:8080/matches/mid/robot_id -- this means we must dispatch
+    // to a robot.
     function(req, res, robotId) {
       assert.ok(robotId in match.game.robots, "This robot doesn't exist!");
       var robot = match.game.robots[robotId];
       return robotViews.dispatchRobotViews(req, res, robot, robotId, match);
     },
 
-    // they just want the match.
+    // They just want the match.
     // http://localhost:8080/matches/mid
     function(req, res) {
       return switchboard.dispatchQueryOverload(req, res,

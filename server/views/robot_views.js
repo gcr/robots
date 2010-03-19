@@ -12,7 +12,10 @@ var
   renderJson   = require('./view_helpers').renderJson,
   renderError  = require('./view_helpers').renderError;
 
+// No ears here.
+
 function dispatchRobotViews(req, res, robot, robotId, match) {
+  // This function handles rendering what happens to the robots.
   var query = url.parse(req.url, true).query || {};
   return switchboard.dispatchQueryOverload(req, res,
     // http://localhost:8080/matches/mid/robot_id?connect=t
@@ -37,7 +40,7 @@ function dispatchRobotViews(req, res, robot, robotId, match) {
 
       req.connection.setTimeout(300000); // 5min
       req.connection.addListener("end", function() {
-        // sometimes if the kind fellow on the other end exits his client,
+        // Sometimes if the kind fellow on the other end exits his client,
         // he doesn't actually *close* the connection.
         req.connection.close();
       });
