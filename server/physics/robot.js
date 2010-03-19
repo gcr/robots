@@ -13,6 +13,7 @@ function Robot(name, location) {
   this.scanWidth = Math.PI / 6;
   this.scanRange = 500;
   this.speed = 0;
+  this.armor = 100;
 }
 sys.inherits(Robot, fieldobject.FieldObject);
 
