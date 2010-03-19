@@ -5,10 +5,11 @@ var
   sys = require('sys'),
   events = require('events');
 
-function Field(width, height) {
+function Field(game, width, height) {
   // A field is like an arena of sorts. This one is just square; it has a
   // width and a height and won't bother anybody. Each field has objects and
   // stuff.
+  this.game = game;
   this.width = width;
   this.height = height;
   this.objects = [];

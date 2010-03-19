@@ -40,6 +40,11 @@ ears.listenFor({
       match.history.add({'remove_slot': true});
     }
   },
+  'Field': {
+    'pump': function(field) {
+      field.game.match.history.add({"field": field.toJson()});
+    }
+  },
   'GameLogic': {
     'connectedRobot': function(game, robot) {
       game.match.history.add({'connected_robot': robot});

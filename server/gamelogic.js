@@ -11,7 +11,7 @@ var
 function GameLogic(match) {
   this.match = match;
 
-  this.field = new field.Field(1024, 1024);
+  this.field = new field.Field(this, 1024, 1024);
 
   // A mapping.
   // this.futures = {
