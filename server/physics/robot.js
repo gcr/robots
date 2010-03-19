@@ -1,11 +1,15 @@
 // robot.js -- OMG ROBOTS
 
+var
+  sys         = require('sys'),
+  fieldobject = require('./fieldobject');
+
 function Robot(name) {
 
-
 }
+sys.inherits(Robot, fieldobject.FieldObject);
 
-// def field_info(self):
+// def renderInfo(self):
 //   # return enough information for the client to draw on the screen. This
 //   # should usually be kept secret (ie not in self.__json__).
 //   return {'type': 'robot',
