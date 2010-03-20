@@ -151,6 +151,14 @@ ATRobotsGame.prototype.robotAction = function(robotId, action, args, callback, e
     // to turn? robotACtion(rid, 'turn', 25) will do what you want.
     var game = this;
 
+    // list of functions we'll need:
+    // get, set turning
+    // compass (rotation right now)
+    // get, set throttle
+    // location
+    // scanning
+    // distance to wall
+    // get, set turret rotation
     this.setFuture(this.time +  0, robotId,
       function() {
         // TODO: UM NO THANKS.
