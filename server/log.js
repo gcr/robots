@@ -48,6 +48,11 @@ function beginLogging() {
       'removeSlot': function(match, slotId) {
         info("Match " + match.mid + " removed slot " + slotId);
       }
+    },
+    'GameLogic': {
+      'connectedRobot': function(game, robotId, robot) {
+        info("Match: " + game.match.mid + " robot: " + robotId + " connected");
+      }
     }
     //'Field': {
     //}

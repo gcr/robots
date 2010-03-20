@@ -106,7 +106,7 @@ GameLogic.prototype.makeRobot = function(robotId, name) {
 
   this.robots[robotId] = rob;
   this.field.addObject(rob);
-  this.emit("connectedRobot", this, rob);
+  this.emit("connectedRobot", this, robotId, rob);
   return rob;
 };
 

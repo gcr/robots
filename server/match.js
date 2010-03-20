@@ -41,7 +41,7 @@ Match.prototype.start = function() {
   for (var rid in this.game.robots) {
     if (this.game.robots.hasOwnProperty(rid) &&
         this.game.robots[rid] === null) {
-          this.game.disconnectRobot(rid);
+          this.removeSlot(rid);
       }
   }
   this.game.start();
@@ -76,6 +76,9 @@ Match.prototype.removeSlot = function(slotId) {
   // remove this.game.robots[slotId], but ONLEH if we're not started. Emit an
   // event. gamelogic will call us.
   assert.ok(!this.game.started, "You cannot leave a started match.");
+  // Sometimes, thanks to how we play with match_views, the slot won't exist
+  // but we'll try to remove it twice. Well, instead of throwing an exception,
+  // we should instead just return false.
   if (!(slotId in this.game.robots)) {
     log.warn("Match " + this.mid + " tried to remove " + slotId + ", a nonexistent slot");
     return false;

@@ -34,8 +34,6 @@ function dispatchRobotViews(req, res, robot, robotId, match) {
           return renderJson(req, res, match.game.robots[robotId]);
         });
 
-      log.info("Match: " + match.mid + " robot: " + robotId + " connected");
-
       var robot = match.game.makeRobot(robotId, query.name || pickCoolName());
 
       req.connection.setTimeout(300000); // 5min
