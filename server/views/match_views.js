@@ -78,7 +78,6 @@ function dispatchMatchViews(req, res, match, path) {
         ['register'],
         function(req, res) {
           var rid = match.requestSlot(buildUuid(15));
-          require('../log').debug(rid);
           renderJson(req, res, rid);
         },
 
