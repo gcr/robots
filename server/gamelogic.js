@@ -58,6 +58,8 @@ GameLogic.prototype.start = function() {
   //
   this.started = true;
   this.emit("started", this);
+  // Then, run all the queued actions right at the beginning.
+  this.pump();
 };
 
 GameLogic.prototype.pump = function() {
@@ -97,6 +99,12 @@ GameLogic.prototype.setFuture = function(time, robotId, cb, errback) {
   this.futures[time] = this.futures[time] || {};
   this.futures[time][robotId] = {callback: cb, errback: errback};
 };
+
+GameLogic.prototype.robotAction = function(robotId, action) {
+    // This function will make a robot do some kind of action later. E.g. need
+    // to turn? robotACtion(rid, 'turn', 25) will do what you want.
+
+    // This method should be blank. Subclass GameLogic instead.
 };
 
 GameLogic.prototype.makeRobot = function(robotId, name) {
@@ -133,8 +141,32 @@ GameLogic.prototype.disconnectRobot = function(robotId) {
   this.emit("disconnectedRobot", this, robot);
 };
 
+function ATRobotsGame() {
+  GameLogic.apply(this, arguments);
+}
+sys.inherits(ATRobotsGame, GameLogic);
+
+ATRobotsGame.prototype.robotAction = function(robotId, action) {
+    // This function will make a robot do some kind of action later. E.g. need
+    // to turn? robotACtion(rid, 'turn', 25) will do what you want.
+    assert.ok(arguments.length >= 4, "You need at least the robot ID, the action, and two callbacks and errbacks!");
+
+    var callback = arguments[arguments.length-2],
+        errback = arguments[arguments.length-1],
+        game = this;
+
+    this.setFuture(this.time +  0, robotId,
+      function() {
+        game.robots[robotId].rotation += 1.5;
+        require('./log').info("Ahahah, future: EXECUTED!");
+        callback(true);
+      },
+      errback);
+};
+
 process.mixin(exports,
   {
-    GameLogic: GameLogic
+    GameLogic: GameLogic,
+    ATRobotsGame: ATRobotsGame
   }
 );

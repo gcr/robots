@@ -6,6 +6,7 @@
 
 var
   url          = require('url'),
+  assert       = require('assert'),
   switchboard  = require('./switchboard'),
   log          = require('../log'),
   pickCoolName = require('./robot_naming').pickCoolName,
@@ -18,9 +19,30 @@ function dispatchRobotViews(req, res, robot, robotId, match) {
   // This function handles rendering what happens to the robots.
   var query = url.parse(req.url, true).query || {};
   return switchboard.dispatchQueryOverload(req, res,
+    // http://localhost:8080/matches/mid/robot_id?rotate=t
+    ['rotate'],
+    function(req, res) {
+      assert.ok(match.game.started, "The match isn't started yet!");
+      match.game.robotAction(robotId, 'rotate',
+        function(result) {
+          // callback
+          return renderJson(req, res, result);
+        },
+        function(err) {
+          // errback
+          return renderError(req, res, err);
+        });
+    },
+
     // http://localhost:8080/matches/mid/robot_id?connect=t
     ['connect'],
     function(req, res) {
+      if (match.game.started) {
+        // If we've started, don't change the robot. Just tell what the robot
+        // is.
+        return renderJson(req, res, match.game.robots[robotId]);
+      }
+
       match.game.setFuture(0, robotId,
         // Callback
         function() {
