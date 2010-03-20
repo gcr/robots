@@ -96,6 +96,7 @@ function dispatchMatchViews(req, res, match, path) {
           // Starts the match
           assert.ok(!match.game.started, "You cannot start a started match!");
           match.start();
+          renderJson(req, res, true);
         },
 
         ['history'],
