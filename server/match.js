@@ -13,8 +13,10 @@ function Match(mid, authCode, pub) {
   this.authCode = authCode;
   this.pub = pub;
   this.game = new gamelogic.GameLogic(this);
+
+  this.speed = 5;
+
   // field_size
-  // speed
   // robots
 }
 sys.inherits(Match, events.EventEmitter);
@@ -25,6 +27,7 @@ Match.prototype.toJson = function() {
   return process.mixin(this.game.toJson(),
     {
       init_time: this.initTime,
+      speed: this.speed,
       'public': this.pub
     }
   );
