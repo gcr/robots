@@ -8,7 +8,8 @@ var
 function Robot(name, location) {
   this.name = name;
   this.location = new vec.Vector(location[0], location[1]);
-  this.turretRot = vec.normalizeAngle(Math.random() * 2 * Math.PI);
+  this.rotation = vec.normalizeAngle(Math.random() * 2 * Math.PI);
+  this.turretRot = 0;
   this.scanMode = "";
   this.scanWidth = Math.PI / 6;
   this.scanRange = 500;
@@ -23,6 +24,7 @@ Robot.prototype.renderInfo = function() {
     type: 'robot',
     name: this.name,
     location: [this.location.x, this.location.y],
+    rotation: this.rotation,
     turret_rot: this.turretRot,
     scan_mode: this.scanMode,
     scan_width: this.scanWidth,

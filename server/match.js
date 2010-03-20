@@ -16,6 +16,8 @@ function Match(mid, authCode, pub) {
 
   this.speed = 0.5;
 
+  this.timer = null;
+
   // field_size
   // robots
 }
@@ -37,12 +39,24 @@ Match.prototype.start = function() {
   // Start the match.
   // We must remove all the blank robots first.
   for (var rid in this.game.robots) {
-      if (this.game.robots.hasOwnProperty(rid)) {
+    if (this.game.robots.hasOwnProperty(rid) &&
+        this.game.robots[rid] === null) {
           this.game.disconnectRobot(rid);
       }
   }
   this.game.start();
+
+  // We must assign something to 'this' because inside the function in
+  // setTimeout, 'this' refers to the window object.
+  var self = this;
+  this.timer = setInterval(function() {
+    self.game.pump();
+  }, 1000/this.speed);
   this.emit("started", this);
+};
+
+Match.prototype.pump = function() {
+    this.game.pump();
 };
 
 Match.prototype.requestSlot = function(slotId) {

@@ -50,8 +50,8 @@ function beginLogging() {
       }
     },
     'Field': {
-      'pump': function() {
-        info("pump");
+      'pump': function(field) {
+        info("pump: ", sys.inspect(field.toJson()));
       }
     }
   });
