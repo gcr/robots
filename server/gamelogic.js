@@ -146,17 +146,14 @@ function ATRobotsGame() {
 }
 sys.inherits(ATRobotsGame, GameLogic);
 
-ATRobotsGame.prototype.robotAction = function(robotId, action) {
+ATRobotsGame.prototype.robotAction = function(robotId, action, args, callback, errback) {
     // This function will make a robot do some kind of action later. E.g. need
     // to turn? robotACtion(rid, 'turn', 25) will do what you want.
-    assert.ok(arguments.length >= 4, "You need at least the robot ID, the action, and two callbacks and errbacks!");
-
-    var callback = arguments[arguments.length-2],
-        errback = arguments[arguments.length-1],
-        game = this;
+    var game = this;
 
     this.setFuture(this.time +  0, robotId,
       function() {
+        // TODO: UM NO THANKS.
         game.robots[robotId].rotation += 1.5;
         require('./log').info("Ahahah, future: EXECUTED!");
         callback(true);

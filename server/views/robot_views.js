@@ -15,24 +15,31 @@ var
 
 // No ears here.
 
+// A useful function: automatically ask the game to do something. Then, render
+// the request and result.
+function takeGameAction(match, robotId, action, numargs) {
+  return function(req, res) {
+    var args = Array.prototype.slice.call(arguments, -numargs);
+    assert.ok(match.game.started, "The match isn't started yet!");
+    match.game.robotAction(robotId, action, args,
+      // callback
+      function(result) {
+        return renderJson(req, res, result);
+      },
+      // errback
+      function(err) {
+        return renderError(req, res, err);
+      });
+  };
+}
+
 function dispatchRobotViews(req, res, robot, robotId, match) {
   // This function handles rendering what happens to the robots.
   var query = url.parse(req.url, true).query || {};
   return switchboard.dispatchQueryOverload(req, res,
     // http://localhost:8080/matches/mid/robot_id?rotate=t
     ['rotate'],
-    function(req, res) {
-      assert.ok(match.game.started, "The match isn't started yet!");
-      match.game.robotAction(robotId, 'rotate',
-        function(result) {
-          // callback
-          return renderJson(req, res, result);
-        },
-        function(err) {
-          // errback
-          return renderError(req, res, err);
-        });
-    },
+    takeGameAction(match, robotId, 'rotate', 0),
 
     // http://localhost:8080/matches/mid/robot_id?connect=t
     ['connect'],
