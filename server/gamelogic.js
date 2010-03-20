@@ -50,6 +50,13 @@ GameLogic.prototype.toJson = function() {
   };
 };
 
+GameLogic.prototype.start = function() {
+  // Start the match!
+  //
+  this.started = true;
+  this.emit("started", this);
+};
+
 GameLogic.prototype.pump = function() {
   // First. go through and carry out all these wonderful callbacks.
   for (var rid in this.futures[this.time]) {

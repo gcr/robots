@@ -63,8 +63,8 @@ function dispatchMatchViews(req, res, match, path) {
   // so. two possibilities. one: they wanted the robot in the match. two: they
   // just wanted the match. we'll handle the former first.
   return switchboard.dispatchOnePath(req, res, path,
-    // http://localhost:8080/matches/mid/robot_id -- this means we must dispatch
-    // to a robot.
+    // http://localhost:8080/matches/mid/robot_id -- this means we must
+    // dispatch to a robot.
     function(req, res, robotId) {
       assert.ok(robotId in match.game.robots, "This robot doesn't exist!");
       var robot = match.game.robots[robotId];
@@ -90,6 +90,13 @@ function dispatchMatchViews(req, res, match, path) {
               history: match.history.time()
             }
           ));
+        },
+
+        ['start'],
+        function(req, res) {
+          // Starts the match
+          assert.ok(!match.game.started, "You cannot start a started match!");
+          match.start();
         },
 
         ['history'],

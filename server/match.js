@@ -14,7 +14,7 @@ function Match(mid, authCode, pub) {
   this.pub = pub;
   this.game = new gamelogic.GameLogic(this);
 
-  this.speed = 5;
+  this.speed = 0.5;
 
   // field_size
   // robots
@@ -34,6 +34,14 @@ Match.prototype.toJson = function() {
 };
 
 Match.prototype.start = function() {
+  // Start the match.
+  // We must remove all the blank robots first.
+  for (var rid in this.game.robots) {
+      if (this.game.robots.hasOwnProperty(rid)) {
+          this.game.disconnectRobot(rid);
+      }
+  }
+  this.game.start();
   this.emit("started", this);
 };
 
