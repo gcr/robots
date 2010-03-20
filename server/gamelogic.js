@@ -15,8 +15,11 @@ function GameLogic(match) {
 
   // A mapping.
   // this.futures = {
-  //   time: [ [Function], [Function], ... ],
-  //   time: [ [Function], ... ]
+  //   time: { {callback: [Function], errback: [Function]},
+  //           {callback: [Function], errback: [Function]}
+  //         },
+  //   time: { {callback: [Function], errback: [Function]},
+  //         },
   // }
   this.futures = {};
   this.time = 0;
@@ -61,7 +64,11 @@ GameLogic.prototype.pump = function() {
   // First. go through and carry out all these wonderful callbacks.
   for (var rid in this.futures[this.time]) {
     if (this.futures[this.time].hasOwnProperty(rid)) {
-      this.futures[this.time][rid](this.time);
+      try {
+        this.futures[this.time][rid].callback(this.time);
+      } catch(err) {
+        this.futures[this.time][rid].errback(err);
+      }
     }
   }
   delete this.futures[this.time];
@@ -70,7 +77,7 @@ GameLogic.prototype.pump = function() {
   this.time += 1;
 };
 
-GameLogic.prototype.setFuture = function(time, robotId, cb) {
+GameLogic.prototype.setFuture = function(time, robotId, cb, errback) {
   // Rigs callback (cb) to be executed at time (time). The callback should
   // (should!) expect two arguments: a possible error, and the actual results of
   // the callback. By convention, of course; GameLogic.prototype.pump won't
@@ -83,12 +90,13 @@ GameLogic.prototype.setFuture = function(time, robotId, cb) {
     if (this.futures.hasOwnProperty(ftime)) {
       if (robotId in this.futures[ftime]) {
         // Cancel that! First argument is a callback.
-        this.futures[ftime][robotId]("Tried to do two things at once!");
+        this.futures[ftime][robotId].errback("Tried to do two things at once!");
       }
     }
   }
   this.futures[time] = this.futures[time] || {};
-  this.futures[time][robotId] = cb;
+  this.futures[time][robotId] = {callback: cb, errback: errback};
+};
 };
 
 GameLogic.prototype.makeRobot = function(robotId, name) {

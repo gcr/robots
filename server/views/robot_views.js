@@ -22,16 +22,20 @@ function dispatchRobotViews(req, res, robot, robotId, match) {
     ['connect'],
     function(req, res) {
       match.game.setFuture(0, robotId,
-        function(err, time) {
+        // Callback
+        function() {
           // What happens when the match starts?
           // Render the robot. BUT don't render just 'var robot'; maybe it
-          // changed.
-          if (err) {
-            // This part will get run whenever we get duplicate connections.
-            match.game.disconnectRobot(robotId);
-            return renderError(req, res, err);
-          }
+          // changed since then.
           return renderJson(req, res, match.game.robots[robotId]);
+        },
+        // Errback
+        function(err) {
+          // This part will get run whenever we get duplicate connections.
+          // No need to detect if the robotjis still there or not; this is
+          // just an errback.
+          match.game.disconnectRobot(robotId);
+          return renderError(req, res, err);
         });
 
       var robot = match.game.makeRobot(robotId, query.name || pickCoolName());
