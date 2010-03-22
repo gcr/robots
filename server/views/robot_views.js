@@ -16,7 +16,9 @@ var
 // No ears here.
 
 // A useful function: automatically ask the game to do something. Then, render
-// the request and result.
+// the request and result. This function is designed to be used from
+// dispatchQueryOverload -- numargs will tell how many arguments (from the
+// right) we'll chomp.
 function takeGameAction(match, robotId, action, numargs) {
   return function(req, res) {
     var args = Array.prototype.slice.call(arguments, -numargs);

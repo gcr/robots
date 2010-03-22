@@ -14,13 +14,13 @@ function GameLogic(match) {
   this.field = new field.Field(this, 1024, 1024);
 
   // A mapping.
-  // this.futures = {
-  //   time: { {callback: [Function], errback: [Function]},
-  //           {callback: [Function], errback: [Function]}
-  //         },
-  //   time: { {callback: [Function], errback: [Function]},
-  //         },
-  // }
+  //     this.futures = {
+  //       time: { {callback: [Function], errback: [Function]},
+  //               {callback: [Function], errback: [Function]}
+  //             },
+  //       time: { {callback: [Function], errback: [Function]},
+  //             },
+  //     }
   this.futures = {};
   this.time = 0;
 
@@ -141,6 +141,10 @@ GameLogic.prototype.disconnectRobot = function(robotId) {
   this.emit("disconnectedRobot", this, robot);
 };
 
+// AT Robots inspired game
+// -----------------------
+// This game is inspired by AT Robots. It includes the standard things such as
+// firing bullets and breaking robots.
 function ATRobotsGame() {
   GameLogic.apply(this, arguments);
 }
