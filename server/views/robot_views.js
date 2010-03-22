@@ -38,8 +38,9 @@ function dispatchRobotViews(req, res, robot, robotId, match) {
   var query = url.parse(req.url, true).query || {};
   return switchboard.dispatchQueryOverload(req, res,
     // http://localhost:8080/matches/mid/robot_id?rotate=t
-    ['rotate'],
-    takeGameAction(match, robotId, 'rotate', 0),
+    // ['turn', 'amount']
+    ['turn'],
+    takeGameAction(match, robotId, 'turn', 0),
 
     // http://localhost:8080/matches/mid/robot_id?connect=t
     ['connect'],
