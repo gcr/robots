@@ -45,6 +45,10 @@ Robot.prototype.pump = function() {
 
 };
 
+Robot.prototype.turn = function(amount) {
+    require('../log').debug("Turning: " + amount + " radians!");
+};
+
 process.mixin(exports,
   {
     Robot: Robot

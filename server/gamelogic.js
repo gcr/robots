@@ -153,8 +153,10 @@ sys.inherits(ATRobotsGame, GameLogic);
 ATRobotsGame.prototype.robotAction = function(robotId, action, args, callback, errback) {
     // This function will make a robot do some kind of action later. E.g. need
     // to turn? robotACtion(rid, 'turn', 25) will do what you want.
-    var game = this;
+    var game = this,
+        robot = this.robots[robotId];
 
+    assert.ok(robot, "This robot doesn't exist!");
     // list of functions we'll need:
     // get, set turning
     // compass (rotation right now)
@@ -163,14 +165,40 @@ ATRobotsGame.prototype.robotAction = function(robotId, action, args, callback, e
     // scanning
     // distance to wall
     // get, set turret rotation
-    this.setFuture(this.time +  0, robotId,
-      function() {
-        // TODO: UM NO THANKS.
-        game.robots[robotId].rotation += 1.5;
-        require('./log').info("Ahahah, future: EXECUTED!");
-        callback(true);
-      },
-      errback);
+
+    // Here come a few lists.
+    // INSTANT is all the actions that we should return *right away.* Don't
+    // post to our 'futures' list, just... pop the callback RIGHT NAO.
+    var INSTANT = {
+      // TODO!
+    };
+
+    // DELAYED is all the actions that should be returned later. Save them on
+    // our futures, worry about it later. This mapping maps from action
+    // strings to a 2-tuple: [timeToWait, methodName]. Apply that methodName
+    // with arguments.
+    var DELAYED = {
+      turn: [0, 'turn'] // call robot.turn
+    };
+
+    // DEFERRED is really crazy. These functions will actually return
+    // functions. Call the 'outer' function right away. Then, set up to call
+    // the 'inner' function later, in the future.
+    var DEFERRED = {
+      // TODO!
+    };
+
+    // Now, actually take the actions.
+    if (action in DELAYED) {
+      var time = DELAYED[action][0],
+          method = DELAYED[action][1];
+      this.setFuture(this.time +  time, robotId,
+        function() {
+          callback(robot[method].apply(robot, args));
+        },
+        errback);
+
+    }
 };
 
 process.mixin(exports,

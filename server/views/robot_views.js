@@ -21,7 +21,15 @@ var
 // right) we'll chomp.
 function takeGameAction(match, robotId, action, numargs) {
   return function(req, res) {
-    var args = Array.prototype.slice.call(arguments, -numargs);
+    // TODO: numargs=0 doesn't work right, as slice(arguments, 0) will return
+    // ABSOLUTELY EVERYTHING OMGOMG
+    var args = Array.prototype.slice.call(arguments, -numargs).map(
+      // Now, this? THIS is stupid. We can't just do that.map(parseInt)
+      // because map passes THREE arguments: the element, its index, and the
+      // array. parseInt assumes that the second argument (usually the index)
+      // is a radix, and thus will totally break for indexes of like 1, 2,
+      // whatever. Ugh. *sigh*
+      function(x) { return parseInt(x, 10); } );
     assert.ok(match.game.started, "The match isn't started yet!");
     match.game.robotAction(robotId, action, args,
       // callback
@@ -40,9 +48,8 @@ function dispatchRobotViews(req, res, robot, robotId, match) {
   var query = url.parse(req.url, true).query || {};
   return switchboard.dispatchQueryOverload(req, res,
     // http://localhost:8080/matches/mid/robot_id?rotate=t
-    // ['turn', 'amount']
-    ['turn'],
-    takeGameAction(match, robotId, 'turn', 0),
+    ['turn', 'amount'],
+    takeGameAction(match, robotId, 'turn', 1),
 
     // http://localhost:8080/matches/mid/robot_id?connect=t
     ['connect'],
