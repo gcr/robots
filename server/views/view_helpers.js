@@ -19,7 +19,7 @@ function renderJson(req, res, obj) {
   } else {
     json = json + "\n";
   }
-  res.writeHeader(200, {"Content-Type": "text/plain; charset: UTF-8",
+  res.writeHeader(200, {"Content-Type": "text/plain; charset=utf-8",
                         "Content-Length": json.length});
   res.write(json);
   res.close();

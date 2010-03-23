@@ -6,7 +6,7 @@ var
   url         = require('url');
 
 function notFound(req, res) {
-  res.writeHeader(404, {"Content-Type": "text/plain; charset: UTF-8"});
+  res.writeHeader(404, {"Content-Type": "text/plain; charset=utf-8"});
   res.write("Not found\n");
   res.close();
   log.error("URL not found: " + req.url + "\n" + sys.inspect(req));

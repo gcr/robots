@@ -149,10 +149,10 @@ var
     ".zip": "application/zip"
   },
   charsets = {
-    'text/javascript': 'UTF-8',
-    'text/html': 'UTF-8',
-    'text/plain': 'UTF-8',
-    'text/css': 'UTF-8'
+    'text/javascript': 'utf-8',
+    'text/html': 'utf-8',
+    'text/plain': 'utf-8',
+    'text/css': 'utf-8'
   };
 
 
@@ -179,7 +179,7 @@ function serveFile(webroot, urlPath, req, res) {
           var contentType = contentTypes[path.extname(filePath)] || 'application/octet-stream',
               charset = charsets[contentType];
           if (charset) {
-            contentType += '; charset: ' + charset;
+            contentType += '; charset=' + charset;
           }
           res.writeHeader(200, 
             {
