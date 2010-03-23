@@ -132,7 +132,7 @@ class Match(object):
     def from_url(cls, url):
         try:
             data = fetch(url, {'info': 't'})
-        except RobotException:
+        except (RobotException, urllib2.HTTPError):
             return False
         if not (isinstance(data, dict) and 'started' in data and 'init_time' in
                 data and 'gametime' in data and 'public' in data):
