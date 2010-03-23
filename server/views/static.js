@@ -150,7 +150,9 @@ var
   },
   charsets = {
     'text/javascript': 'UTF-8',
-    'text/html': 'UTF-8'
+    'text/html': 'UTF-8',
+    'text/plain': 'UTF-8',
+    'text/css': 'UTF-8'
   };
 
 

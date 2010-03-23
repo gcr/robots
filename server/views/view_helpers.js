@@ -9,7 +9,7 @@ var
 function renderJson(req, res, obj) {
   var json;
   var query = url.parse(req.url, true).query || {};
-  if (typeof obj == 'object' && 'toJson' in obj) {
+  if (obj !== null && typeof obj == 'object' && 'toJson' in obj) {
     json = JSON.stringify(obj.toJson());
   } else {
     json = JSON.stringify(obj);
@@ -19,7 +19,7 @@ function renderJson(req, res, obj) {
   } else {
     json = json + "\n";
   }
-  res.writeHeader(200, {"Content-Type": "text/plain",
+  res.writeHeader(200, {"Content-Type": "text/plain; charset: UTF-8",
                         "Content-Length": json.length});
   res.write(json);
   res.close();
