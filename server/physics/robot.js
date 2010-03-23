@@ -9,6 +9,9 @@ function Robot(name, location) {
   this.name = name;
   this.location = new vec.Vector(location[0], location[1]);
   this.rotation = vec.normalizeAngle(Math.random() * 2 * Math.PI);
+  this.wantedRotation = this.rotation;
+
+  this.engine = 1;
   this.turretRot = 0;
   this.scanMode = "";
   this.scanWidth = Math.PI / 6;
@@ -42,11 +45,20 @@ Robot.prototype.toJson = function() {
 };
 
 Robot.prototype.pump = function() {
-
+  // Calculate our physics: turn, move, or whatever.
+  // First, we'll turn.
+  var angleDiff = vec.normalizeAngle(this.wantedRotation - this.rotation),
+      rotAccel = this.engine/5;
+  if (Math.abs(angleDiff) < rotAccel) {
+    this.rotation = this.wantedRotation;
+  } else {
+    this.rotation += angleDiff>0? rotAccel : -rotAccel;
+  }
 };
 
 Robot.prototype.turn = function(amount) {
-    require('../log').debug("Turning: " + amount + " radians!");
+  this.wantedRotation = this.rotation + amount;
+  return this.wantedRotation;
 };
 
 process.mixin(exports,

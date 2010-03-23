@@ -23,13 +23,7 @@ function takeGameAction(match, robotId, action, numargs) {
   return function(req, res) {
     // TODO: numargs=0 doesn't work right, as slice(arguments, 0) will return
     // ABSOLUTELY EVERYTHING OMGOMG
-    var args = Array.prototype.slice.call(arguments, -numargs).map(
-      // Now, this? THIS is stupid. We can't just do that.map(parseInt)
-      // because map passes THREE arguments: the element, its index, and the
-      // array. parseInt assumes that the second argument (usually the index)
-      // is a radix, and thus will totally break for indexes of like 1, 2,
-      // whatever. Ugh. *sigh*
-      function(x) { return parseInt(x, 10); } );
+    var args = Array.prototype.slice.call(arguments, -numargs).map(parseFloat);
     assert.ok(match.game.started, "The match isn't started yet!");
     match.game.robotAction(robotId, action, args,
       // callback

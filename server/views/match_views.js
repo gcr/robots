@@ -47,8 +47,8 @@ ears.listenFor({
     }
   },
   'GameLogic': {
-    'connectedRobot': function(game, robot) {
-      game.match.history.add({'connected_robot': robot});
+    'connectedRobot': function(game, robotId, robot) {
+      game.match.history.add({'connected_robot': robot.toJson()});
     },
     'disconnectedRobot': function(game, robot) {
       game.match.history.add({'disconnect_robot': robot});

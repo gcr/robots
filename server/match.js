@@ -14,7 +14,7 @@ function Match(mid, authCode, pub) {
   this.pub = pub;
   this.game = new gamelogic.ATRobotsGame(this);
 
-  this.speed = 0.5;
+  this.speed = 0.3;
 
   this.timer = null;
 
@@ -51,7 +51,7 @@ Match.prototype.start = function() {
   var self = this;
   this.timer = setInterval(function() {
     self.game.pump();
-  }, 1000/this.speed);
+  }, 1000*this.speed);
   this.emit("started", this);
 };
 
