@@ -91,11 +91,12 @@ function dispatchMatchViews(req, res, match, path) {
           ));
         },
 
-        ['start'],
-        function(req, res) {
-          // Starts the match
+        ['start', 'auth_code'],
+        function(req, res, ignoreme, authCode) {
+          // Starts the match. (ignoreme is passed the value of 'start', which
+          // will likely be 't' or '1' or something.)
           assert.ok(!match.game.started, "You cannot start a started match!");
-          match.start();
+          match.start(authCode);
           renderJson(req, res, true);
         },
 

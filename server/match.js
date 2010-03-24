@@ -35,8 +35,9 @@ Match.prototype.toJson = function() {
   );
 };
 
-Match.prototype.start = function() {
+Match.prototype.start = function(authCode) {
   // Start the match.
+  assert.ok(authCode == this.authCode, "Incorrect authentication code.");
   // We must remove all the blank robots first.
   for (var rid in this.game.robots) {
     if (this.game.robots.hasOwnProperty(rid) &&
