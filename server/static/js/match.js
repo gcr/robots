@@ -9,12 +9,14 @@ courier.match = (function() { // begin courier namespace
 
 /* ------------------ Robots --------------------- */
 function Robot (r) {
+  courier.core.EventEmitter.call(this);
   if (typeof r == 'object' && r !== null) {
     this.name = r.name;
     this.armor = r.armor;
     this.heat = r.heat;
   }
 }
+courier.core.inherits(Robot, courier.core.EventEmitter);
 
 
 /* ------------------ Match --------------------- */
@@ -138,7 +140,7 @@ Match.prototype.connectRobot = function(robot) {
   for (var i=0,l=this.robots.length; i<l; i++) {
     if (this.robots[i] === null) {
       this.robots[i] = robot;
-      this.emit('connectedRobot', this.robots[i]);
+      this.emit('connectedRobot', this, this.robots[i]);
       break;
     }
   }
@@ -149,6 +151,8 @@ Match.prototype.disconnectRobot = function(robot) {
     if (this.robots[i] && this.robots[i].name == robot.name) {
       this.robots[i] = null;
       this.emit('disconnectedRobot', robot);
+      // Sorry!
+      robot.emit('disconnectedRobot', robot);
       break;
     }
   }

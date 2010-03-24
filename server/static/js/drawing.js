@@ -102,8 +102,8 @@ courier.drawing = (function() { // begin courier namespace
       // will too.
       var f = new Field(m.field_size[0], m.field_size[1], jq);
       var fdat;
-      m.onFieldUpdate(
-        function(field_dat) {
+      m.addListener('fieldUpdate',
+        function(match, field_dat) {
           fdat = field_dat;
         });
       window.setInterval(
