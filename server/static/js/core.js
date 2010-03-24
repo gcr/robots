@@ -16,7 +16,7 @@ function ajaxRequest(url, data, cb) {
     success:
       function(data, textStatus) {
         if (typeof data == 'object' && 'exception' in data) {
-          alert("An error! " + data.client_error);
+          alert("An error! " + data.exception);
         } else {
           cb(data, textStatus);
         }
@@ -33,19 +33,21 @@ function ajaxRequest(url, data, cb) {
 }
 
 function StreamingHistory(url, state, cb) {
-  /// This object will run a callback when something on the server changes.
-  /// Give it a URL to ping and a callback to execute whenever that
-  /// happens and it'll go on its way. Whenever the server does something,
-  /// the callback will run with the server's response. This is done in such
-  /// a way so you won't ever skip history you missed.
+  // This object will run a callback when something on the server changes.
+  // Give it a URL to ping and a callback to execute whenever that
+  // happens and it'll go on its way. Whenever the server does something,
+  // the callback will run with the server's response. This is done in such
+  // a way so you won't ever skip history you missed.
+  // See: history.js
   this.cb = cb;
   this.url = url;
   this.state = state;
 
   var self = this;
   if (this.state == -1) {
-    // they don't know what state they're at? uh oh! we'd best tell them,
-    // but this is bad because they're going to miss things!
+    // they don't know what time they're at? uh oh! we'd best tell them,
+    // but this is bad because they're going to miss things! it's always
+    // better to pass the time in as an argument.
     this.xhr = ajaxRequest(url, {}, function(state, textStatus) {
       self.state = state;
       self.nextHist();
@@ -55,8 +57,8 @@ function StreamingHistory(url, state, cb) {
   }
 }
 StreamingHistory.prototype.nextHist = function() {
-  /// Carry out the next action in the history, calling callback if we get
-  /// anything.
+  // Carry out the next action in the history, calling callback if we get
+  // anything.
   var self = this;
   this.xhr = ajaxRequest(this.url, {since: this.state},
     function (actions) {
@@ -72,17 +74,6 @@ StreamingHistory.prototype.stop = function() {
     this.xhr.abort();
   }
 };
-
-function createPropertySetters(obj, suffix, propList) {
-  // assign some property setters for obj
-  $.each(propList,
-      function(i, prop) {
-        obj.prototype[prop] = function(value) {
-          // assign value to the property
-          this[prop + suffix] = value;
-        };
-      });
-}
 
 // Many thanks to http://www.quirksmode.org/js/cookies.html for this code.
 function createCookie(name,value,days) {
@@ -114,13 +105,40 @@ function eraseCookie(name) {
 	createCookie(name,"",-1);
 }
 
+// nodejs-inspired event emitters.
+function EventEmitter() {
+  this.events = {};
+}
+EventEmitter.prototype.addListener = function(type, listener) {
+  this.events[type] = this.events[type] || [];
+  this.events[type].push(listener);
+};
+EventEmitter.prototype.emit = function(type) {
+  if (type in this.events) {
+    var listeners = this.events[type];
+    for (var i=0,l=listeners.length; i<l; i++) {
+        listeners[i].apply(this, Array.prototype.slice.call(arguments, 1));
+    }
+  }
+};
+
+// A generous thanks to node.js -- sys.js for this function (found:
+// http://github.com/ry/node/blob/3238944c7aaef10ffa966b5e730204f24beead68/lib/sys.js )
+function inherits(ctor, superCtor) {
+  var tempCtor = function(){};
+  tempCtor.prototype = superCtor.prototype;
+  ctor.prototype = new tempCtor();
+  ctor.prototype.constructor = ctor;
+}
+
 return {
   ajaxRequest: ajaxRequest,
   StreamingHistory: StreamingHistory,
-  createPropertySetters: createPropertySetters,
   createCookie: createCookie,
   readCookie: readCookie,
-  eraseCookie: eraseCookie
+  eraseCookie: eraseCookie,
+  EventEmitter: EventEmitter,
+  inherits: inherits
 };
 
 })();  // end courier namespace
