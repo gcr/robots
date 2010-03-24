@@ -158,13 +158,22 @@ ATRobotsGame.prototype.robotAction = function(robotId, action, args, callback, e
 
     assert.ok(robot, "This robot doesn't exist!");
     // list of functions we'll need:
-    // get, set turning
-    // compass (rotation right now)
-    // get, set throttle
-    // location
-    // scanning
-    // distance to wall
-    // get, set turret rotation
+    // ['turret_rotate', 'angle'],
+    // takeGameAction(match, robotId, 'setTurretRotate', 1),
+    // ['turret_rotate'],
+    // takeGameAction(match, robotId, 'getTurretRotate', 0),
+    // ['throttle', 'amount'],
+    // takeGameAction(match, robotId, 'setThrottle', 1),
+    // ['throttle'],
+    // takeGameAction(match, robotId, 'getThrottle', 0),
+    // ['rotation'],
+    // takeGameAction(match, robotId, 'getRotation', 0),
+    // ['location'],
+    // takeGameAction(match, robotId, 'getLocation', 0),
+    // ['scan_robots', 'arc'],
+    // takeGameAction(match, robotId, 'scanRobots', 1),
+    // ['scan_wall'],
+    // takeGameAction(match, robotId, 'scanWall', 0),
 
     // Here come a few lists.
     // INSTANT is all the actions that we should return *right away.* Don't
