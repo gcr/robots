@@ -161,6 +161,12 @@ GameLogic.prototype.makeRobot = function(robotId, name) {
   var rob = new robot.Robot(name,
     [Math.random() * this.field.width, Math.random() * this.field.height]);
 
+  for (var rid in this.robots) {
+      if (this.robots.hasOwnProperty(rid) && this.robots[rid]) {
+          assert.notEqual(name, this.robots[rid].name, "This robot already has that name!");
+      }
+  }
+
   this.robots[robotId] = rob;
   this.field.addObject(rob);
   this.emit("connectedRobot", this, robotId, rob);
