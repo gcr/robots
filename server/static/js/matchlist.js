@@ -10,11 +10,13 @@ courier.matchlist = (function() { // begin courier namespace
 function MatchList() {
   // represents a new match list. run populate(jq) to populate into a jquery
   // object.
+  courier.core.EventEmitter.call(this);
   this.matches = {};
   this.matchDelCb = {};
   this.populating = false;
-  this.newMatchCallback = undefined;
 }
+courier.core.inherits(MatchList, courier.core.EventEmitter);
+
 MatchList.prototype.populate = function(stream, cb) {
   // Get the list of matches, and run cb when we get them all.
   if (this.populating) {
@@ -62,24 +64,12 @@ MatchList.prototype.stopStream = function() {
 MatchList.prototype.newMatch = function(match) {
   // add the match to us
   this.matches[match.mid] = match;
-  if (typeof this.newMatchCallback == 'function') {
-    this.newMatchCallback(match);
-  }
+  this.emit('newMatch', this, match);
 };
 MatchList.prototype.removeMatch = function(match) {
   // delete the given match.
-  if (typeof this.matchDelCb[match.mid] == 'function') {
-    this.matchDelCb[match.mid](match);
-  }
   delete this.matches[match.mid];
-};
-MatchList.prototype.onNewMatch = function(cb) {
-  // run the specified callback when a new match appears!
-  this.newMatchCallback = cb;
-};
-MatchList.prototype.onMatchDelete = function(match, cb) {
-  // be sure to run this callback when we delete a match.
-  this.matchDelCb[match.mid] = cb;
+  this.emit('removeMatch', match);
 };
 
 function registerMatch(pub, speed, startTimeout, lockstep) {
