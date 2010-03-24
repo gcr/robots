@@ -191,7 +191,7 @@ function ATRobotsGame() {
 }
 sys.inherits(ATRobotsGame, GameLogic);
 
-// Here come a few lists.
+// Here come the lists of actions we can take.
 // INSTANT is all the actions that we should return *right away.* Don't
 // post to our 'futures' list, just... pop the callback RIGHT NAO.
 ATRobotsGame.prototype.INSTANT = {
