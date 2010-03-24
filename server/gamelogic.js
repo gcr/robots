@@ -170,7 +170,8 @@ ATRobotsGame.prototype.robotAction = function(robotId, action, args, callback, e
     // INSTANT is all the actions that we should return *right away.* Don't
     // post to our 'futures' list, just... pop the callback RIGHT NAO.
     var INSTANT = {
-      // TODO!
+      setTurretRotate: 'setTurretRot',
+      getTurretRotate: 'getTurretRot'
     };
 
     // DELAYED is all the actions that should be returned later. Save them on
@@ -189,6 +190,14 @@ ATRobotsGame.prototype.robotAction = function(robotId, action, args, callback, e
     };
 
     // Now, actually take the actions.
+    if (action in INSTANT) {
+      try {
+        return callback(robot[INSTANT[action]].apply(robot, args));
+      } catch (err) {
+        return errback(err);
+      }
+    }
+
     if (action in DELAYED) {
       var time = DELAYED[action][0],
           method = DELAYED[action][1];

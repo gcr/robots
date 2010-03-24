@@ -66,7 +66,6 @@ class Robot(object):
         self.url = url
         self.name = data['name']
         self.armor = data['armor']
-        self.heat = data['heat']
         self._turret_rotation = None
 
     def __str__(self):
@@ -108,7 +107,7 @@ class Robot(object):
 
     def set_turret_rotation(self, angle):
         self._turret_rotation = angle
-        return fetch_persist(self.url, {'turret_rotate': 't', 'angle':
+        return fetch_persist(self.url, {'turret_rotate': 't', 'arc':
             math.radians(angle)})
     def get_turret_rotation(self):
         if self._turret_rotation is None:

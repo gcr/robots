@@ -41,9 +41,25 @@ function dispatchRobotViews(req, res, robot, robotId, match) {
   // This function handles rendering what happens to the robots.
   var query = url.parse(req.url, true).query || {};
   return switchboard.dispatchQueryOverload(req, res,
-    // http://localhost:8080/matches/mid/robot_id?rotate=t
+    // http://localhost:8080/matches/mid/robot_id?turn=t&amount=3.14
     ['turn', 'amount'],
     takeGameAction(match, robotId, 'turn', 1),
+    ['turret_rotate', 'angle'],
+    takeGameAction(match, robotId, 'setTurretRotate', 1),
+    ['turret_rotate'],
+    takeGameAction(match, robotId, 'getTurretRotate', 0),
+    ['throttle', 'amount'],
+    takeGameAction(match, robotId, 'setThrottle', 1),
+    ['throttle'],
+    takeGameAction(match, robotId, 'getThrottle', 0),
+    ['rotation'],
+    takeGameAction(match, robotId, 'getRotation', 0),
+    ['location'],
+    takeGameAction(match, robotId, 'getLocation', 0),
+    ['scan_robots', 'arc'],
+    takeGameAction(match, robotId, 'scanRobots', 1),
+    ['scan_wall'],
+    takeGameAction(match, robotId, 'scanWall', 0),
 
     // http://localhost:8080/matches/mid/robot_id?connect=t
     ['connect'],
