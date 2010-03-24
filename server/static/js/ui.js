@@ -80,12 +80,10 @@ function WatchMatchRobots(m, list) {
         RenderRobotRow(e_robot_jq, rob);
         // Gotta do the same to our jquery too.
         e_robot_jq.detach().appendTo(filled_slots_jq);
-        console.log("connected robot WHAT", rob);
         rob.addListener('disconnectedRobot',
           function(robot) {
             // find the robot in our filled slots and remove it. (See
             // above)
-            console.log(robot);
             for (var i = 0, l = filled_slots.length; i<l; i++) {
               if (filled_slots[i] === e_robot_jq) {
                 filled_slots.splice(i, 1);
