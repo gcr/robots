@@ -61,6 +61,15 @@ Robot.prototype.turn = function(amount) {
   return this.wantedRotation;
 };
 
+Robot.prototype.getTurretRot = function() {
+  return this.turretRot;
+};
+
+Robot.prototype.setTurretRot = function(newRot) {
+  this.turretRot = vec.normalizeAngle(newRot);
+  return newRot;
+};
+
 process.mixin(exports,
   {
     Robot: Robot
