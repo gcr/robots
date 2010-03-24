@@ -69,7 +69,7 @@ MatchList.prototype.newMatch = function(match) {
 MatchList.prototype.removeMatch = function(match) {
   // delete the given match.
   delete this.matches[match.mid];
-  this.emit('removeMatch', match);
+  this.emit('removeMatch', this, match);
   // sorry!
   match.emit('removeMatch', match);
 };

@@ -132,7 +132,6 @@ Match.prototype.matchStarted = function() {
 Match.prototype.newSlot = function() {
   // Make a new blank slot.
   this.robots.push(null);
-  this.onDisconnectRobotCb.push(null);
   this.emit('newSlot', this);
 };
 Match.prototype.connectRobot = function(robot) {
@@ -147,12 +146,15 @@ Match.prototype.connectRobot = function(robot) {
 };
 Match.prototype.disconnectRobot = function(robot) {
   // The robot disconnected. We should clear its slot.
+  // keep in mind: robot is actually a new robot that shares no events or
+  // nothin' with the actual robot
   for (var i=0,l=this.robots.length; i<l; i++) {
     if (this.robots[i] && this.robots[i].name == robot.name) {
+      var prevRobot = this.robots[i];
       this.robots[i] = null;
-      this.emit('disconnectedRobot', robot);
+      this.emit('disconnectedRobot', prevRobot);
       // Sorry!
-      robot.emit('disconnectedRobot', robot);
+      prevRobot.emit('disconnectedRobot', prevRobot);
       break;
     }
   }
@@ -163,7 +165,6 @@ Match.prototype.removeSlot = function() {
   for (var i=0,l=this.robots.length; i<l; i++) {
     if (this.robots[i] === null) {
       this.robots.splice(i, 1);
-      this.onDisconnectRobotCb.splice(i, 1);
       this.emit('removeSlot', this);
       break;
     }

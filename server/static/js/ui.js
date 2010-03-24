@@ -38,12 +38,12 @@ function RenderMatchList(jq) {
   var mljq = jq.empty();
   var mlLoading = $("<div>One moment...</div>").appendTo(mljq);
   ml.addListener('newMatch',
-    function(match) {
+    function(mlist, match) {
       var matchJq = $("<li>").append(
           $("<a>", {href: '/matches/' + match.mid}).append(match.mid)
         ).appendTo(mljq);
       RenderMatchRow($("<div>").appendTo(matchJq), match);
-      match.addListener('removeMatch', match,
+      match.addListener('removeMatch',
         function() {
           matchJq.fadeOut(function() {$(this).remove();});
         });
@@ -80,10 +80,12 @@ function WatchMatchRobots(m, list) {
         RenderRobotRow(e_robot_jq, rob);
         // Gotta do the same to our jquery too.
         e_robot_jq.detach().appendTo(filled_slots_jq);
+        console.log("connected robot WHAT", rob);
         rob.addListener('disconnectedRobot',
-          function() {
+          function(robot) {
             // find the robot in our filled slots and remove it. (See
             // above)
+            console.log(robot);
             for (var i = 0, l = filled_slots.length; i<l; i++) {
               if (filled_slots[i] === e_robot_jq) {
                 filled_slots.splice(i, 1);
@@ -95,8 +97,8 @@ function WatchMatchRobots(m, list) {
           });
       });
 
-  m.onRemoveSlot(
-      function (rob) {
+  m.addListener('removeSlot',
+      function (match, rob) {
         var e_slot_jq = empty_slots.splice(0, 1)[0];
         e_slot_jq.remove();
       });
