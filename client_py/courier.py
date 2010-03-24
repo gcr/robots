@@ -100,14 +100,14 @@ class Robot(object):
 
     def scan(self, angle):
         assert -90 <= angle <= 90
-        return fetch_persist(self.url, {'scan_robots': 't', 'angle': math.radians(angle)})
+        return fetch_persist(self.url, {'scan_robots': 't', 'arc': math.radians(angle)})
 
     def scan_wall(self):
         return fetch_persist(self.url, {'scan_wall': 't'})
 
     def set_turret_rotation(self, angle):
         self._turret_rotation = angle
-        return fetch_persist(self.url, {'turret_rotate': 't', 'arc':
+        return fetch_persist(self.url, {'turret_rotate': 't', 'angle':
             math.radians(angle)})
     def get_turret_rotation(self):
         if self._turret_rotation is None:
