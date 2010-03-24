@@ -5,6 +5,7 @@ var
   sys    = require('sys'),
   assert = require('assert'),
   robot  = require('./physics/robot'),
+  roboproto = robot.Robot.prototype,
   field  = require('./physics/field'),
   events = require('events');
 
@@ -100,11 +101,51 @@ GameLogic.prototype.setFuture = function(time, robotId, cb, errback) {
   this.futures[time][robotId] = {callback: cb, errback: errback};
 };
 
-GameLogic.prototype.robotAction = function(robotId, action) {
+GameLogic.prototype.robotAction = function(robotId, action, args, callback, errback) {
     // This function will make a robot do some kind of action later. E.g. need
     // to turn? robotACtion(rid, 'turn', 25) will do what you want.
+    var game = this,
+        robot = this.robots[robotId];
 
-    // This method should be blank. Subclass GameLogic instead.
+    assert.ok(robot, "This robot doesn't exist!");
+    // list of functions we'll need:
+    // ['turret_rotate', 'angle'],
+    // takeGameAction(match, robotId, 'setTurretRotate', 1),
+    // ['turret_rotate'],
+    // takeGameAction(match, robotId, 'getTurretRotate', 0),
+    // ['throttle', 'amount'],
+    // takeGameAction(match, robotId, 'setThrottle', 1),
+    // ['throttle'],
+    // takeGameAction(match, robotId, 'getThrottle', 0),
+    // ['rotation'],
+    // takeGameAction(match, robotId, 'getRotation', 0),
+    // ['location'],
+    // takeGameAction(match, robotId, 'getLocation', 0),
+    // ['scan_robots', 'arc'],
+    // takeGameAction(match, robotId, 'scanRobots', 1),
+    // ['scan_wall'],
+    // takeGameAction(match, robotId, 'scanWall', 0),
+
+
+    // Now, actually take the actions.
+    if (action in this.INSTANT) {
+      try {
+        return callback(this.INSTANT[action].apply(robot, args));
+      } catch (err) {
+        return errback(err);
+      }
+    }
+
+    if (action in this.DELAYED) {
+      var time = this.DELAYED[action][0],
+          method = this.DELAYED[action][1];
+      this.setFuture(this.time +  time, robotId,
+        function() {
+          callback(method.apply(robot, args));
+        },
+        errback);
+
+    }
 };
 
 GameLogic.prototype.makeRobot = function(robotId, name) {
@@ -150,73 +191,27 @@ function ATRobotsGame() {
 }
 sys.inherits(ATRobotsGame, GameLogic);
 
-ATRobotsGame.prototype.robotAction = function(robotId, action, args, callback, errback) {
-    // This function will make a robot do some kind of action later. E.g. need
-    // to turn? robotACtion(rid, 'turn', 25) will do what you want.
-    var game = this,
-        robot = this.robots[robotId];
+// Here come a few lists.
+// INSTANT is all the actions that we should return *right away.* Don't
+// post to our 'futures' list, just... pop the callback RIGHT NAO.
+ATRobotsGame.prototype.INSTANT = {
+  setTurretRotate: roboproto.setTurretRot,
+  getTurretRotate: roboproto.getTurretRot
+};
 
-    assert.ok(robot, "This robot doesn't exist!");
-    // list of functions we'll need:
-    // ['turret_rotate', 'angle'],
-    // takeGameAction(match, robotId, 'setTurretRotate', 1),
-    // ['turret_rotate'],
-    // takeGameAction(match, robotId, 'getTurretRotate', 0),
-    // ['throttle', 'amount'],
-    // takeGameAction(match, robotId, 'setThrottle', 1),
-    // ['throttle'],
-    // takeGameAction(match, robotId, 'getThrottle', 0),
-    // ['rotation'],
-    // takeGameAction(match, robotId, 'getRotation', 0),
-    // ['location'],
-    // takeGameAction(match, robotId, 'getLocation', 0),
-    // ['scan_robots', 'arc'],
-    // takeGameAction(match, robotId, 'scanRobots', 1),
-    // ['scan_wall'],
-    // takeGameAction(match, robotId, 'scanWall', 0),
+// DELAYED is all the actions that should be returned later. Save them on
+// our futures, worry about it later. This mapping maps from action
+// strings to a 2-tuple: [timeToWait, methodName]. Apply that methodName
+// with arguments.
+ATRobotsGame.prototype.DELAYED = {
+  turn: [0, roboproto.turn] // call robot.turn
+};
 
-    // Here come a few lists.
-    // INSTANT is all the actions that we should return *right away.* Don't
-    // post to our 'futures' list, just... pop the callback RIGHT NAO.
-    var INSTANT = {
-      setTurretRotate: 'setTurretRot',
-      getTurretRotate: 'getTurretRot'
-    };
-
-    // DELAYED is all the actions that should be returned later. Save them on
-    // our futures, worry about it later. This mapping maps from action
-    // strings to a 2-tuple: [timeToWait, methodName]. Apply that methodName
-    // with arguments.
-    var DELAYED = {
-      turn: [0, 'turn'] // call robot.turn
-    };
-
-    // DEFERRED is really crazy. These functions will actually return
-    // functions. Call the 'outer' function right away. Then, set up to call
-    // the 'inner' function later, in the future.
-    var DEFERRED = {
-      // TODO!
-    };
-
-    // Now, actually take the actions.
-    if (action in INSTANT) {
-      try {
-        return callback(robot[INSTANT[action]].apply(robot, args));
-      } catch (err) {
-        return errback(err);
-      }
-    }
-
-    if (action in DELAYED) {
-      var time = DELAYED[action][0],
-          method = DELAYED[action][1];
-      this.setFuture(this.time +  time, robotId,
-        function() {
-          callback(robot[method].apply(robot, args));
-        },
-        errback);
-
-    }
+// DEFERRED is really crazy. These functions will actually return
+// functions. Call the 'outer' function right away. Then, set up to call
+// the 'inner' function later, in the future.
+ATRobotsGame.prototype.DEFERRED = {
+  // TODO!
 };
 
 process.mixin(exports,
