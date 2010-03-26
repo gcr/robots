@@ -16,7 +16,7 @@ function ajaxRequest(url, data, cb) {
     success:
       function(data, textStatus) {
         if (typeof data == 'object' && 'exception' in data) {
-          alert("An error! " + data.exception);
+          alert("An error appears: " + data.exception);
         } else {
           cb(data, textStatus);
         }
@@ -26,13 +26,13 @@ function ajaxRequest(url, data, cb) {
         if (e == 'timeout') {
           ajaxRequest(url, data, cb);
         } else {
-          alert("Oh no! An error appeared, and I can't fix it! " + e);
+          alert("Network error: " + e);
         }
       }
   });
 }
 
-function StreamingHistory(url, state, cb) {
+function StreamingHistory(url, startTime, cb) {
   // This object will run a callback when something on the server changes.
   // Give it a URL to ping and a callback to execute whenever that
   // happens and it'll go on its way. Whenever the server does something,
@@ -41,15 +41,15 @@ function StreamingHistory(url, state, cb) {
   // See: history.js
   this.cb = cb;
   this.url = url;
-  this.state = state;
+  this.time = startTime;
 
   var self = this;
-  if (this.state == -1) {
+  if (startTime == -1) {
     // they don't know what time they're at? uh oh! we'd best tell them,
     // but this is bad because they're going to miss things! it's always
     // better to pass the time in as an argument.
-    this.xhr = ajaxRequest(url, {}, function(state, textStatus) {
-      self.state = state;
+    this.xhr = ajaxRequest(url, {}, function(startTime, textStatus) {
+      self.time = startTime;
       self.nextHist();
     });
   } else {
@@ -60,11 +60,11 @@ StreamingHistory.prototype.nextHist = function() {
   // Carry out the next action in the history, calling callback if we get
   // anything.
   var self = this;
-  this.xhr = ajaxRequest(this.url, {since: this.state},
+  this.xhr = ajaxRequest(this.url, {since: this.time},
     function (actions) {
       for (var i = 0, l = actions.length; i < l; i++) {
         self.cb(actions[i]);
-        self.state++;
+        self.time++;
       }
       self.nextHist();
     });
