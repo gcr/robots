@@ -8,7 +8,7 @@ var courier = courier || {};
 courier.matchlist = (function() { // begin courier namespace
 
 function MatchList() {
-  // represents a new match list. run populate(jq) to populate into a jquery
+  // Represents a new match list. Run populate(jq) to populate into a jquery
   // object.
   courier.core.EventEmitter.call(this);
   this.matches = {};
@@ -20,21 +20,24 @@ courier.core.inherits(MatchList, courier.core.EventEmitter);
 MatchList.prototype.populate = function(stream, cb) {
   // Get the list of matches, and run cb when we get them all.
   if (this.populating) {
-    // we're already waiting!
+    // We're already trying to get the information! Don't do two things at
+    // once!
     return false;
   }
   this.populating = true;
   var self = this;
   courier.core.ajaxRequest("/matches", {list: true},
     function(matchstate) {
-      // retreive the list of matches
+      // Retrieve the list of matches
       for (var l=matchstate.matches.length, i=0; i < l; i++) {
         var m = new courier.match.Match(matchstate.matches[i]);
         self.newMatch(m);
       }
+      // We have all the information. Now, pass it to whoever wanted it!
       if (typeof cb == 'function') {
         cb();
       }
+      // Follow the match list if necessary.
       if (stream) {
         self.beginStream(matchstate.history);
       }
@@ -43,7 +46,7 @@ MatchList.prototype.populate = function(stream, cb) {
     });
 };
 MatchList.prototype.beginStream = function(time) {
-  // start streaming since 'time'
+  // Start streaming since 'time'
   var self = this;
   this.sh = new courier.core.StreamingHistory("/matches?history=t",
     time,
@@ -56,26 +59,26 @@ MatchList.prototype.beginStream = function(time) {
     });
 };
 MatchList.prototype.stopStream = function() {
-  // stop streaming
+  // Stop streaming. Used for, e.g. the refresh button.
   if (this.sh !== undefined) {
     this.sh.stop();
   }
 };
 MatchList.prototype.newMatch = function(match) {
-  // add the match to us
+  // A new match is registered.
   this.matches[match.mid] = match;
   this.emit('newMatch', this, match);
 };
 MatchList.prototype.removeMatch = function(match) {
-  // delete the given match.
+  // Delete the given match.
   delete this.matches[match.mid];
   this.emit('removeMatch', this, match);
-  // sorry!
+  // sorry! this bit of tomfoolery eases the burden on ui.js
   match.emit('removeMatch', match);
 };
 
 function registerMatch(pub, speed, startTimeout, lockstep) {
-  // Register a new match on the server.
+  // Try to register a new match on the server.
   // pub: Whether to show the match on the server list.
   // speed: how fast (in seconds) each step should be
   // startTimeout: how long to wait until we start
@@ -91,6 +94,9 @@ function registerMatch(pub, speed, startTimeout, lockstep) {
     cb = undefined;
   }
   courier.core.ajaxRequest("/matches?register=t",
+      // todo: um. the server doesn't actually support most of these. Maybe we
+      // should just go with a hash or something instead of a linear,
+      // ambiguous list of of arbitrary arguments.
       {'public': typeof pub != 'function'? pub : undefined,
         'speed': typeof speed != 'function'? speed : undefined,
         'start_timeout': typeof startTimeout != 'function'? startTimeout : undefined,
