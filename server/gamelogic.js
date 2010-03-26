@@ -108,19 +108,13 @@ GameLogic.prototype.robotAction = function(robotId, action, args, callback, errb
         robot = this.robots[robotId];
 
     assert.ok(robot, "This robot doesn't exist!");
-    // list of functions we'll need:
-    // ['turret_rotate', 'angle'],
-    // takeGameAction(match, robotId, 'setTurretRotate', 1),
-    // ['turret_rotate'],
-    // takeGameAction(match, robotId, 'getTurretRotate', 0),
+    // list of functions we still need:
     // ['throttle', 'amount'],
     // takeGameAction(match, robotId, 'setThrottle', 1),
     // ['throttle'],
     // takeGameAction(match, robotId, 'getThrottle', 0),
     // ['rotation'],
     // takeGameAction(match, robotId, 'getRotation', 0),
-    // ['location'],
-    // takeGameAction(match, robotId, 'getLocation', 0),
     // ['scan_robots', 'arc'],
     // takeGameAction(match, robotId, 'scanRobots', 1),
     // ['scan_wall'],
@@ -210,7 +204,8 @@ ATRobotsGame.prototype.INSTANT = {
 // strings to a 2-tuple: [timeToWait, methodName]. Apply that methodName
 // with arguments.
 ATRobotsGame.prototype.DELAYED = {
-  turn: [0, roboproto.turn] // call robot.turn
+  turn: [0, roboproto.turn], // call robot.turn
+  getLocation: [3, roboproto.getLocation]
 };
 
 // DEFERRED is really crazy. These functions will actually return

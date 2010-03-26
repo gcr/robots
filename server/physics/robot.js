@@ -70,6 +70,10 @@ Robot.prototype.setTurretRot = function(newRot) {
   return newRot;
 };
 
+Robot.prototype.getLocation = function() {
+    return [this.location.x, this.location.y];
+};
+
 process.mixin(exports,
   {
     Robot: Robot
