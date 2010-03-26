@@ -39,12 +39,14 @@ Field.prototype.drawRobot = function(rob) {
   ctx.save();
       ctx.translate(rob.location[0], rob.location[1]);
       ctx.rotate(-rob.rotation);
+      // Triangle
       ctx.beginPath();
       ctx.moveTo(0, 25);
       ctx.lineTo(15, -15);
       ctx.lineTo(0, -10);
       ctx.lineTo(-15, -15);
       ctx.fill();
+      // Turret cannon
       ctx.rotate(-rob.turret_rot);
       ctx.beginPath();
       ctx.moveTo(0,0);
