@@ -51,7 +51,7 @@ ears.listenFor({
       game.match.history.add({'connected_robot': robot.toJson()});
     },
     'disconnectedRobot': function(game, robot) {
-      game.match.history.add({'disconnect_robot': robot});
+      game.match.history.add({'disconnect_robot': robot.toJson()});
     }
   }
 });

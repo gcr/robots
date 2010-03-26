@@ -39,7 +39,7 @@ GameLogic.prototype.robotArray = function() {
   var result = [];
   for (var robId in this.robots) {
     if (this.robots.hasOwnProperty(robId)) {
-      result.push(this.robots[robId].toJson());
+      result.push(this.robots[robId] === null? null : this.robots[robId].toJson());
     }
   }
   return result;
