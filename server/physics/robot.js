@@ -18,6 +18,7 @@ function Robot(name, location, field) {
   this.scanWidth = Math.PI / 6;
   this.scanRange = 500;
   this.speed = 0;
+  this.throttle = 0;
   this.armor = 100;
 }
 sys.inherits(Robot, fieldobject.FieldObject);
@@ -55,6 +56,22 @@ Robot.prototype.pump = function() {
   } else {
     this.rotation += angleDiff>0? rotAccel : -rotAccel;
   }
+
+  // Now, do throttle!
+  var speedDiff = this.throttle - this.speed,
+      accel = this.engine * 3;
+  if (Math.abs(speedDiff) < accel) {
+    this.speed += speedDiff;
+  } else {
+    this.speed += speedDiff>0? accel : -accel;
+  }
+
+  // Now, change our location!
+  this.field.move(this,
+    new vec.Vector(
+      Math.sin(this.rotation),
+      Math.cos(this.rotation)
+    ).multiply(this.speed));
 };
 
 Robot.prototype.turn = function(amount) {
@@ -72,7 +89,20 @@ Robot.prototype.setTurretRot = function(newRot) {
 };
 
 Robot.prototype.getLocation = function() {
-    return [this.location.x, this.location.y];
+  return [this.location.x, this.location.y];
+};
+
+Robot.prototype.setThrottle = function(throttle) {
+  // Set throttle. The minimum we can have is -self.engine*5 and the max we
+  // can have is self.engine*10.
+  // This expects a number between -50 and 100.
+  var amount = Math.max(-50, Math.min(throttle, 100));
+  this.throttle = 10 * this.engine * amount/100;
+  return this.throttle;
+};
+
+Robot.prototype.getThrottle = function() {
+  return this.throttle;
 };
 
 process.mixin(exports,

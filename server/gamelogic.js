@@ -197,7 +197,8 @@ sys.inherits(ATRobotsGame, GameLogic);
 // post to our 'futures' list, just... pop the callback RIGHT NAO.
 ATRobotsGame.prototype.INSTANT = {
   setTurretRotate: roboproto.setTurretRot,
-  getTurretRotate: roboproto.getTurretRot
+  getTurretRotate: roboproto.getTurretRot,
+  getThrottle: roboproto.getThrottle
 };
 
 // DELAYED is all the actions that should be returned later. Save them on
@@ -206,7 +207,8 @@ ATRobotsGame.prototype.INSTANT = {
 // with arguments.
 ATRobotsGame.prototype.DELAYED = {
   turn: [0, roboproto.turn], // call robot.turn
-  getLocation: [3, roboproto.getLocation]
+  getLocation: [3, roboproto.getLocation],
+  setThrottle: [0, roboproto.setThrottle]
 };
 
 // DEFERRED is really crazy. These functions will actually return

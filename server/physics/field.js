@@ -46,6 +46,16 @@ Field.prototype.toJson = function() {
   };
 };
 
+Field.prototype.move = function(obj, displacement) {
+  // Moves obj (changes obj.location) to be offset by displacement
+  // Simple for now. In the future when we do quadtrees or whatever, we'll
+  // want to make this more sophisticated -- multisampling or sweeping for
+  // quick-movin' objects, etc. But not yet.
+  obj.location = obj.location.add( displacement );
+  obj.location.x = Math.min(this.width, Math.max(0, obj.location.x));
+  obj.location.y = Math.min(this.height, Math.max(0, obj.location.y));
+};
+
 process.mixin(exports,
   {
     Field: Field
