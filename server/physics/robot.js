@@ -5,8 +5,9 @@ var
   fieldobject = require('./fieldobject'),
   vec         = require('./vector');
 
-function Robot(name, location) {
+function Robot(name, location, field) {
   this.name = name;
+  this.field = field;
   this.location = new vec.Vector(location[0], location[1]);
   this.rotation = vec.normalizeAngle(Math.random() * 2 * Math.PI);
   this.wantedRotation = this.rotation;

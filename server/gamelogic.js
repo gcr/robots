@@ -153,7 +153,8 @@ GameLogic.prototype.makeRobot = function(robotId, name) {
 
   // Time to actually make the robot.
   var rob = new robot.Robot(name,
-    [Math.random() * this.field.width, Math.random() * this.field.height]);
+    [Math.random() * this.field.width, Math.random() * this.field.height],
+  this.field);
 
   for (var rid in this.robots) {
       if (this.robots.hasOwnProperty(rid) && this.robots[rid]) {
