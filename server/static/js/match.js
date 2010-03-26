@@ -13,7 +13,6 @@ function Robot (r) {
   if (typeof r == 'object' && r !== null) {
     this.name = r.name;
     this.armor = r.armor;
-    this.heat = r.heat;
   }
 }
 courier.core.inherits(Robot, courier.core.EventEmitter);

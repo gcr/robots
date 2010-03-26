@@ -41,8 +41,7 @@ Robot.prototype.renderInfo = function() {
 Robot.prototype.toJson = function() {
   return {
     name: this.name,
-    armor: this.armor,
-    heat: 1000000
+    armor: this.armor
   };
 };
 
