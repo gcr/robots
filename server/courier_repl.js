@@ -31,6 +31,13 @@ function start(mlist) {
         function (mlist, match) {
           repl.scope.newMatch = match;
         }
+      },
+
+    'GameLogic':
+      {'connectedRobot':
+        function (game, robotId, robot) {
+          repl.scope.newBot = robot;
+        }
       }
     }
   );
