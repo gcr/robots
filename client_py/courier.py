@@ -44,14 +44,14 @@ def fetch_persist(url, kwargs=None):
 def url_concat(url, *parts):
     """
     splice a URL together; just concatenate it really.
-        url_concat("http://foo.com:80/bar?a=b", "foozle/droozle/", "salad")
+        url_concat("http://foo.com:80/bar?a=b#drip", "foozle/droozle/", "salad")
         => "http://foo.com:80/bar/foozle/droozle/salad"
     """
     # parts will be a tuple.
     parts = list(parts)
     # Remove query strings from the first item in the arguments.
     urlbase = urlparse(url)
-    url = urlunparse(urlbase[0:4] + ('',) + urlbase[5:])
+    url = urlunparse(urlbase[:3] + ('', '', ''))
     # Now return the arguments.
     return '/'.join([url] + [dir.strip('/ ') for dir in parts])
 
