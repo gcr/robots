@@ -181,7 +181,7 @@ Robot.prototype.scanRobots = function(scanWidth) {
             {
               distance: Math.floor(self.distanceTo(obj.location)/20)*20,
               bearing: Math.round(
-                self.turretBearingTo(obj.location)*2/self.scanWidth)/2
+                self.turretBearingTo(obj.location)*2/self.scanWidth) /2
             }
           );
         });
