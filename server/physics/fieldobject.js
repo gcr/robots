@@ -21,12 +21,18 @@ FieldObject.prototype.pump = function() {
 
 };
 
+FieldObject.prototype.toJSON = function() {
+  return {
+    location: [this.location.x, this.location.y]
+  };
+};
+
 // This function gives everything the client needs to draw the object to the
 // screen.
 FieldObject.prototype.renderInfo = function() {
   return {
     type: 'object',
-    location: this.location
+    location: [this.location.x, this.location.y]
   };
 };
 
