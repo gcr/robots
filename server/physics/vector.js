@@ -68,7 +68,10 @@ Vector.prototype.projectedOn = function(other) {
 function normalizeAngle(angle) {
   // Given an angle in radians, will return an equivalent angle between
   // [-pi, pi]
-  return (angle + Math.PI) % (2*Math.PI) - Math.PI;
+  // We have to work around Javascript's STUPID modulo bug: -2 % 3 is not -2,
+  // it is 1. That's why we're calling modulo twice.
+  var a = angle + Math.PI;
+  return (a%(2*Math.PI) + 2*Math.PI) % (2*Math.PI) - Math.PI;
 }
 
 
