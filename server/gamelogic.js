@@ -35,17 +35,18 @@ function GameLogic(match) {
 sys.inherits(GameLogic, events.EventEmitter);
 
 GameLogic.prototype.robotArray = function() {
-  // an array of all the robots in this.robots
+  // an array of all the robots in this.robots. Note that we should call
+  // toJSON on these to make this immutable.
   var result = [];
   for (var robId in this.robots) {
     if (this.robots.hasOwnProperty(robId)) {
-      result.push(this.robots[robId] === null? null : this.robots[robId].toJson());
+      result.push(this.robots[robId] === null? null : this.robots[robId].toJSON());
     }
   }
   return result;
 };
 
-GameLogic.prototype.toJson = function() {
+GameLogic.prototype.toJSON = function() {
   return {
     field_size: [this.field.width, this.field.height],
     started: this.started,

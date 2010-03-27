@@ -11,13 +11,13 @@ function MatchList() {
 }
 sys.inherits(MatchList, events.EventEmitter);
 
-MatchList.prototype.toJson = function() {
+MatchList.prototype.toJSON = function() {
   // Returns a JSON representation of us.
   // Just a list of matches, please.
   var matches = [];
   for (var m in this.matches) {
     if (this.matches.hasOwnProperty(m) && this.matches[m].pub) {
-      matches.push(m.toJson());
+      matches.push(m.toJSON());
     }
   }
   return {'matches': matches};

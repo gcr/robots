@@ -38,7 +38,7 @@ Robot.prototype.renderInfo = function() {
   };
 };
 
-Robot.prototype.toJson = function() {
+Robot.prototype.toJSON = function() {
   return {
     name: this.name,
     armor: this.armor

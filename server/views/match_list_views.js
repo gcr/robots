@@ -74,7 +74,7 @@ function makeMatchListViews(matches) {
       // http://localhost:8080/matches?list
       function(req, res) {
         // Render information on the match list
-        return renderJson(req, res, process.mixin(matches.toJson(),
+        return renderJson(req, res, process.mixin(matches.toJSON(),
           {
             history: matches.history.time()
           }

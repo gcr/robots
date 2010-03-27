@@ -9,8 +9,8 @@ var
 function renderJson(req, res, obj) {
   var json;
   var query = url.parse(req.url, true).query || {};
-  if (obj !== null && typeof obj == 'object' && 'toJson' in obj) {
-    json = JSON.stringify(obj.toJson());
+  if (typeof obj == 'undefined') {
+    json = JSON.stringify(null);
   } else {
     json = JSON.stringify(obj);
   }
@@ -20,6 +20,7 @@ function renderJson(req, res, obj) {
     json = json + "\n";
   }
   res.writeHeader(200, {"Content-Type": "text/plain; charset=utf-8",
+                                        // todo: change to text/json
                         "Content-Length": json.length});
   res.write(json);
   res.close();

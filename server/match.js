@@ -23,8 +23,8 @@ function Match(mid, authCode, pub) {
 }
 sys.inherits(Match, events.EventEmitter);
 
-Match.prototype.toJson = function() {
-  return process.mixin(this.game.toJson(),
+Match.prototype.toJSON = function() {
+  return process.mixin(this.game.toJSON(),
     {
       init_time: this.initTime,
       speed: this.speed,

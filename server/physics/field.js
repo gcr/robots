@@ -38,7 +38,7 @@ Field.prototype.pump = function() {
   this.emit("pump", this);
 };
 
-Field.prototype.toJson = function() {
+Field.prototype.toJSON = function() {
   return {
     objects: this.objects.map(function(obj) { return obj.renderInfo(); }),
     width: this.width,

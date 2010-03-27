@@ -36,15 +36,15 @@ ears.listenFor({
   },
   'Field': {
     'pump': function(field) {
-      field.game.match.history.add({"field": field.toJson()});
+      field.game.match.history.add({"field": field.toJSON()});
     }
   },
   'GameLogic': {
     'connectedRobot': function(game, robotId, robot) {
-      game.match.history.add({'connected_robot': robot.toJson()});
+      game.match.history.add({'connected_robot': robot.toJSON()});
     },
     'disconnectedRobot': function(game, robot) {
-      game.match.history.add({'disconnect_robot': robot.toJson()});
+      game.match.history.add({'disconnect_robot': robot.toJSON()});
     }
   }
 });
@@ -77,7 +77,7 @@ function dispatchMatchViews(req, res, match, path) {
         ['info'],
         function(req, res) {
           // Render information on the match
-          return renderJson(req, res, process.mixin(match.toJson(),
+          return renderJson(req, res, process.mixin(match.toJSON(),
             {
               history: match.history.time()
             }
