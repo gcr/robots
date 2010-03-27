@@ -110,6 +110,8 @@ GameLogic.prototype.robotAction = function(robotId, action, args, callback, errb
 
     assert.ok(robot, "This robot doesn't exist!");
     // list of functions we still need:
+    // ['rotation'],
+    // takeGameAction(match, robotId, 'getRotation', 0),
     // ['scan_robots', 'arc'],
     // takeGameAction(match, robotId, 'scanRobots', 1),
     // ['scan_wall'],
