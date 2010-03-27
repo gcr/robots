@@ -16,13 +16,6 @@ var
   buildUuid           = require('./view_helpers').buildUuid,
   staticFiles         = require('./static');
 
-// here's the python code for all these callbacks. we'll need ears for all these.
-//   def on_hit(obj, location):
-//       self.history.add({"hit": {'obj': obj, 'location': location}})
-//   def on_splash(obj, location, damage):
-//       self.history.add({"splash_damage":
-//           {"objects": obj, "location": location, "damage": damage}})
-
 ears.listenFor({
   'MatchList': {
     'newMatch': function(mlist, match) {

@@ -24,8 +24,6 @@ function Match(mid, authCode, pub) {
 sys.inherits(Match, events.EventEmitter);
 
 Match.prototype.toJson = function() {
-  // TODO: the python code actually calls game.__json__() and then adds these
-  // properties on top of it.
   return process.mixin(this.game.toJson(),
     {
       init_time: this.initTime,
