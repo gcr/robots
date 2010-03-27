@@ -2,6 +2,7 @@
 
 var
   sys         = require('sys'),
+  assert      = require('assert'),
   fieldobject = require('./fieldobject'),
   vec         = require('./vector');
 
@@ -102,6 +103,23 @@ Robot.prototype.setThrottle = function(throttle) {
 
 Robot.prototype.getThrottle = function() {
   return this.throttle;
+};
+
+Robot.prototype.scanRobots = function(scanWidth) {
+    // Scan for robots! Returns a function that, when called, will scan for
+    // other robots.
+    assert.ok(scanWidth <= Math.PI/2, "You can only scan 90° to one side.");
+    this.scanWidth = scanWidth;
+    this.scanMode = "robots";
+    var self = this; // for closure
+    return function() {
+      self.scanMode = "";
+      return self.field.allObjectsWithin(self.location, self.scanRange).filter(
+        function(obj) {
+          return (obj instanceof Robot) &&
+                 (obj !== self);
+        });
+    };
 };
 
 process.mixin(exports,

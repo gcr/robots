@@ -56,6 +56,16 @@ Field.prototype.move = function(obj, displacement) {
   obj.location.y = Math.min(this.height, Math.max(0, obj.location.y));
 };
 
+Field.prototype.allObjectsWithin = function(location, radius) {
+    // Return a list of all the objects within radius of the given location
+    return this.objects.filter(function(obj) {
+      return (location.sub(obj.location)).dist() < radius;
+    }).sort(function(a, b) {
+      return ((location.sub(a.location)).dist() -
+              (location.sub(b.location)).dist());
+    });
+};
+
 process.mixin(exports,
   {
     Field: Field
