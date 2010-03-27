@@ -4,7 +4,8 @@ var
   sys         = require('sys'),
   assert      = require('assert'),
   fieldobject = require('./fieldobject'),
-  vec         = require('./vector');
+  vec         = require('./vector'),
+  NORTH       = new vec.Vector(0, 1);
 
 function Robot(name, location, field) {
   this.name = name;
@@ -56,6 +57,7 @@ Robot.prototype.pump = function() {
   } else {
     this.rotation += angleDiff>0? rotAccel : -rotAccel;
   }
+  this.rotation = vec.normalizeAngle(this.rotation);
 
   // Now, do throttle!
   var speedDiff = this.throttle - this.speed,
