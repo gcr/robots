@@ -78,7 +78,39 @@ Robot.prototype.pump = function() {
 
 Robot.prototype.turn = function(amount) {
   this.wantedRotation = this.rotation + amount;
-  return this.wantedRotation;
+  return amount;
+};
+
+Robot.prototype.bearingTo = function(location) {
+    // Return the direction (in radians) from our nose to the given vector
+    // |
+    // |
+    // |-.  this angle
+    // |  \ 
+    // us-.:___      -   -   - the angle our vector library expects
+    //         ''---..__
+    //                  ''--location
+    var angle = location.sub(this.location).angleTo(NORTH);
+    angle = location.sub(this.location).x>0? angle : -angle;
+    return vec.normalizeAngle(
+      // Negative because the vector library is counting CCW and we want CW
+      angle - this.rotation
+    );
+};
+
+Robot.prototype.turretBearingTo = function(location) {
+    // Return the direction (in radians) from our nose to the given vector
+    // |   /turret angle
+    // |  /
+    // | /. return this angle
+    // |/  \
+    // us-.:___      -   -   - the angle our vector library expects
+    //         ''---..__
+    //                  ''--location
+    return vec.normalizeAngle(
+      // Negative because the vector library is counting CCW and we want CW
+      location.sub(this.location).angleTo(NORTH) - this.rotation
+    );
 };
 
 Robot.prototype.getTurretRot = function() {
