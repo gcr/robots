@@ -152,12 +152,28 @@ Robot.prototype.scanRobots = function(scanWidth) {
     this.scanWidth = scanWidth;
     this.scanMode = "robots";
     var self = this; // for closure
-    return function() {
+    return function finishScan() {
       self.scanMode = "";
+      // Find all objects within our radius...
       return self.field.allObjectsWithin(self.location, self.scanRange).filter(
-        function(obj) {
+        function filter(obj) {
+          // Only find the robots that aren't ourselves and that are within our
+          // scan arc
           return (obj instanceof Robot) &&
-                 (obj !== self);
+                 (obj !== self) &&
+                 (Math.abs(self.turretBearingTo(obj.location)) <
+                   self.scanWidth);
+        }).map(function (obj) {
+          // Now, take the robots and augment them with distance and angle
+          // information. Return this list to the client.
+          return process.mixin(obj.toJSON(),
+            {
+              distance: Math.floor(self.distanceTo(obj.location)/20)*20,
+              bearing: Math.round(
+                self.turretBearingTo(obj.location)*2/self.scanWidth
+              )/2
+            }
+          );
         });
     };
 };
