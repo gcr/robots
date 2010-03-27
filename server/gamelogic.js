@@ -116,20 +116,31 @@ GameLogic.prototype.robotAction = function(robotId, action, args, callback, errb
     // takeGameAction(match, robotId, 'scanWall', 0),
 
     // Now, actually take the actions.
+    var time, method, laterFunc;
     if (action in this.INSTANT) {
       try {
         return callback(this.INSTANT[action].apply(robot, args));
       } catch (err) {
         return errback(err);
       }
-    }
-
-    if (action in this.DELAYED) {
-      var time = this.DELAYED[action][0],
-          method = this.DELAYED[action][1];
+    } else if (action in this.DELAYED) {
+      time = this.DELAYED[action][0];
+      method = this.DELAYED[action][1];
       this.setFuture(this.time +  time, robotId,
         function() {
           callback(method.apply(robot, args));
+        },
+        errback);
+    } else if (action in this.PARTIAL_DELAYED) {
+      time = this.PARTIAL_DELAYED[action][0];
+      method = this.PARTIAL_DELAYED[action][1];
+      // Don't lose your head! First, call the 'outer' function right away...
+      laterFunc = method.apply(robot, args);
+      // Then, later, set up to call the callback with the results of that
+      // call.
+      this.setFuture(this.time + time, robotId,
+        function() {
+          callback(laterFunc.apply(robot, args));
         },
         errback);
     }
@@ -204,11 +215,11 @@ ATRobotsGame.prototype.DELAYED = {
   setThrottle: [0, roboproto.setThrottle]
 };
 
-// DEFERRED is really crazy. These functions will actually return
+// PARTIAL_DELAYED is really crazy. These functions will actually return
 // functions. Call the 'outer' function right away. Then, set up to call
 // the 'inner' function later, in the future.
-ATRobotsGame.prototype.DEFERRED = {
-  // TODO!
+ATRobotsGame.prototype.PARTIAL_DELAYED = {
+  scanRobots: [2, roboproto.scanRobots]
 };
 
 process.mixin(exports,
