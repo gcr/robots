@@ -148,30 +148,40 @@ Robot.prototype.getThrottle = function() {
 Robot.prototype.scanRobots = function(scanWidth) {
     // Scan for robots! Returns a function that, when called, will scan for
     // other robots.
+    // Steps:
+    //  - Find all objects within scanRange of us
+    //  - Of these, only keep robots that aren't ourselves that are within our
+    //    scan arc
+    //  - Then, return this list to the client, mixing in bearing and distance
+    //    information wrt our turret
     assert.ok(scanWidth <= Math.PI/2, "You can only scan 90° to one side.");
-    this.scanWidth = scanWidth;
+    assert.equal(this.scanMode, "", "You are already scanning for something!");
+    // Do this right away so the client knows to draw the scan arc
     this.scanMode = "robots";
+    this.scanWidth = scanWidth;
+
+    // The gamelogic will call this function later.
     var self = this; // for closure
     return function finishScan() {
+      // Tell the client to stop drawing a scan arc
       self.scanMode = "";
       // Find all objects within our radius...
       return self.field.allObjectsWithin(self.location, self.scanRange).filter(
         function filter(obj) {
-          // Only find the robots that aren't ourselves and that are within our
-          // scan arc
+          // Only keep the robots that aren't ourselves and that are within
+          // our scan arc
           return (obj instanceof Robot) &&
                  (obj !== self) &&
                  (Math.abs(self.turretBearingTo(obj.location)) <
                    self.scanWidth);
         }).map(function (obj) {
-          // Now, take the robots and augment them with distance and angle
-          // information. Return this list to the client.
+          // Now, take the resulting list of robots and augment them with
+          // distance and angle information. Return this list to the client.
           return process.mixin(obj.toJSON(),
             {
               distance: Math.floor(self.distanceTo(obj.location)/20)*20,
               bearing: Math.round(
-                self.turretBearingTo(obj.location)*2/self.scanWidth
-              )/2
+                self.turretBearingTo(obj.location)*2/self.scanWidth)/2
             }
           );
         });
