@@ -124,7 +124,7 @@ class Robot(object):
         return fetch_persist(self.url, {'scan_wall': 't'})
 
     def set_turret_rotation(self, angle):
-        self._turret_rotation = angle
+        self._turret_rotation = ((angle+180) % 360) - 180
         return fetch_persist(self.url, {'turret_rotate': 't', 'angle':
             math.radians(angle)})
     def get_turret_rotation(self):
