@@ -83,8 +83,8 @@ GameLogic.prototype.pump = function() {
 
 GameLogic.prototype.setFuture = function(time, robotId, cb, errback) {
   // Rigs callback (cb) to be executed at time (time). The callback should
-  // (should!) expect two arguments: a possible error, and the actual results of
-  // the callback. By convention, of course; GameLogic.prototype.pump won't
+  // (should!) expect two arguments: a possible error, and the actual results
+  // of the callback. By convention, of course; GameLogic.prototype.pump won't
   // care.
   assert.ok(time >= this.time, "That already happened!");
 
@@ -110,17 +110,10 @@ GameLogic.prototype.robotAction = function(robotId, action, args, callback, errb
 
     assert.ok(robot, "This robot doesn't exist!");
     // list of functions we still need:
-    // ['throttle', 'amount'],
-    // takeGameAction(match, robotId, 'setThrottle', 1),
-    // ['throttle'],
-    // takeGameAction(match, robotId, 'getThrottle', 0),
-    // ['rotation'],
-    // takeGameAction(match, robotId, 'getRotation', 0),
     // ['scan_robots', 'arc'],
     // takeGameAction(match, robotId, 'scanRobots', 1),
     // ['scan_wall'],
     // takeGameAction(match, robotId, 'scanWall', 0),
-
 
     // Now, actually take the actions.
     if (action in this.INSTANT) {
@@ -139,7 +132,6 @@ GameLogic.prototype.robotAction = function(robotId, action, args, callback, errb
           callback(method.apply(robot, args));
         },
         errback);
-
     }
 };
 
