@@ -36,6 +36,7 @@ Match.prototype.toJSON = function() {
 Match.prototype.start = function(authCode) {
   // Start the match.
   assert.ok(authCode == this.authCode, "Incorrect authentication code.");
+  assert.ok(!this.game.started, "You cannot start a started match.");
   // We must remove all the blank robots first.
   for (var rid in this.game.robots) {
     if (this.game.robots.hasOwnProperty(rid) &&
