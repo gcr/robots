@@ -41,16 +41,34 @@ def fetch_persist(url, kwargs=None):
         else:
             raise e
 
-def url_concat(*parts):
+def flatten(seq):
     """
-    splice a URL together; just concatenate it really
+    flatten([1,2,3,[4,5,6],7])
+    => [1, 2, 3, 4, 5, 6, 7]
     """
+    res = []
+    for item in seq:
+        if (isinstance(item, (tuple, list))):
+            res.extend(flatten(item))
+        else:
+            res.append(item)
+    return res
+
+def url_concat(url, *parts):
+    """
+    splice a URL together; just concatenate it really.
+        url_concat("http://foo.com:80/bar?a=b", "foozle/droozle/", "salad")
+        => "http://foo.com:80/bar/foozle/droozle/salad"
+    """
+    # parts will be a tuple.
     parts = list(parts)
-    # remove trailing slash
-    for i, path in enumerate(parts):
-        if path.strip().endswith('/'):
-            parts[i] = path.strip()[:-1]
-    return '/'.join(parts)
+    # Remove query strings from the first item in the arguments.
+    urlbase = urlparse(url)
+    url = urlunparse(urlbase[0:4] + ('',) + urlbase[5:])
+    # Now mash the arguments together.
+    path = flatten([part.split('/') for part in parts])
+    # Now return them, but only pick the non-blank paths.
+    return '/'.join([url] + filter(lambda x: x, path))
 
 class Robot(object):
     """
@@ -184,8 +202,9 @@ class RoboLink(object):
             url = cls.ask_for_url()
         match = Match.from_url(url)
         if match:
-            # if they already have a url like http://server/matches/aoa/robot_bbb,
-            # then skip the step of registering stuff and just reconnect them.
+            # if they already have a url like
+            # http://server/matches/aoa/robot_bbb, then skip the step of
+            # registering stuff and just reconnect them.
             try:
                 url = match.register_slot()
             except RobotException:
