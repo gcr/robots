@@ -107,10 +107,16 @@ Robot.prototype.turretBearingTo = function(location) {
     // us-.:___      -   -   - the angle our vector library expects
     //         ''---..__
     //                  ''--location
+    var angle = location.sub(this.location).angleTo(NORTH);
+    angle = location.sub(this.location).x>0? angle : -angle;
     return vec.normalizeAngle(
       // Negative because the vector library is counting CCW and we want CW
-      location.sub(this.location).angleTo(NORTH) - this.rotation
+      angle - (this.rotation + this.turretRot)
     );
+};
+
+Robot.prototype.distanceTo = function(location) {
+    return this.location.sub(location).dist();
 };
 
 Robot.prototype.getTurretRot = function() {
