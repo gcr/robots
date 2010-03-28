@@ -107,7 +107,12 @@ class Robot(object):
         return fetch_persist(self.url, {'scan_wall': 't'})
 
     def fire(self, adjust=0):
-        return fetch_persist(self.url, {'fire': 't', 'adjust': adjust})
+        """
+        Fire t3h bulletz!
+        You can adjust your aim without rotating your turret by up to about
+        12° here.
+        """
+        return fetch_persist(self.url, {'fire': 't', 'adjust': math.radians(adjust)})
 
     def set_turret_rotation(self, angle):
         self._turret_rotation = ((angle+180) % 360) - 180
