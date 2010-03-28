@@ -85,6 +85,15 @@ Robot.prototype.pump = function() {
     ).multiply(this.speed));
 };
 
+Robot.prototype.collidedWithWall = function() {
+  // We collided with a wall? Onoes!
+  this.speed /= 2;
+  this.throttle /= 2;
+  if (Math.abs(this.throttle) < 0.5) {
+    this.throttle = 0;
+  }
+};
+
 Robot.prototype.turn = function(amount) {
   this.wantedRotation = this.rotation + amount;
   return amount;

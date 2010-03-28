@@ -53,8 +53,13 @@ Field.prototype.move = function(obj, displacement) {
   // want to make this more sophisticated -- multisampling or sweeping for
   // quick-movin' objects, etc. But not yet.
   obj.location = obj.location.add( displacement );
-  obj.location.x = Math.min(this.width, Math.max(0, obj.location.x));
-  obj.location.y = Math.min(this.height, Math.max(0, obj.location.y));
+  if (obj.location.x < 0 || obj.location.x > this.width ||
+      obj.location.y < 0 || obj.location.y > this.height) {
+    // ONOES they hit something!
+    obj.collidedWithWall();
+    obj.location.x = Math.min(this.width, Math.max(0, obj.location.x));
+    obj.location.y = Math.min(this.height, Math.max(0, obj.location.y));
+  }
 };
 
 Field.prototype.allObjectsWithin = function(location, radius) {

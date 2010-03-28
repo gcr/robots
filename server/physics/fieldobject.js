@@ -36,6 +36,11 @@ FieldObject.prototype.renderInfo = function() {
   };
 };
 
+FieldObject.prototype.collidedWithWall = function() {
+  // Field will call this function when the object tries to collide with the
+  // wall.
+};
+
 process.mixin(exports,
   {
     FieldObject: FieldObject
