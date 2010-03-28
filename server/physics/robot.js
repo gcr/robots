@@ -222,6 +222,14 @@ Robot.prototype.scanWall = function() {
   };
 };
 
+Robot.prototype.fire = function(adjust) {
+  // Fire a bullet! KABLOOOIE
+  // 'adjust' is a paramater that allows you to adjust the aim of your turret
+  // by up to ± pi/15 radians. (Don't warn about exceeding this, just clip it)
+  adjust = Math.min(Math.PI/15, Math.max(-Math.PI/15, adjust));
+  require('../log').debug("PEW PEW PEW! robot fired " + adjust);
+};
+
 process.mixin(exports,
   {
     Robot: Robot
