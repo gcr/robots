@@ -209,7 +209,8 @@ ATRobotsGame.prototype.DELAYED = {
   turn: [0, roboproto.turn], // call robot.turn
   getLocation: [3, roboproto.getLocation],
   getRotation: [2, roboproto.getRotation],
-  setThrottle: [0, roboproto.setThrottle]
+  setThrottle: [0, roboproto.setThrottle],
+  fire: [1, roboproto.fire]
 };
 
 // PARTIAL_DELAYED is really crazy. These functions will actually return
