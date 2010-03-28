@@ -14,6 +14,7 @@ function Robot(name, location, field) {
   this.location = new vec.Vector(location[0], location[1]);
   this.rotation = vec.normalizeAngle(Math.random() * 2 * Math.PI);
   this.wantedRotation = this.rotation;
+  this.bulletCoolDown = 0;
 
   this.engine = 1;
   this.turretRot = 0;
@@ -77,6 +78,8 @@ Robot.prototype.pump = function() {
   } else {
     this.speed += speedDiff>0? accel : -accel;
   }
+
+  this.bulletCoolDown++;
 
   // Now, change our location!
   this.field.move(this,
@@ -228,7 +231,13 @@ Robot.prototype.fire = function(adjust) {
   // 'adjust' is a paramater that allows you to adjust the aim of your turret
   // by up to ± pi/15 radians. (Don't warn about exceeding this, just clip it)
   adjust = Math.min(Math.PI/15, Math.max(-Math.PI/15, adjust));
-  require('../log').debug("PEW PEW PEW! robot fired " + adjust);
+  //require('../log').debug("PEW PEW PEW! robot fired " + adjust);
+  if (this.bulletCoolDown < 3) {
+    // Don't fire too fast now!
+    return false;
+  }
+  this.bulletCoolDown = 0;
+
   this.field.addObject(
     new bullet.Bullet(
       this.field, // Field
@@ -237,6 +246,7 @@ Robot.prototype.fire = function(adjust) {
       this.rotation + this.turretRot + adjust
     )
   );
+  return true;
 };
 
 process.mixin(exports,

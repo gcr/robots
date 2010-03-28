@@ -5,6 +5,7 @@
 var
   sys = require('sys'),
   robot = require('./robot'),
+  vec = require('./vector'),
   fieldobject = require('./fieldobject');
 
 function Bullet(field, owner, startlocation, rotation) {
@@ -19,6 +20,22 @@ function Bullet(field, owner, startlocation, rotation) {
   this.rotation = rotation;
 }
 sys.inherits(Bullet, fieldobject.FieldObject);
+
+Bullet.prototype.pump = function() {
+  // Move ourselves about the field
+  this.field.move(
+    this,
+    new vec.Vector(
+      Math.sin(this.rotation),
+      Math.cos(this.rotation)
+    ).multiply(10)
+  );
+};
+
+Bullet.prototype.collidedWithWall = function() {
+  // BOOMIE!
+  this.field.removeObject(this);
+};
 
 // Return enough information for a client to draw us on the screen.
 Bullet.prototype.renderInfo = function() {

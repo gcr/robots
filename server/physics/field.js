@@ -26,6 +26,7 @@ Field.prototype.removeObject = function(obj) {
   var idx = this.objects.indexOf(obj);
   if (idx != -1) {
     this.objects.splice(idx, 1);
+    this.emit("removedObject", this, obj);
     return obj;
   } else {
     return false;
@@ -33,8 +34,14 @@ Field.prototype.removeObject = function(obj) {
 };
 
 Field.prototype.pump = function() {
-  for (var i=0,l=this.objects.length; i<l; i++) {
+  // Note: we're not optimizing this loop because this.objects may change
+  // while we iterate over it.
+  var l = this.objects.length;
+  for (var i=0; i<l; i++) {
     this.objects[i].pump();
+    // If our number of objects changed while we iterate over it
+    i = i - (l-this.objects.length);
+    l = this.objects.length;
   }
   this.emit("pump", this);
 };
