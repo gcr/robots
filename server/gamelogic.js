@@ -110,8 +110,6 @@ GameLogic.prototype.robotAction = function(robotId, action, args, callback, errb
 
     assert.ok(robot, "This robot doesn't exist!");
     // list of functions we still need:
-    // ['rotation'],
-    // takeGameAction(match, robotId, 'getRotation', 0),
     // ['scan_robots', 'arc'],
     // takeGameAction(match, robotId, 'scanRobots', 1),
     // ['scan_wall'],
@@ -214,6 +212,7 @@ ATRobotsGame.prototype.INSTANT = {
 ATRobotsGame.prototype.DELAYED = {
   turn: [0, roboproto.turn], // call robot.turn
   getLocation: [3, roboproto.getLocation],
+  getRotation: [2, roboproto.getRotation],
   setThrottle: [0, roboproto.setThrottle]
 };
 

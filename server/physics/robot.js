@@ -132,6 +132,10 @@ Robot.prototype.getLocation = function() {
   return [this.location.x, this.location.y];
 };
 
+Robot.prototype.getRotation = function() {
+    return this.rotation;
+};
+
 Robot.prototype.setThrottle = function(throttle) {
   // Set throttle. The minimum we can have is -self.engine*5 and the max we
   // can have is self.engine*10.
