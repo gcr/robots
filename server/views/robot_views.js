@@ -60,6 +60,8 @@ function dispatchRobotViews(req, res, robot, robotId, match) {
     takeGameAction(match, robotId, 'scanRobots', 1),
     ['scan_wall'],
     takeGameAction(match, robotId, 'scanWall', 0),
+    ['fire', 'adjust'],
+    takeGameAction(match, robotId, 'fire', 1),
 
     // http://localhost:8080/matches/mid/robot_id?connect=t
     ['connect'],
