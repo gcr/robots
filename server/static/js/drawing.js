@@ -52,24 +52,29 @@ Field.prototype.drawRobot = function(rob) {
       ctx.moveTo(0,0);
       ctx.lineTo(0, 30);
       ctx.stroke();
-      if (rob.scan_mode == "robots") {
-        // Scanning for robots
-        ctx.beginPath();
-        ctx.lineTo(0, 0);
-        ctx.arc(0, 0,
-            rob.scanrange, // radius
-            3.14/2-rob.scan_width, // left
-            3.14/2+rob.scan_width, // right
-            false); // anticlockwise?
-        ctx.lineTo(0, 0);
-        ctx.stroke();
-      } else if (rob.scan_mode == "walls") {
-        // Sonar ping for wall
-        for (var i = 5,r; i>0; i--) {
-          r = Math.random()/2 + 0.5;
-          ctx.beginPath();
-          ctx.arc(0, 0, rob.scanrange*i/5*r, 3.14/2+0.2, 3.14/2-0.2, true);
-          ctx.stroke();
+      if ('scan' in rob) {
+        switch (rob.scan.mode) {
+          case "robots":
+            // Scanning for robots
+            ctx.beginPath();
+            ctx.lineTo(0, 0);
+            ctx.arc(0, 0,
+                rob.scan.range, // radius
+                3.14/2-rob.scan.width, // left
+                3.14/2+rob.scan.width, // right
+                false); // anticlockwise?
+            ctx.lineTo(0, 0);
+            ctx.stroke();
+            break;
+          case "walls":
+            // Sonar ping for wall
+            for (var i = 5,r; i>0; i--) {
+              r = Math.random()/2 + 0.5;
+              ctx.beginPath();
+              ctx.arc(0, 0, rob.scan.range*i/5*r, 3.14/2+0.2, 3.14/2-0.2, true);
+              ctx.stroke();
+            }
+            break;
         }
       }
       ctx.rotate(rob.turret_rot);

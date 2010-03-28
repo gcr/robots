@@ -27,17 +27,26 @@ sys.inherits(Robot, fieldobject.FieldObject);
 
 // Return enough information for a client to draw us on the screen.
 Robot.prototype.renderInfo = function() {
-  return {
+  var result = {
     type: 'robot',
     name: this.name,
     location: [this.location.x, this.location.y],
     rotation: this.rotation,
     turret_rot: this.turretRot,
-    scan_mode: this.scanMode,
-    scan_width: this.scanWidth,
-    scanrange: this.scanRange,
     speed: this.speed
   };
+  if (this.scanMode !== "") {
+    process.mixin(result,
+      {
+        scan: {
+          mode: this.scanMode,
+          width: this.scanMode == "walls"? undefined : this.scanWidth,
+          range: this.scanRange
+        }
+      }
+    );
+  }
+  return result;
 };
 
 Robot.prototype.toJSON = function() {
