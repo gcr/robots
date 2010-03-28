@@ -32,9 +32,9 @@ Field.prototype.withTransform = function(cb) {
 };
 
 Field.prototype.drawRobot = function(rob) {
-  // Renders a robot at location with rotation and a certain color.
+  // Renders a robot at location with rotation and a certain color(?).
   // Not really a proper robot object; more like a dictionary that the
-  // server returns. See FieldObject.field_info()
+  // server returns. See physics/robot.js::Robot.renderInfo()
   var ctx = this.ctx;
   ctx.save();
       ctx.translate(rob.location[0], rob.location[1]);
@@ -81,10 +81,26 @@ Field.prototype.drawRobot = function(rob) {
   ctx.restore();
 };
 
+Field.prototype.drawBullet = function(bullet) {
+    // Renders a bullet at a certain location with a certain rotation.
+    // bullet: {location: [x, y], rotation: __}
+    var ctx = this.ctx;
+    ctx.save();
+      ctx.translate(bullet.location[0], bullet.location[1]);
+      ctx.rotate(-bullet.rotation);
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(0, -15);
+      ctx.lineTo(0, 15);
+      ctx.stroke();
+    ctx.restore();
+};
+
 Field.prototype.render = function(field) {
   // This gets run at every field update.
   // field: {"width": 1024, heigth: 1025,
-  //    "objects": [ # see FieldObject.field_info() in fieldobject.py, robot.py
+  //    "objects": [ // see FieldObject::renderInfo() in
+  //                 // physics/fieldobject.py, robot.py, bullet.py
   //           {'type': 'robot', 'location': [23, 35], ...}
   //        ]
   // }
@@ -98,6 +114,9 @@ Field.prototype.render = function(field) {
         switch (field.objects[i].type) {
           case 'robot':
             self.drawRobot(field.objects[i]);
+            break;
+          case 'bullet':
+            self.drawBullet(field.objects[i]);
             break;
           case 'object':
             // default
