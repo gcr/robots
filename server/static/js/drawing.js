@@ -63,7 +63,7 @@ Field.prototype.drawRobot = function(rob) {
             false); // anticlockwise?
         ctx.lineTo(0, 0);
         ctx.stroke();
-      } else if (rob.scan_mode == "wall") {
+      } else if (rob.scan_mode == "walls") {
         // Sonar ping for wall
         for (var i = 5,r; i>0; i--) {
           r = Math.random()/2 + 0.5;

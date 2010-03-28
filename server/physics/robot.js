@@ -178,18 +178,30 @@ Robot.prototype.scanRobots = function(scanWidth) {
                  (obj !== self) &&
                  (Math.abs(self.turretBearingTo(obj.location)) <
                    self.scanWidth);
-        }).map(function (obj) {
+        }).map(
+          function (obj) {
           // Now, take the resulting list of robots and augment them with
           // distance and angle information. Return this list to the client.
           return process.mixin(obj.toJSON(),
             {
               distance: Math.floor(self.distanceTo(obj.location)/20)*20,
               bearing: Math.round(
-                self.turretBearingTo(obj.location)*2/self.scanWidth) /2
-            }
-          );
+                self.turretBearingTo(obj.location)*2/self.scanWidth)/2
+            });
         });
     };
+};
+
+Robot.prototype.scanWall = function() {
+  // Returns a function that, when called, will scan walls
+  assert.equal(this.scanMode, "", "You are already scanning for something!");
+  this.scanMode = "walls";
+  var self = this;
+  return function finishScan() {
+    self.scanMode = "";
+    var dist = self.field.distToWall(self.location, self.rotation + self.turretRot);
+    return dist < self.scanRange? dist : null;
+  };
 };
 
 process.mixin(exports,

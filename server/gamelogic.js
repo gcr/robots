@@ -110,10 +110,6 @@ GameLogic.prototype.robotAction = function(robotId, action, args, callback, errb
 
     assert.ok(robot, "This robot doesn't exist!");
     // list of functions we still need:
-    // ['scan_robots', 'arc'],
-    // takeGameAction(match, robotId, 'scanRobots', 1),
-    // ['scan_wall'],
-    // takeGameAction(match, robotId, 'scanWall', 0),
 
     // Now, actually take the actions.
     var time, method, laterFunc;
@@ -220,7 +216,8 @@ ATRobotsGame.prototype.DELAYED = {
 // functions. Call the 'outer' function right away. Then, set up to call
 // the 'inner' function later, in the future.
 ATRobotsGame.prototype.PARTIAL_DELAYED = {
-  scanRobots: [2, roboproto.scanRobots]
+  scanRobots: [2, roboproto.scanRobots],
+  scanWall: [1, roboproto.scanWall]
 };
 
 process.mixin(exports,
