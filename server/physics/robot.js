@@ -5,6 +5,7 @@ var
   assert      = require('assert'),
   fieldobject = require('./fieldobject'),
   vec         = require('./vector'),
+  bullet      = require('./bullet'),
   NORTH       = new vec.Vector(0, 1);
 
 function Robot(name, location, field) {
@@ -228,6 +229,14 @@ Robot.prototype.fire = function(adjust) {
   // by up to ± pi/15 radians. (Don't warn about exceeding this, just clip it)
   adjust = Math.min(Math.PI/15, Math.max(-Math.PI/15, adjust));
   require('../log').debug("PEW PEW PEW! robot fired " + adjust);
+  this.field.addObject(
+    new bullet.Bullet(
+      this.field, // Field
+      this, // Owner (don't kill us plz!)
+      this.location.copy(),
+      this.rotation + this.turretRot + adjust
+    )
+  );
 };
 
 process.mixin(exports,
