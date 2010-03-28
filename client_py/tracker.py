@@ -26,7 +26,7 @@ while True:
     if scan_results:
         # If we found them, record their distance and accuracy (will be either
         # -1, -.5, 0, .5, 1; the angle is this times your scan width)
-        dist, accuracy = scan_results
+        dist, accuracy = scan_results[0]['distance'], scan_results[0]['bearing']
         # Steer our turret to face our target (this is instantaneous).
         robot.turret_rotation += (accuracy * biggest_arc / (2**factor))
         factor += 1
