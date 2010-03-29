@@ -28,7 +28,7 @@ Bullet.prototype.pump = function() {
     new vec.Vector(
       Math.sin(this.rotation),
       Math.cos(this.rotation)
-    ).multiply(10)
+    ).multiply(25)
   );
 };
 
