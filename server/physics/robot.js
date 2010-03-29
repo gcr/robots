@@ -98,6 +98,10 @@ Robot.prototype.collidedWithWall = function() {
   }
 };
 
+Robot.prototype.getRotation = function() {
+    return this.rotation;
+};
+
 Robot.prototype.turn = function(amount) {
   this.wantedRotation = this.rotation + amount;
   return amount;
@@ -154,8 +158,8 @@ Robot.prototype.getLocation = function() {
   return [this.location.x, this.location.y];
 };
 
-Robot.prototype.getRotation = function() {
-    return this.rotation;
+Robot.prototype.getThrottle = function() {
+  return this.throttle;
 };
 
 Robot.prototype.setThrottle = function(throttle) {
@@ -164,10 +168,6 @@ Robot.prototype.setThrottle = function(throttle) {
   // This expects a number between -50 and 100.
   var amount = Math.max(-50, Math.min(throttle, 100));
   this.throttle = 10 * this.engine * amount/100;
-  return this.throttle;
-};
-
-Robot.prototype.getThrottle = function() {
   return this.throttle;
 };
 
