@@ -45,7 +45,9 @@ Match.prototype.start = function(authCode) {
         break;
       }
   }
-  assert.ok(someRobots, "This match has no robots!");
+  if (!someRobots) {
+    return false;
+  }
 
   // We must remove all the blank robots first.
   for (rid in this.game.robots) {
@@ -63,6 +65,7 @@ Match.prototype.start = function(authCode) {
     self.game.pump();
   }, 1000*this.speed);
   this.emit("started", this);
+  return true;
 };
 
 Match.prototype.pump = function() {

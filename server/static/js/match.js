@@ -116,13 +116,15 @@ Match.prototype.startMatch = function(cb) {
   if (this.authCode && !(this.starting || this.started)) {
     // another guard: don't run two of these at the same time!
     this.starting = true;
-    // no need to call this.matchStarted; the server may or may not actually
-    // decide to start the match.
+    var self = this;
     courier.core.ajaxRequest( this.url,
       {start: true, auth_code: this.authCode},
-      function() {
+      function(result) {
+        // no need to call self.matchStarted; the server may or may not
+        // actually decide to start the match.
+        self.starting = false;
         if (typeof cb == 'function') {
-          cb();
+          cb(result);
         }
       });
   }

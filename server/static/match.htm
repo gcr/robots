@@ -37,8 +37,13 @@
             if (authCode) {
                 startBtn.click(
                     function() {
-                        startBtn.remove();
-                        m.startMatch();
+                        m.startMatch(
+                            function(success) {
+                                if (success) {
+                                    startBtn.remove();
+                                }
+                            }
+                        );
                         return false;
                     });
             } else {
