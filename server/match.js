@@ -37,8 +37,18 @@ Match.prototype.start = function(authCode) {
   // Start the match.
   assert.ok(authCode == this.authCode, "Incorrect authentication code.");
   assert.ok(!this.game.started, "You cannot start a started match.");
+  // Only start if the match has some connected robots
+  var someRobots = false, rid;
+  for (rid in this.game.robots) {
+      if (this.game.robots.hasOwnProperty(rid) && this.game.robots[rid]) {
+        someRobots = true;
+        break;
+      }
+  }
+  assert.ok(someRobots, "This match has no robots!");
+
   // We must remove all the blank robots first.
-  for (var rid in this.game.robots) {
+  for (rid in this.game.robots) {
     if (this.game.robots.hasOwnProperty(rid) &&
         this.game.robots[rid] === null) {
           this.removeSlot(rid);
