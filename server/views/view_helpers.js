@@ -81,7 +81,7 @@ function buildUuid(size) {
 
 function booleanize(m) {
   if (typeof m == 'string') {
-    return (["", "n", "nil", "null", "undefined", "no"].indexOf(m.toLowerCase()) != -1);
+    return (["", "n", "nil", "null", "undefined", "no", "f", "false"].indexOf(m.toLowerCase()) != -1);
   } else {
     return Boolean(m);
   }
