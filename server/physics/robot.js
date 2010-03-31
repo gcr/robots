@@ -24,6 +24,7 @@ function Robot(name, location, field) {
   this.speed = 0;
   this.throttle = 0;
   this.armor = 100;
+  this.radius = 20; // For collision detection -- circular for now
 }
 sys.inherits(Robot, fieldobject.FieldObject);
 
@@ -247,6 +248,10 @@ Robot.prototype.fire = function(adjust) {
     )
   );
   return true;
+};
+
+Robot.prototype.collidedWith = function(other) {
+  require('../log').debug("COLLISION OMG! " + this.name);
 };
 
 process.mixin(exports,

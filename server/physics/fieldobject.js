@@ -11,6 +11,7 @@ var
 function FieldObject(field) {
   this.location = new vector.Vector(0,0);
   this.field = field;
+  this.radius = 15;
 }
 sys.inherits(FieldObject, events.EventEmitter);
 
@@ -39,6 +40,11 @@ FieldObject.prototype.renderInfo = function() {
 FieldObject.prototype.collidedWithWall = function() {
   // Field will call this function when the object tries to collide with the
   // wall.
+};
+
+FieldObject.prototype.collidedWith = function(other) {
+    // What happens when we collide with another object
+    // other is the other object that collides with us.
 };
 
 process.mixin(exports,

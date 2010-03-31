@@ -69,6 +69,22 @@ Field.prototype.move = function(obj, displacement) {
     obj.location.x = Math.min(this.width, Math.max(0, obj.location.x));
     obj.location.y = Math.min(this.height, Math.max(0, obj.location.y));
   }
+
+  // Now: loop through every other object and see if this object collides with
+  // it
+  for (var i=0,l=this.objects.length; i<l; i++) {
+    if (this.objects[i] !== obj) {
+      // Test for collision between obj and this.objects[i]
+      // TODO: find a better algorithm; preferably one that's not O(n^2)
+      if (this.objects[i].location.sub(obj.location).dist() <
+        (this.objects[i].radius + obj.radius)) {
+          obj.collidedWith(this.objects[i], true);
+          this.objects[i].collidedWith(obj, false);
+          // TODO: Move them out of the way
+          // break; ? only collide w/ one object?
+      }
+    }
+  }
 };
 
 Field.prototype.allObjectsWithin = function(location, radius) {
