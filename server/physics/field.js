@@ -39,8 +39,10 @@ Field.prototype.pump = function() {
   var l = this.objects.length;
   for (var i=0; i<l; i++) {
     this.objects[i].pump();
-    // If our number of objects changed while we iterate over it
-    i = i - (l-this.objects.length);
+    // If our number of objects shrunk while we iterate over it
+    // The Math.max logic is to filter out if our list grows -- we don't want
+    // to pump an object twice, now!
+    i = i - Math.max(0, l-this.objects.length);
     l = this.objects.length;
   }
   this.emit("pump", this);
