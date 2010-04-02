@@ -18,6 +18,7 @@ function Bullet(field, owner, startlocation, rotation) {
   this.owner = owner;
   this.location = startlocation;
   this.rotation = rotation;
+  this.radius = 20;
 }
 sys.inherits(Bullet, fieldobject.FieldObject);
 
