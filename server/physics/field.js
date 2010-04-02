@@ -87,6 +87,44 @@ Field.prototype.move = function(obj, displacement) {
   }
 };
 
+Field.prototype.unOverlap = function(a, b) {
+    // Given two OVERLAPPING  objects a, b, this returns the smallest vector
+    // by which to move A so they're no longer overlapping. Two quick notes:
+    // This assumes they're both overlapping and will return bogus results if
+    // not, and it also assumes both are circular. Also note: Needs to be
+    // tested for two objects of different radii.
+    //      ,
+    //     /     Dx
+    //    ; +----------+b
+    //    | |         /
+    //  ,-:-|---. dx /
+    // '   \|   +---/   D = distance from a to b
+    //      | dy|  /`-.
+    //    Dy|\  | /d   `.
+    //      | `.|/       \     ,
+    //      |   /-.       \ ,-'
+    //      |  /   `-------:
+    //      | /            :
+    //      |/              :
+    //     a+               |
+    //                      ;
+    //
+    // Using similar triangles (see the diagram in my head):
+    var Dx = b.location.x - a.location.x,
+        Dy = b.location.y - a.location.y,
+        // D is the distance between them
+        D = Math.sqrt(Dx*Dx + Dy*Dy),
+        // d is the distance we must move them. (variables are case sensitive.)
+        d = D - (a.radius + b.radius);
+        // ...but what direction? Problem: Find dx and dy.
+        // By similar triangles, we know that D/d = Dx/dx = Dy/dy
+        // Therefore, Dx/D * d = dx; likewise for dy
+    return new vec.Vector(
+      d*Dx/D, // this is dx
+      d*Dy/D  // this is dy
+    );
+};
+
 Field.prototype.allObjectsWithin = function(location, radius) {
     // Return a list of all the objects within radius of the given location
     return this.objects.filter(function(obj) {
