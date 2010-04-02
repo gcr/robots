@@ -114,15 +114,21 @@ Field.prototype.unOverlap = function(a, b) {
         Dy = b.location.y - a.location.y,
         // D is the distance between them
         D = Math.sqrt(Dx*Dx + Dy*Dy),
-        // d is the distance we must move them. (variables are case sensitive.)
+        // d is the distance we must move one. (variables are case sensitive.)
         d = D - (a.radius + b.radius);
         // ...but what direction? Problem: Find dx and dy.
         // By similar triangles, we know that D/d = Dx/dx = Dy/dy
         // Therefore, Dx/D * d = dx; likewise for dy
-    return new vec.Vector(
-      d*Dx/D, // this is dx
-      d*Dy/D  // this is dy
-    );
+    if (Dx === 0 && Dy === 0) {
+      // Exact same position? Arbitrarily choose to move A right
+      return new vec.Vector(D, 0);
+    } else {
+      // Move A by this vector
+      return new vec.Vector(
+        d*Dx/D, // this is dx
+        d*Dy/D  // this is dy
+      );
+    }
 };
 
 Field.prototype.allObjectsWithin = function(location, radius) {
