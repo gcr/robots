@@ -80,8 +80,10 @@ Field.prototype.move = function(obj, displacement) {
         (this.objects[i].radius + obj.radius)) {
           obj.collidedWith(this.objects[i], true);
           this.objects[i].collidedWith(obj, false);
-          // TODO: Move them out of the way
-          // break; ? only collide w/ one object?
+          // Move them out of the way
+          obj.location = obj.location.add(
+            this.unOverlap(obj, this.objects[i])
+          );
       }
     }
   }
