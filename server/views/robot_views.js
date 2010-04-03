@@ -25,6 +25,7 @@ function takeGameAction(match, robotId, action, numargs) {
     // ABSOLUTELY EVERYTHING OMGOMG
     var args = Array.prototype.slice.call(arguments, -numargs).map(parseFloat);
     assert.ok(match.game.started, "The match isn't started yet!");
+    assert.ok(match.game.robots[robotId], "Your robot is unconnected!");
     match.game.robotAction(robotId, action, args,
       // callback
       function(result) {
