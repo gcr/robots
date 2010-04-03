@@ -14,7 +14,7 @@ function Match(mid, authCode, pub) {
   this.pub = pub;
   this.game = new gamelogic.ATRobotsGame(this);
 
-  this.speed = 0.3;
+  this.speed = 0.1;
 
   this.timer = null;
 
