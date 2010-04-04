@@ -198,7 +198,8 @@ sys.inherits(ATRobotsGame, GameLogic);
 ATRobotsGame.prototype.INSTANT = {
   setTurretRotate: roboproto.setTurretRot,
   getTurretRotate: roboproto.getTurretRot,
-  getThrottle: roboproto.getThrottle
+  getThrottle: roboproto.getThrottle,
+  setThrottle: roboproto.setThrottle
 };
 
 // DELAYED is all the actions that should be returned later. Save them on
@@ -209,7 +210,6 @@ ATRobotsGame.prototype.DELAYED = {
   turn: [0, roboproto.turn], // call robot.turn
   getLocation: [3, roboproto.getLocation],
   getRotation: [2, roboproto.getRotation],
-  setThrottle: [0, roboproto.setThrottle],
   getSpeed: [0, roboproto.getSpeed],
   fire: [1, roboproto.fire]
 };
