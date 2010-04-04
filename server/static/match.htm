@@ -44,6 +44,7 @@
                                 }
                             }
                         );
+                        // Ensure that the link is not followed.
                         return false;
                     });
             } else {
@@ -52,6 +53,9 @@
             m.populate(true, 
                 function(match) {
                     courier.drawing.followField(match, $("#field"));
+                    if (match.started) {
+                        startBtn.remove();
+                    }
                 });
         });
     </script>
