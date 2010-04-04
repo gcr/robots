@@ -210,6 +210,7 @@ ATRobotsGame.prototype.DELAYED = {
   getLocation: [3, roboproto.getLocation],
   getRotation: [2, roboproto.getRotation],
   setThrottle: [0, roboproto.setThrottle],
+  getSpeed: [0, roboproto.getSpeed],
   fire: [1, roboproto.fire]
 };
 

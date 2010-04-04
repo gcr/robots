@@ -159,6 +159,10 @@ Robot.prototype.getLocation = function() {
   return [this.location.x, this.location.y];
 };
 
+Robot.prototype.getSpeed = function() {
+  return this.speed;
+};
+
 Robot.prototype.getThrottle = function() {
   return this.throttle;
 };

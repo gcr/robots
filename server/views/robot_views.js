@@ -57,6 +57,8 @@ function dispatchRobotViews(req, res, robot, robotId, match) {
     takeGameAction(match, robotId, 'getRotation', 0),
     ['location'],
     takeGameAction(match, robotId, 'getLocation', 0),
+    ['speed'],
+    takeGameAction(match, robotId, 'getSpeed', 0),
     ['scan_robots', 'arc'],
     takeGameAction(match, robotId, 'scanRobots', 1),
     ['scan_wall'],

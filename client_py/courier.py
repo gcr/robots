@@ -78,6 +78,13 @@ class Robot(object):
         """
         return fetch_persist(self.url, {'turn': 't', 'amount': math.radians(amount)})
 
+    turn_right = turn
+    def turn_left(self, amount):
+        """
+        Steer left by amount
+        """
+        return self.turn(-amount)
+
     def turn_abs(self, angle):
         """
         Steer ourselves so that we're facing the given angle
@@ -93,6 +100,9 @@ class Robot(object):
         return fetch_persist(self.url, {'throttle': 't', 'amount': amount})
     throttle = property(get_throttle, set_throttle)
 
+    def spedometer(self):
+        return fetch_persist(self.url, {'speed': 't'})
+
     def compass(self):
         return math.degrees(fetch_persist(self.url, {'rotation': 't'}))
 
@@ -103,6 +113,7 @@ class Robot(object):
         assert -90 <= angle <= 90
         return fetch_persist(self.url, {'scan_robots': 't', 'arc': math.radians(angle)})
 
+    scan_robots = scan
     def scan_wall(self):
         return fetch_persist(self.url, {'scan_wall': 't'})
 
@@ -123,6 +134,7 @@ class Robot(object):
             self._turret_rotation = math.degrees(fetch_persist(self.url, {'turret_rotate': 't'}))
         return self._turret_rotation
     turret_rotation = property(get_turret_rotation, set_turret_rotation)
+    turret_rot = turret_rotation
 
 class Match(object):
     @classmethod
