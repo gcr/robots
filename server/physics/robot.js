@@ -258,28 +258,24 @@ BaseRobot.prototype.collidedWith = function(other) {
   require('../log').debug("COLLISION OMG! " + this.name);
 };
 
-// exports.inherits = function (ctor, superCtor) {
-//   var tempCtor = function(){};
-//   tempCtor.prototype = superCtor.prototype;
-//   ctor.super_ = superCtor;
-//   ctor.prototype = new tempCtor();
-//   ctor.prototype.constructor = ctor;
-// };
-
 function mixRobots() {
-  // Return a new type of robot that mixes traits of all the arguments.
+  // Return a new type of robot that mixes traits of all the robots you give
+  // it.
+  // First we gotta create a temporary constructor now.
   var tempCtor = function(){},
-    rtypes = Array.prototype.slice.call(arguments),
+    // Which robot types did you ask?
+    rtypes = [BaseRobot] + Array.prototype.slice.call(arguments),
+    // Here's the constructor for the new robot. Apply all of our constructors
+    // in order, starting with BaseRobot.
     newBotFlavor = function() {
-      // Bear with me for a moment.
-      BaseRobot.apply(this, arguments);
       for (var i=0,l=rtypes.length; i<l; i++) {
           rtypes[i].apply(this, arguments);
       }
     };
+  // Sorta-copied from sys.inherit.
   tempCtor.prototype = BaseRobot.prototype;
   newBotFlavor.prototype = new tempCtor();
-  newBotFlavor.prototype.constructor = BaseRobot;
+  newBotFlavor.prototype.constructor = newBotFlavor;
   return newBotFlavor;
 }
 
