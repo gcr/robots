@@ -8,7 +8,7 @@ var
   bullet      = require('./bullet'),
   NORTH       = new vec.Vector(0, 1);
 
-function Robot(name, location, field) {
+function BaseRobot(name, location, field) {
   this.name = name;
   this.field = field;
   this.location = new vec.Vector(location[0], location[1]);
@@ -26,10 +26,10 @@ function Robot(name, location, field) {
   this.armor = 100;
   this.radius = 20; // For collision detection -- circular for now
 }
-sys.inherits(Robot, fieldobject.FieldObject);
+sys.inherits(BaseRobot, fieldobject.FieldObject);
 
 // Return enough information for a client to draw us on the screen.
-Robot.prototype.renderInfo = function() {
+BaseRobot.prototype.renderInfo = function() {
   var result = {
     type: 'robot',
     name: this.name,
@@ -52,14 +52,14 @@ Robot.prototype.renderInfo = function() {
   return result;
 };
 
-Robot.prototype.toJSON = function() {
+BaseRobot.prototype.toJSON = function() {
   return {
     name: this.name,
     armor: this.armor
   };
 };
 
-Robot.prototype.pump = function() {
+BaseRobot.prototype.pump = function() {
   // Calculate our physics: turn, move, or whatever.
   // First, we'll turn.
   var angleDiff = vec.normalizeAngle(this.wantedRotation - this.rotation),
@@ -90,7 +90,7 @@ Robot.prototype.pump = function() {
     ).multiply(this.speed));
 };
 
-Robot.prototype.collidedWithWall = function() {
+BaseRobot.prototype.collidedWithWall = function() {
   // We collided with a wall? Onoes!
   this.speed /= 2;
   this.throttle /= 2;
@@ -99,16 +99,16 @@ Robot.prototype.collidedWithWall = function() {
   }
 };
 
-Robot.prototype.getRotation = function() {
+BaseRobot.prototype.getRotation = function() {
     return this.rotation;
 };
 
-Robot.prototype.turn = function(amount) {
+BaseRobot.prototype.turn = function(amount) {
   this.wantedRotation = this.rotation + amount;
   return amount;
 };
 
-Robot.prototype.bearingTo = function(location) {
+BaseRobot.prototype.bearingTo = function(location) {
     // Return the direction (in radians) from our nose to the given vector
     // |
     // |
@@ -125,7 +125,7 @@ Robot.prototype.bearingTo = function(location) {
     );
 };
 
-Robot.prototype.turretBearingTo = function(location) {
+BaseRobot.prototype.turretBearingTo = function(location) {
     // Return the direction (in radians) from our nose to the given vector
     // |   /turret angle
     // |  /
@@ -142,32 +142,32 @@ Robot.prototype.turretBearingTo = function(location) {
     );
 };
 
-Robot.prototype.distanceTo = function(location) {
+BaseRobot.prototype.distanceTo = function(location) {
     return this.location.sub(location).dist();
 };
 
-Robot.prototype.getTurretRot = function() {
+BaseRobot.prototype.getTurretRot = function() {
   return this.turretRot;
 };
 
-Robot.prototype.setTurretRot = function(newRot) {
+BaseRobot.prototype.setTurretRot = function(newRot) {
   this.turretRot = vec.normalizeAngle(newRot);
   return newRot;
 };
 
-Robot.prototype.getLocation = function() {
+BaseRobot.prototype.getLocation = function() {
   return [this.location.x, this.location.y];
 };
 
-Robot.prototype.getSpeed = function() {
+BaseRobot.prototype.getSpeed = function() {
   return this.speed;
 };
 
-Robot.prototype.getThrottle = function() {
+BaseRobot.prototype.getThrottle = function() {
   return this.throttle;
 };
 
-Robot.prototype.setThrottle = function(throttle) {
+BaseRobot.prototype.setThrottle = function(throttle) {
   // Set throttle. The minimum we can have is -self.engine*5 and the max we
   // can have is self.engine*10.
   // This expects a number between -50 and 100.
@@ -176,7 +176,7 @@ Robot.prototype.setThrottle = function(throttle) {
   return this.throttle;
 };
 
-Robot.prototype.scanRobots = function(scanWidth) {
+BaseRobot.prototype.scanRobots = function(scanWidth) {
     // Scan for robots! Returns a function that, when called, will scan for
     // other robots.
     // Steps:
@@ -201,7 +201,7 @@ Robot.prototype.scanRobots = function(scanWidth) {
         function filter(obj) {
           // Only keep the robots that aren't ourselves and that are within
           // our scan arc
-          return (obj instanceof Robot) &&
+          return (obj instanceof BaseRobot) &&
                  (obj !== self) &&
                  (Math.abs(self.turretBearingTo(obj.location)) <
                    self.scanWidth);
@@ -219,7 +219,7 @@ Robot.prototype.scanRobots = function(scanWidth) {
     };
 };
 
-Robot.prototype.scanWall = function() {
+BaseRobot.prototype.scanWall = function() {
   // Returns a function that, when called, will scan walls
   assert.equal(this.scanMode, "", "You are already scanning for something!");
   this.scanMode = "walls";
@@ -231,7 +231,7 @@ Robot.prototype.scanWall = function() {
   };
 };
 
-Robot.prototype.fire = function(adjust) {
+BaseRobot.prototype.fire = function(adjust) {
   // Fire a bullet! KABLOOOIE
   // 'adjust' is a paramater that allows you to adjust the aim of your turret
   // by up to ± pi/15 radians. (Don't warn about exceeding this, just clip it)
@@ -254,12 +254,38 @@ Robot.prototype.fire = function(adjust) {
   return true;
 };
 
-Robot.prototype.collidedWith = function(other) {
+BaseRobot.prototype.collidedWith = function(other) {
   require('../log').debug("COLLISION OMG! " + this.name);
 };
 
+// exports.inherits = function (ctor, superCtor) {
+//   var tempCtor = function(){};
+//   tempCtor.prototype = superCtor.prototype;
+//   ctor.super_ = superCtor;
+//   ctor.prototype = new tempCtor();
+//   ctor.prototype.constructor = ctor;
+// };
+
+function mixRobots() {
+  // Return a new type of robot that mixes traits of all the arguments.
+  var tempCtor = function(){},
+    rtypes = Array.prototype.slice.call(arguments),
+    newBotFlavor = function() {
+      // Bear with me for a moment.
+      BaseRobot.apply(this, arguments);
+      for (var i=0,l=rtypes.length; i<l; i++) {
+          rtypes[i].apply(this, arguments);
+      }
+    };
+  tempCtor.prototype = BaseRobot.prototype;
+  newBotFlavor.prototype = new tempCtor();
+  newBotFlavor.prototype.constructor = BaseRobot;
+  return newBotFlavor;
+}
+
 process.mixin(exports,
   {
-    Robot: Robot
+    Robot: BaseRobot,
+    mixRobots: mixRobots
   }
 );

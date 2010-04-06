@@ -4,7 +4,6 @@
 
 var
   sys = require('sys'),
-  robot = require('./robot'),
   vec = require('./vector'),
   fieldobject = require('./fieldobject');
 

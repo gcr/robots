@@ -5,7 +5,6 @@ var
   sys    = require('sys'),
   assert = require('assert'),
   robot  = require('./physics/robot'),
-  roboproto = robot.Robot.prototype,
   field  = require('./physics/field'),
   events = require('events');
 
@@ -115,7 +114,7 @@ GameLogic.prototype.robotAction = function(robotId, action, args, callback, errb
     var time, method, laterFunc;
     if (action in this.INSTANT) {
       try {
-        return callback(this.INSTANT[action].apply(robot, args));
+        return callback(robot[this.INSTANT[action]].apply(robot, args));
       } catch (err) {
         return errback(err);
       }
@@ -124,14 +123,14 @@ GameLogic.prototype.robotAction = function(robotId, action, args, callback, errb
       method = this.DELAYED[action][1];
       this.setFuture(this.time +  time, robotId,
         function() {
-          callback(method.apply(robot, args));
+          callback(robot[method].apply(robot, args));
         },
         errback);
     } else if (action in this.PARTIAL_DELAYED) {
       time = this.PARTIAL_DELAYED[action][0];
       method = this.PARTIAL_DELAYED[action][1];
       // Don't lose your head! First, call the 'outer' function right away...
-      laterFunc = method.apply(robot, args);
+      laterFunc = robot[method].apply(robot, args);
       // Then, later, set up to call the callback with the results of that
       // call.
       this.setFuture(this.time + time, robotId,
@@ -152,7 +151,7 @@ GameLogic.prototype.makeRobot = function(robotId, name) {
   }
 
   // Time to actually make the robot.
-  var rob = new robot.Robot(name,
+  var rob = new this.roboFlavor(name,
     [Math.random() * this.field.width, Math.random() * this.field.height],
   this.field);
 
@@ -192,14 +191,16 @@ function ATRobotsGame() {
 }
 sys.inherits(ATRobotsGame, GameLogic);
 
+ATRobotsGame.prototype.roboFlavor = robot.mixRobots();
+
 // Here come the lists of actions we can take.
 // INSTANT is all the actions that we should return *right away.* Don't
 // post to our 'futures' list, just... pop the callback RIGHT NAO.
 ATRobotsGame.prototype.INSTANT = {
-  setTurretRotate: roboproto.setTurretRot,
-  getTurretRotate: roboproto.getTurretRot,
-  getThrottle: roboproto.getThrottle,
-  setThrottle: roboproto.setThrottle
+  setTurretRotate: 'setTurretRot',
+  getTurretRotate: 'getTurretRot',
+  getThrottle: 'getThrottle',
+  setThrottle: 'setThrottle'
 };
 
 // DELAYED is all the actions that should be returned later. Save them on
@@ -207,19 +208,19 @@ ATRobotsGame.prototype.INSTANT = {
 // strings to a 2-tuple: [timeToWait, methodName]. Apply that methodName
 // with arguments.
 ATRobotsGame.prototype.DELAYED = {
-  turn: [0, roboproto.turn], // call robot.turn
-  getLocation: [3, roboproto.getLocation],
-  getRotation: [2, roboproto.getRotation],
-  getSpeed: [0, roboproto.getSpeed],
-  fire: [1, roboproto.fire]
+  turn: [0, 'turn'], // call robot.turn
+  getLocation: [3, 'getLocation'],
+  getRotation: [2, 'getRotation'],
+  getSpeed: [0, 'getSpeed'],
+  fire: [1, 'fire']
 };
 
 // PARTIAL_DELAYED is really crazy. These functions will actually return
 // functions. Call the 'outer' function right away. Then, set up to call
 // the 'inner' function later, in the future.
 ATRobotsGame.prototype.PARTIAL_DELAYED = {
-  scanRobots: [2, roboproto.scanRobots],
-  scanWall: [1, roboproto.scanWall]
+  scanRobots: [2, 'scanRobots'],
+  scanWall: [1, 'scanWall']
 };
 
 process.mixin(exports,
