@@ -61,6 +61,27 @@ Field.prototype.move = function(obj, displacement) {
   // Simple for now. In the future when we do quadtrees or whatever, we'll
   // want to make this more sophisticated -- multisampling or sweeping for
   // quick-movin' objects, etc. But not yet.
+
+  // Loop through every other object and see if this object collides with it
+  // TODO: NAIVE
+  for (var i=0,l=this.objects.length; i<l; i++) {
+    if (this.objects[i] !== obj) {
+      // Test for collision between obj and this.objects[i]
+      // TODO: find a better algorithm; preferably one that's not O(n^2)
+      if (this.objects[i].location.sub(obj.location).dist() <
+            (this.objects[i].radius + obj.radius)) {
+          // We only want to signal THIS object that it collided with something.
+          if (obj.collidedWith(this.objects[i], true)) {
+            // Move it out of the way
+            obj.location = obj.location.add(
+              this.unOverlap(obj, this.objects[i])
+            );
+          }
+      }
+    }
+  }
+
+  // Are they going through walls? NO GOING THROUGH WALLS
   obj.location = obj.location.add( displacement );
   if (obj.location.x < 0 || obj.location.x > this.width ||
       obj.location.y < 0 || obj.location.y > this.height) {
@@ -70,23 +91,6 @@ Field.prototype.move = function(obj, displacement) {
     obj.location.y = Math.min(this.height, Math.max(0, obj.location.y));
   }
 
-  // Now: loop through every other object and see if this object collides with
-  // it
-  for (var i=0,l=this.objects.length; i<l; i++) {
-    if (this.objects[i] !== obj) {
-      // Test for collision between obj and this.objects[i]
-      // TODO: find a better algorithm; preferably one that's not O(n^2)
-      if (this.objects[i].location.sub(obj.location).dist() <
-        (this.objects[i].radius + obj.radius)) {
-          obj.collidedWith(this.objects[i], true);
-          this.objects[i].collidedWith(obj, false);
-          // Move them out of the way
-          obj.location = obj.location.add(
-            this.unOverlap(obj, this.objects[i])
-          );
-      }
-    }
-  }
 };
 
 Field.prototype.unOverlap = function(a, b) {

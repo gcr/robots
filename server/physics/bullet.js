@@ -33,6 +33,11 @@ Bullet.prototype.pump = function() {
   );
 };
 
+Bullet.prototype.collidedWith = function(other) {
+  // Go through our owner
+  return (other !== this.owner);
+};
+
 Bullet.prototype.collidedWithWall = function() {
   // BOOMIE!
   this.field.removeObject(this);

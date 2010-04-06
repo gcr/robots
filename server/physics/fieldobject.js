@@ -45,6 +45,11 @@ FieldObject.prototype.collidedWithWall = function() {
 FieldObject.prototype.collidedWith = function(other) {
     // What happens when we collide with another object
     // other is the other object that collides with us.
+
+    // This function gets called by 'field.move' when this object collides with
+    // another object. Should we be moved out of the way? Return true; if we're
+    // a ghost and like going through other objects, return false.
+    return true;
 };
 
 process.mixin(exports,
