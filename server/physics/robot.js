@@ -256,6 +256,7 @@ Robot.prototype.fire = function(adjust) {
 
 Robot.prototype.collidedWith = function(other) {
   require('../log').debug("COLLISION OMG! " + this.name);
+  return true;
 };
 
 process.mixin(exports,
