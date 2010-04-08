@@ -62,12 +62,14 @@ Field.prototype.move = function(obj, displacement) {
   // we'll want to make this more sophisticated -- multisampling or sweeping
   // for quick-movin' objects, etc. But not yet.
 
+  // Oh, and everything is all circles I guess.
+
   obj.location = obj.location.add( displacement );
 
   // Now, loop through every other object and see if this object collides with
   // it
   // TODO: NAIVE AND STUPID.
-  var l = this.objects.length;
+  var l = this.objects.length; // like this for a reason, see the end of the loop
   for (var i=0; i<l; i++) {
     if (this.objects[i] !== obj) {
       // Test for collision between obj and this.objects[i]
@@ -76,17 +78,28 @@ Field.prototype.move = function(obj, displacement) {
          (this.objects[i].radius + obj.radius)) {
           var other = this.objects[i];
           // Doing it this way avoids short-circuiting -- if we had simply
-          // done if obj.collide(other) && other.collide(obj) and
+          // done 'if obj.collide(other) && other.collide(obj)' and if
           // obj.collide(other) returns false, other.collide(obj) would not
           // get called.
           var one = obj.collidedWith(other, true),
               two = other.collidedWith(obj, false);
           if (one && two) {
-            // Move them both half out of the way, but only if both say
-            // they're tangible.
-            var displacementvec = this.unOverlap(obj, other);
-            obj.location = obj.location.add(displacementvec.multiply(0.5));
-            other.location = other.location.sub(displacementvec.multiply(0.5));
+            // Move both objects out of the way, but only if both say they're
+            // tangible.
+            var shove = this.unOverlap(obj, other);
+            obj.location = obj.location.add(shove.multiply(0.5));
+            other.location = other.location.sub(shove.multiply(0.5));
+            // In the real world, two objects that collide each get moved out
+            // of the way a distance proportional to I think the ratio of
+            // their masses and their relative speeds wrt the impact? but
+            // apparently in this world, everything weighs the same as
+            // everything else and is moving the exact same speed. oh well,
+            // less work for meee~~~!
+
+            // TODO: Tampering with obj.location like this has the drawback
+            // that what if we just moved the object into a different object?
+            // One way to address this would be to call Field.move()
+            // recursively until they're no longer touching *anything* at all.
           }
       }
       // If our number of objects shrunk while we iterate over it, handle in
