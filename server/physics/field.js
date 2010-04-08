@@ -57,32 +57,46 @@ Field.prototype.toJSON = function() {
 };
 
 Field.prototype.move = function(obj, displacement) {
-  // Moves obj (changes obj.location) to be offset by displacement
-  // Simple for now. In the future when we do quadtrees or whatever, we'll
-  // want to make this more sophisticated -- multisampling or sweeping for
-  // quick-movin' objects, etc. But not yet.
+  // Moves obj (changes obj.location) to be offset by the given displacement
+  // vector. Simple for now. In the future when we do quadtrees or whatever,
+  // we'll want to make this more sophisticated -- multisampling or sweeping
+  // for quick-movin' objects, etc. But not yet.
 
-  // Loop through every other object and see if this object collides with it
-  // TODO: NAIVE
-  for (var i=0,l=this.objects.length; i<l; i++) {
+  obj.location = obj.location.add( displacement );
+
+  // Now, loop through every other object and see if this object collides with
+  // it
+  // TODO: NAIVE AND STUPID.
+  var l = this.objects.length;
+  for (var i=0; i<l; i++) {
     if (this.objects[i] !== obj) {
       // Test for collision between obj and this.objects[i]
       // TODO: find a better algorithm; preferably one that's not O(n^2)
       if (this.objects[i].location.sub(obj.location).dist() <
-            (this.objects[i].radius + obj.radius)) {
-          // We only want to signal THIS object that it collided with something.
-          if (obj.collidedWith(this.objects[i], true)) {
-            // Move it out of the way
-            obj.location = obj.location.add(
-              this.unOverlap(obj, this.objects[i])
-            );
+         (this.objects[i].radius + obj.radius)) {
+          var other = this.objects[i];
+          // Doing it this way avoids short-circuiting -- if we had simply
+          // done if obj.collide(other) && other.collide(obj) and
+          // obj.collide(other) returns false, other.collide(obj) would not
+          // get called.
+          var one = obj.collidedWith(other, true),
+              two = other.collidedWith(obj, false);
+          if (one && two) {
+            // Move them both half out of the way, but only if both say
+            // they're tangible.
+            var displacementvec = this.unOverlap(obj, other);
+            obj.location = obj.location.add(displacementvec.multiply(0.5));
+            other.location = other.location.sub(displacementvec.multiply(0.5));
           }
       }
+      // If our number of objects shrunk while we iterate over it, handle in
+      // a special case in a manner similar to Field.pump()
+      i = i - Math.max(0, l-this.objects.length);
+      l = this.objects.length;
     }
   }
 
   // Are they going through walls? NO GOING THROUGH WALLS
-  obj.location = obj.location.add( displacement );
   if (obj.location.x < 0 || obj.location.x > this.width ||
       obj.location.y < 0 || obj.location.y > this.height) {
     // ONOES they hit something!
