@@ -42,13 +42,20 @@ FieldObject.prototype.collidedWithWall = function() {
   // wall.
 };
 
-FieldObject.prototype.collidedWith = function(other) {
+FieldObject.prototype.collidedWith = function(other, move) {
     // What happens when we collide with another object
     // other is the other object that collides with us.
 
+    // The 'move' argument is true if we're the one who just called
+    // Field.move() and false if some other object tried to Field.move() on
+    // top of us.
+
     // This function gets called by 'field.move' when this object collides with
-    // another object. Should we be moved out of the way? Return true; if we're
-    // a ghost and like going through other objects, return false.
+    // another object. Should we be moved out of the way? Return false if we're
+    // a ghost and like going through other objects. Otherwise, return true.
+
+    // Never call Field.move(this, Field.unOverlap(this, other)). The field is
+    // smarter than we are and it will decide what to do.
     return true;
 };
 
