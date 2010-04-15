@@ -255,7 +255,33 @@ Robot.prototype.fire = function(adjust) {
 };
 
 Robot.prototype.collidedWith = function(other) {
-  require('../log').debug("COLLISION OMG! " + this.name);
+  // Reduce our speed.
+  // Rules: If we hit something straight on, then we should reduce our throttle by half.
+  // If we hit something to the side, we should keep our throttle because it hit us.
+  // If we hit something from behind? Don't touch throttle.
+  //
+  // Now. Remember that "straight on" means "in the direction of travel," so if
+  // we're moving backwards, account for that.
+  //
+  //   collision
+  //    x--.
+  //   / \  \
+  //   |  O-+---> travel
+  //   \    /
+  //    '--'
+  //     us
+  //
+
+  // diff will be a vector between 0 and 1 that represents how parallel we are.
+  var diff = Math.cos(this.bearingTo(other.location)) * (this.speed>0?1:-1);
+
+  // reduce the throttle and speed by up to half with cutoff
+  this.throttle -= this.throttle * 0.2 * diff;
+  this.speed -= this.throttle * 0.2 * diff;
+  if (Math.abs(this.throttle) < 0.5) {
+    this.throttle = 0;
+  }
+  
   return true;
 };
 
