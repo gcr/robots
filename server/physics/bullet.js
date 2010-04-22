@@ -33,7 +33,7 @@ Bullet.prototype.pump = function() {
   );
 };
 
-Bullet.prototype.collidedWith = function(other) {
+Bullet.prototype.isTangible = function(other) {
   // Go through our owner; hit other robots
   return (other !== this.owner);
 };

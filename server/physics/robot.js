@@ -256,8 +256,12 @@ Robot.prototype.fire = function(adjust) {
   return true;
 };
 
+Robot.prototype.isTangible = function(other) {
+  return true; // Robots are always tangible
+};
+
 Robot.prototype.collidedWith = function(other) {
-  // Reduce our speed.
+  // CRASH POSITIONS! Reduce our speed.
   // Rules: If we hit something straight on, then we should reduce our throttle by half.
   // If we hit something to the side, we should keep our throttle because it hit us.
   // If we hit something from behind? Don't touch throttle.
@@ -280,16 +284,16 @@ Robot.prototype.collidedWith = function(other) {
   //    0 - - > - - 1
   //          | `-.
   //          0    0.7
-  var diff = Math.min(0, Math.cos(this.bearingTo(other.location)) * (this.speed>0?1:-1));
+  if (other.isTangible(this)) {
+    var diff = Math.min(0, Math.cos(this.bearingTo(other.location)) * (this.speed>0?1:-1));
 
-  // Reduce the throttle and speed by up to .2 with cutoff
-  this.throttle -= this.throttle * 0.2 * diff;
-  this.speed -= this.throttle * 0.2 * diff;
-  if (Math.abs(this.throttle) < 0.5) {
-    this.throttle = 0;
+    // Reduce the throttle and speed by up to .2 with cutoff
+    this.throttle -= this.throttle * 0.2 * diff;
+    this.speed -= this.throttle * 0.2 * diff;
+    if (Math.abs(this.throttle) < 0.5) {
+      this.throttle = 0;
+    }
   }
-  
-  return true;
 };
 
 process.mixin(exports,

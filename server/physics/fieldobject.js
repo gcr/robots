@@ -42,21 +42,24 @@ FieldObject.prototype.collidedWithWall = function() {
   // wall.
 };
 
-FieldObject.prototype.collidedWith = function(other, move) {
-    // What happens when we collide with another object
-    // other is the other object that collides with us.
+FieldObject.prototype.isTangible = function(other) {
+  // This will be called by other objects and field.move, among other things.
+  // Don't make any changes to the object's state here!
+  // Should we be moved out of the way? Return false if we're
+  // a ghost and like going through other objects. Otherwise, return true.
+  return true;
+};
 
-    // The 'move' argument is true if we're the one who just called
-    // Field.move() and false if some other object tried to Field.move() on
-    // top of us.
+FieldObject.prototype.collidedWith = function(other) {
+  // What happens when we collide with another object
+  // other is the other object that collides with us.
 
-    // This function gets called by 'field.move' when this object collides with
-    // another object. Should we be moved out of the way? Return false if we're
-    // a ghost and like going through other objects. Otherwise, return true.
+  // This function gets called by 'field.move' when this object collides with
+  // another object. Use other.isTangible(this) to see if you should do
+  // anything.
 
-    // Never call Field.move(this, Field.unOverlap(this, other)). The field is
-    // smarter than we are and it will decide what to do.
-    return true;
+  // Never call Field.move(this, Field.unOverlap(this, other)). The field is
+  // smarter than we are and it will decide what to do.
 };
 
 process.mixin(exports,

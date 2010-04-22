@@ -77,13 +77,11 @@ Field.prototype.move = function(obj, displacement) {
       if (this.objects[i].location.sub(obj.location).dist() <
          (this.objects[i].radius + obj.radius)) {
           var other = this.objects[i];
-          // Doing it this way avoids short-circuiting -- if we had simply
-          // done 'if obj.collide(other) && other.collide(obj)' and if
-          // obj.collide(other) returns false, other.collide(obj) would not
-          // get called.
-          var one = obj.collidedWith(other, true),
-              two = other.collidedWith(obj, false);
-          if (one && two) {
+          obj.collidedWith(other);
+          other.collidedWith(obj);
+          // beware -- short circuiting here! don't let isTangible make any
+          // changes to the objects' states.
+          if (obj.isTangible(other) && other.isTangible(obj)) {
             // Move both objects out of the way, but only if both say they're
             // tangible.
             var shove = this.unOverlap(obj, other);
