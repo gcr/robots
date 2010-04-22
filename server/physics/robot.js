@@ -286,6 +286,10 @@ Robot.prototype.collidedWith = function(other) {
   //          0    0.7
   if (other.isTangible(this)) {
     var diff = Math.min(0, Math.cos(this.bearingTo(other.location)) * (this.speed>0?1:-1));
+    // if other is right on top of us, the delta vector is <0, 0> and we can't
+    // get the angle of that vector, so diff will be NaN. Found this out the
+    // hard way.
+    diff = isNaN(diff)? 1:diff;
 
     // Reduce the throttle and speed by up to .2 with cutoff
     this.throttle -= this.throttle * 0.2 * diff;
