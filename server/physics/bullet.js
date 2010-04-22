@@ -35,7 +35,7 @@ Bullet.prototype.pump = function() {
 
 Bullet.prototype.isTangible = function(other) {
   // Go through our owner; hit other robots
-  return (other !== this.owner);
+  return (other !== this.owner && !(other instanceof Bullet));
 };
 
 Bullet.prototype.collidedWith = function(other) {
