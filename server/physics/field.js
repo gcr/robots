@@ -14,6 +14,8 @@ function Field(game, width, height) {
   this.width = width;
   this.height = height;
   this.objects = [];
+  // list of objects scheduled to be removed
+  this.toRemove = [];
 }
 sys.inherits(Field, events.EventEmitter);
 
@@ -23,9 +25,11 @@ Field.prototype.addObject = function(obj) {
 };
 
 Field.prototype.removeObject = function(obj) {
+  // Schedule an object to be removed at the next pump.
   var idx = this.objects.indexOf(obj);
   if (idx != -1) {
-    this.objects.splice(idx, 1);
+    this.toRemove.push(idx);
+    //this.objects.splice(idx, 1);
     this.emit("removedObject", this, obj);
     return obj;
   } else {
@@ -34,16 +38,19 @@ Field.prototype.removeObject = function(obj) {
 };
 
 Field.prototype.pump = function() {
-  // Note: we're not optimizing this loop because this.objects may change
+  // Step through one iteration of the game cycle.
+  var i,l;
+  // First, remove objects scheduled to be removed
+  // Note: we're not optimizing this loop because this.objects will change
   // while we iterate over it.
-  var l = this.objects.length;
-  for (var i=0; i<l; i++) {
+  this.toRemove.sort().reverse();
+  for (i=0,l=this.toRemove.length; i<l; i++) {
+    this.objects.splice(this.toRemove[i], 1);
+  }
+  this.toRemove.splice(0,this.toRemove.length);
+  // NOW pump everything.
+  for (i=0,l=this.objects.length; i<l; i++) {
     this.objects[i].pump();
-    // If our number of objects shrunk while we iterate over it
-    // The Math.max logic is to filter out if our list grows -- we don't want
-    // to pump an object twice, now!
-    i = i - Math.max(0, l-this.objects.length);
-    l = this.objects.length;
   }
   this.emit("pump", this);
 };
@@ -69,8 +76,7 @@ Field.prototype.move = function(obj, displacement) {
   // Now, loop through every other object and see if this object collides with
   // it
   // TODO: NAIVE AND STUPID.
-  var l = this.objects.length; // like this for a reason, see the end of the loop
-  for (var i=0; i<l; i++) {
+  for (var i=0,l=this.objects.length; i<l; i++) {
     if (this.objects[i] !== obj) {
       // Test for collision between obj and this.objects[i]
       // TODO: find a better algorithm; preferably one that's not O(n^2)
@@ -100,10 +106,6 @@ Field.prototype.move = function(obj, displacement) {
             // recursively until they're no longer touching *anything* at all.
           }
       }
-      // If our number of objects shrunk while we iterate over it, handle in
-      // a special case in a manner similar to Field.pump()
-      i = i - Math.max(0, l-this.objects.length);
-      l = this.objects.length;
     }
   }
 
