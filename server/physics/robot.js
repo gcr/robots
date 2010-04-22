@@ -245,14 +245,14 @@ Robot.prototype.fire = function(adjust) {
   }
   this.bulletCoolDown = 0;
 
-  this.field.addObject(
-    new bullet.Bullet(
+  var newBullet = new bullet.Bullet(
       this.field, // Field
       this, // Owner (don't kill us plz!)
       this.location.copy(),
       this.rotation + this.turretRot + adjust
-    )
-  );
+    );
+  this.field.addObject(newBullet);
+  this.emit("fire", this, newBullet);
   return true;
 };
 

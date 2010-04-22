@@ -89,6 +89,18 @@ var allEars = {
         addEars('Field', match.game.field);
         addEars('GameLogic', match.game);
       }]
+    },
+  'GameLogic':
+    {
+      'connectedRobot': [function(game, robotId, rob) {
+        addEars('Robot', rob);
+      }]
+    },
+  'Robot':
+    {
+      'fire': [function(robot, bullet) {
+        addEars('Bullet', bullet);
+      }]
     }
 };
 

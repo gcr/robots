@@ -5,9 +5,19 @@ var
   sys    = require('sys'),
   assert = require('assert'),
   robot  = require('./physics/robot'),
+  ears  = require('./ears'),
   roboproto = robot.Robot.prototype,
   field  = require('./physics/field'),
   events = require('events');
+
+ears.listenFor({
+    'Robot':{
+      'fire': function(robot, bullet) {
+        require('./log').debug("FIRE");
+        //robot.field.game.robotBulletColission();
+      }
+    }
+});
 
 function GameLogic(match) {
   this.match = match;
