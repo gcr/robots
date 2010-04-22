@@ -9,9 +9,15 @@ courier.ui = (function() { // begin courier namespace
 
 function RenderRobotRow(jq, robot) {
   // Render a representation of robot into the given jquery object.
-  if (robot) {
+  function actuallyRender(jq, robot) {
     jq.empty();
     jq.empty().text("<\"" + robot.name + "\", armor: " + robot.armor + ">");
+  }
+  if (robot) {
+    actuallyRender(jq, robot);
+    robot.addListener("damaged", function() {
+      actuallyRender(jq, robot);
+    });
   } else {
     jq.empty().text("(unconnected robot)");
   }

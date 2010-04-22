@@ -17,6 +17,12 @@ function Robot (r) {
 }
 courier.core.inherits(Robot, courier.core.EventEmitter);
 
+Robot.prototype.absDamage = function(newArmor) {
+  // We were damaged! OHNOES! Set our armor to newArmor.
+  this.armor = newArmor;
+  this.emit("damaged", this);
+};
+
 
 /* ------------------ Match --------------------- */
 function Match(id, authCode) {
@@ -107,6 +113,9 @@ Match.prototype.beginStream = function(time) {
         case 'match_started':
           self.matchStarted();
           break;
+        case 'robot_damaged':
+          self.robotDamaged(action.robot_damaged, action.new_armor);
+          break;
       }
   });
 };
@@ -171,6 +180,16 @@ Match.prototype.disconnectRobot = function(robot) {
       prevRobot.emit('disconnectedRobot', prevRobot);
       // quit on the first one we find
       break;
+    }
+  }
+};
+
+Match.prototype.robotDamaged = function(robot, newArmor) {
+  // Tell the robot that it was damaged.
+  for (var i=0,l=this.robots.length; i<l; i++) {
+    if (this.robots[i].name == robot.name) {
+      this.robots[i].absDamage(newArmor);
+      break; // fail fast
     }
   }
 };
