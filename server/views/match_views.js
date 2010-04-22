@@ -39,6 +39,11 @@ ears.listenFor({
       field.game.match.history.add({"field": field.toJSON()});
     }
   },
+  'Robot': {
+    'damaged': function(robot, damage) {
+      robot.field.game.match.history.add({'robot_damaged': robot.toJSON(), 'new_armor': robot.armor});
+    }
+  },
   'GameLogic': {
     'connectedRobot': function(game, robotId, robot) {
       game.match.history.add({'connected_robot': robot.toJSON()});

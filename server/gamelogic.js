@@ -11,10 +11,9 @@ var
   events = require('events');
 
 ears.listenFor({
-    'Robot':{
-      'fire': function(robot, bullet) {
-        require('./log').debug("FIRE");
-        //robot.field.game.robotBulletColission();
+    'Bullet':{
+      'hitRobot': function(bullet, robot) {
+        robot.field.game.robotBulletColission(bullet, robot);
       }
     }
 });
@@ -190,6 +189,10 @@ GameLogic.prototype.disconnectRobot = function(robotId) {
   this.emit("disconnectedRobot", this, robot);
 };
 
+GameLogic.prototype.robotBulletColission = function(bullet, robot) {
+  // Ears will call this method when a bullet hits a robot.
+};
+
 // AT Robots inspired game
 // -----------------------
 // This game is inspired by AT Robots. It includes the standard things such as
@@ -227,6 +230,12 @@ ATRobotsGame.prototype.DELAYED = {
 ATRobotsGame.prototype.PARTIAL_DELAYED = {
   scanRobots: [2, roboproto.scanRobots],
   scanWall: [1, roboproto.scanWall]
+};
+
+ATRobotsGame.prototype.robotBulletColission = function(bullet, robot) {
+  // Ears calls this method when a bullet hits a robot. (see:
+  // bullet.Bullet.collidedWith)
+  robot.hullDamage(1);
 };
 
 process.mixin(exports,

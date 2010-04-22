@@ -41,6 +41,7 @@ Bullet.prototype.isTangible = function(other) {
 Bullet.prototype.collidedWith = function(other) {
   if (other instanceof robot.Robot && other !== this.owner) {
     // KABLOO!
+    this.emit("hitRobot", this, other);
     this.field.removeObject(this);
   }
 };

@@ -300,6 +300,17 @@ Robot.prototype.collidedWith = function(other) {
   }
 };
 
+Robot.prototype.hullDamage = function(damage) {
+  // Gamelogic calls us when bullets hit. (see: gamelogic.robotBulletColission)
+  if (this.armor > 0) {
+    this.armor -= damage;
+    this.emit("damaged", this, damage);
+    if (this.armor <= 0) {
+      this.emit("died", this);
+    }
+  }
+};
+
 process.mixin(exports,
   {
     Robot: Robot
