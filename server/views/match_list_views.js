@@ -66,7 +66,7 @@ function makeMatchListViews(matches) {
         var m = matches.registerNew(
           buildUuid(15), // mid
           buildUuid(15), // auth
-          !booleanize(query['public']));
+          !booleanize(query['public'])); // private
         renderJson(req, res, {'match': m.mid, 'auth_code': m.authCode});
       },
 

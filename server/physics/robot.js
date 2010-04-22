@@ -178,7 +178,8 @@ Robot.prototype.setThrottle = function(throttle) {
 
 Robot.prototype.scanRobots = function(scanWidth) {
     // Scan for robots! Returns a function that, when called, will scan for
-    // other robots.
+    // other robots. Keep this in the "PARTIAL_DELAYED" section of your game
+    // logic.
     // Steps:
     //  - Find all objects within scanRange of us
     //  - Of these, only keep robots that aren't ourselves that are within our
@@ -187,7 +188,7 @@ Robot.prototype.scanRobots = function(scanWidth) {
     //    information wrt our turret
     assert.ok(scanWidth <= Math.PI/2, "You can only scan 90° to one side.");
     assert.equal(this.scanMode, "", "You are already scanning for something!");
-    // Do this right away so the client knows to draw the scan arc
+    // Do this stuff right away so the client knows to draw the scan arc
     this.scanMode = "robots";
     this.scanWidth = scanWidth;
 
@@ -220,7 +221,8 @@ Robot.prototype.scanRobots = function(scanWidth) {
 };
 
 Robot.prototype.scanWall = function() {
-  // Returns a function that, when called, will scan walls
+  // Returns a function that, when called, will scan walls. Another
+  // PARTIAL_DELAYED.
   assert.equal(this.scanMode, "", "You are already scanning for something!");
   this.scanMode = "walls";
   var self = this;
@@ -238,7 +240,7 @@ Robot.prototype.fire = function(adjust) {
   adjust = Math.min(Math.PI/15, Math.max(-Math.PI/15, adjust));
   //require('../log').debug("PEW PEW PEW! robot fired " + adjust);
   if (this.bulletCoolDown < 3) {
-    // Don't fire too fast now!
+    // Don't fire too fast now! But don't throw an error or anything.
     return false;
   }
   this.bulletCoolDown = 0;
@@ -272,10 +274,15 @@ Robot.prototype.collidedWith = function(other) {
   //     us
   //
 
-  // diff will be a vector between 0 and 1 that represents how parallel we are.
-  var diff = Math.cos(this.bearingTo(other.location)) * (this.speed>0?1:-1);
+  // diff will be a scalar between 0 and 1 that represents how parallel we are.
+  //          0    0.7
+  //          | ,-'
+  //    0 - - > - - 1
+  //          | `-.
+  //          0    0.7
+  var diff = Math.min(0, Math.cos(this.bearingTo(other.location)) * (this.speed>0?1:-1));
 
-  // reduce the throttle and speed by up to half with cutoff
+  // Reduce the throttle and speed by up to .2 with cutoff
   this.throttle -= this.throttle * 0.2 * diff;
   this.speed -= this.throttle * 0.2 * diff;
   if (Math.abs(this.throttle) < 0.5) {

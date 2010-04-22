@@ -57,7 +57,6 @@ GameLogic.prototype.toJSON = function() {
 
 GameLogic.prototype.start = function() {
   // Start the match!
-  //
   this.started = true;
   this.emit("started", this);
   // Then, run all the queued actions right at the beginning.
@@ -82,10 +81,8 @@ GameLogic.prototype.pump = function() {
 };
 
 GameLogic.prototype.setFuture = function(time, robotId, cb, errback) {
-  // Rigs callback (cb) to be executed at time (time). The callback should
-  // (should!) expect two arguments: a possible error, and the actual results
-  // of the callback. By convention, of course; GameLogic.prototype.pump won't
-  // care.
+  // Rigs callback (cb) to be executed at time (time). If the callback fails,
+  // run the errback.
   assert.ok(time >= this.time, "That already happened!");
 
   // But first, we should go through our futures and ensure that no other

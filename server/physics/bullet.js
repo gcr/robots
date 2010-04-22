@@ -34,7 +34,7 @@ Bullet.prototype.pump = function() {
 };
 
 Bullet.prototype.collidedWith = function(other) {
-  // Go through our owner
+  // Go through our owner; hit other robots
   return (other !== this.owner);
 };
 
