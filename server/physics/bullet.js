@@ -38,6 +38,13 @@ Bullet.prototype.isTangible = function(other) {
   return (other !== this.owner);
 };
 
+Bullet.prototype.collidedWith = function(other) {
+  if (other instanceof robot.Robot && other !== this.owner) {
+    // KABLOO!
+    this.field.removeObject(this);
+  }
+};
+
 Bullet.prototype.collidedWithWall = function() {
   // BOOMIE!
   this.field.removeObject(this);
