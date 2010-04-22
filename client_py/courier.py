@@ -89,7 +89,7 @@ class Robot(object):
         """
         Steer ourselves so that we're facing the given angle
         """
-        self.turn(math.radians(angle - self.compass()))
+        self.turn(angle - self.compass())
 
     def get_throttle(self):
         return fetch_persist(self.url, {'throttle': 't'})
