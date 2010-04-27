@@ -235,7 +235,8 @@ ATRobotsGame.prototype.PARTIAL_DELAYED = {
 ATRobotsGame.prototype.robotBulletColission = function(bullet, robot) {
   // Ears calls this method when a bullet hits a robot. (see:
   // bullet.Bullet.collidedWith)
-  robot.hullDamage(1);
+  // Up to 5 points of damage
+  robot.hullDamage(5*bullet.hitQuality(robot));
 };
 
 process.mixin(exports,

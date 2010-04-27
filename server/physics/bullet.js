@@ -60,6 +60,41 @@ Bullet.prototype.renderInfo = function() {
   };
 };
 
+Bullet.prototype.hitQuality = function(other) {
+  // Returns the 'quality' of the shot; how close our path passes to other's
+  // location. See: "Graphics Gems" (Glassner, 1990) pg. 9-10
+  // Step 1. Find point on the ray from us with our direction closest to
+  // other.location
+  // Step 2. Find distance from this.location to that point.
+
+  // 1. lnormal is the vector perpendicular to our heading.
+  var lnormal = new vec.Vector(
+      -Math.cos(this.rotation), // -y
+      Math.sin(this.rotation) // x
+    );
+
+  //      other
+  //         :
+  //          : lnormal
+  //          :          ___...---'''
+  //        ___:..---'''
+  // ---''us    Q
+  sys.puts("normal: "+sys.inspect(lnormal));
+  var q = lnormal.dot(other.location) - lnormal.dot(this.location);
+  sys.puts("O - ln*q="+sys.inspect(other.location.sub(lnormal.multiply(q))));
+  var Q =                      other.location.sub(lnormal.multiply(q));
+  //Q = Point on Line l nearest other.location
+  sys.puts("Point closest to other: "+sys.inspect(Q));
+
+  // 2. Distance
+  var d = other.location.sub(Q).dist();
+  sys.puts("Dist: "+  d);
+
+  // 3. How good was the hit?
+  return d / (this.radius+other.radius);
+
+};
+
 process.mixin(exports,
   {
     Bullet: Bullet

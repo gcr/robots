@@ -6,7 +6,7 @@ var
   fieldobject = require('./fieldobject'),
   vec         = require('./vector'),
   bullet      = require('./bullet'),
-  NORTH       = new vec.Vector(0, 1);
+  NORTH       = require('./fieldobject').NORTH;
 
 function Robot(name, location, field) {
   this.name = name;
