@@ -59,8 +59,9 @@ GameLogic.prototype.toJSON = function() {
   return {
     field: this.field.toJSON(),
     started: this.started,
-    robots: this.robotArray(),
-    gametime: this.time
+    robots: this.robotArray()
+    // do we need this?
+    //gametime: this.time
   };
 };
 

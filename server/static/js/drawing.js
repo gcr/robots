@@ -123,7 +123,7 @@ Field.prototype.render = function(objects) {
 function followField(m, jq) {
   // We'll set up our field so that when M updates, the <canvas /> in jq
   // will too.
-  var f = new Field(m.field.width, m.field.height, jq);
+  var f = new Field(m.field_geometry.width, m.field_geometry.height, jq);
   var fdat;
   m.addListener('newFrame',
     function(match, frame_dat) {

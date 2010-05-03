@@ -206,12 +206,11 @@ Match.prototype.processFrame = function(frame) {
   //   current_events: ... }
   // (see: views/frames.js)
   // just pass it on, but add events to robots.
-  for (var ev in frame.current_events) {
-      if (frame.current_events.hasOwnProperty(ev)) {
-        if ('robot_damaged' in ev) {
-          this.robotDamaged(ev.robot, ev.new_armor);
-        }
-      }
+  for (var i=0,l=frame.current_events.length; i<l; i++) {
+    if ('robot_damaged' in frame.current_events[i]) {
+      this.robotDamaged(frame.current_events[i].robot_damaged,
+                      frame.current_events[i].new_armor);
+    }
   }
   // drawing will slurp this up
   this.emit('newFrame', this, frame);

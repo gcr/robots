@@ -43,7 +43,7 @@ sys.inherits(FrameList, events.EventEmitter);
 FrameList.prototype.newFrame = function() {
   // Make a new frame, append it to our history, and then emit an event.
   var frame = {
-    robots: this.match.game.robotArray(),
+    //robots: this.match.game.robotArray(),
     objects: this.match.game.field.objects.map(
       function(obj) { return obj.renderInfo(); }
     ),

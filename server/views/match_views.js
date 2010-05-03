@@ -38,13 +38,13 @@ ears.listenFor({
   },
   'Field': {
     'pump': function(field) {
-      var f = field.game.match.frame.newFrame();
+      var f = field.game.match.frames.newFrame();
       field.game.match.history.add({"frame": f});
     }
   },
   'Robot': {
     'damaged': function(robot, damage) {
-      robot.field.game.match.frame.registerEvent({'robot_damaged': robot.toJSON(), 'new_armor': robot.armor});
+      robot.field.game.match.frames.registerEvent({'robot_damaged': robot.toJSON(), 'new_armor': robot.armor});
     }
   },
   'GameLogic': {
