@@ -57,7 +57,7 @@ Field.prototype.pump = function() {
 
 Field.prototype.toJSON = function() {
   return {
-    objects: this.objects.map(function(obj) { return obj.renderInfo(); }),
+    shape: 'square',
     width: this.width,
     height: this.height
   };

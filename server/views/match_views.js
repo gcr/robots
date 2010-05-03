@@ -8,6 +8,7 @@ var
   hist                = require('../history'),
   log                 = require('../log'),
   switchboard         = require('./switchboard'),
+  frame               = require('./frames'),
   robotViews          = require('./robot_views'),
   renderJson          = require('./view_helpers').renderJson,
   renderError         = require('./view_helpers').renderError,
@@ -21,6 +22,7 @@ ears.listenFor({
     'newMatch': function(mlist, match) {
       // Just minding my own business...
       match.history = new hist.History();
+      match.frames = new frame.FrameList(match);
     }
   },
   'Match': {
@@ -36,12 +38,13 @@ ears.listenFor({
   },
   'Field': {
     'pump': function(field) {
-      field.game.match.history.add({"field": field.toJSON()});
+      var f = field.game.match.frame.newFrame();
+      field.game.match.history.add({"frame": f});
     }
   },
   'Robot': {
     'damaged': function(robot, damage) {
-      robot.field.game.match.history.add({'robot_damaged': robot.toJSON(), 'new_armor': robot.armor});
+      robot.field.game.match.frame.registerEvent({'robot_damaged': robot.toJSON(), 'new_armor': robot.armor});
     }
   },
   'GameLogic': {

@@ -57,7 +57,7 @@ GameLogic.prototype.robotArray = function() {
 
 GameLogic.prototype.toJSON = function() {
   return {
-    field_size: [this.field.width, this.field.height],
+    field: this.field.toJSON(),
     started: this.started,
     robots: this.robotArray(),
     gametime: this.time
