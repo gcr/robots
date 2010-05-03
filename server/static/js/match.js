@@ -51,7 +51,7 @@ Match.prototype.populate = function(stream, cb) {
       self.initTime   = minfo.init_time;
       self.started    = minfo.started;
       self.speed      = minfo.speed;
-      self.field_size = minfo.field_size;
+      self.field_geometry = minfo.field;
       self['public']  = minfo['public'];
       self.robots     = [];
       for (var i = 0,l = minfo.robots.length; i < l; i++) {
@@ -94,10 +94,14 @@ Match.prototype.beginStream = function(time) {
     function(action) {
       // This handles what to do when the server tells us something.
       switch (get_action(action)) {
-        case 'field':
-          // just pass it on
-          self.emit('fieldUpdate', this, action.field);
+        case 'frame':
+          // Added a new frame.
+          self.processFrame(action.frame);
           break;
+        //case 'field':
+        //  // just pass it on
+        //  self.emit('fieldUpdate', this, action.field);
+        //  break;
         case 'remove_slot':
           self.removeSlot();
           break;
@@ -113,15 +117,16 @@ Match.prototype.beginStream = function(time) {
         case 'match_started':
           self.matchStarted();
           break;
-        case 'robot_damaged':
-          self.robotDamaged(action.robot_damaged, action.new_armor);
-          break;
+        //case 'robot_damaged':
+        //  self.robotDamaged(action.robot_damaged, action.new_armor);
+        //  break;
       }
   });
 };
 
 Match.prototype.startMatch = function(cb) {
-  // Will try to start the match.
+  // Will try to start the match. (As opposed to: signifying that somebody
+  // else started the match; see this.matchStarted)
   if (this.authCode && !(this.starting || this.started)) {
     // another guard: don't run two of these at the same time!
     this.starting = true;
@@ -192,6 +197,24 @@ Match.prototype.robotDamaged = function(robot, newArmor) {
       break; // fail fast
     }
   }
+};
+
+Match.prototype.processFrame = function(frame) {
+  // Frame looks like this:
+  // { robots: ...
+  //   objects: ...
+  //   current_events: ... }
+  // (see: views/frames.js)
+  // just pass it on, but add events to robots.
+  for (var ev in frame.current_events) {
+      if (frame.current_events.hasOwnProperty(ev)) {
+        if ('robot_damaged' in ev) {
+          this.robotDamaged(ev.robot, ev.new_armor);
+        }
+      }
+  }
+  // drawing will slurp this up
+  this.emit('newFrame', this, frame);
 };
 
 Match.prototype.removeSlot = function() {

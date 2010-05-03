@@ -96,27 +96,21 @@ Field.prototype.drawBullet = function(bullet) {
     ctx.restore();
 };
 
-Field.prototype.render = function(field) {
+Field.prototype.render = function(objects) {
   // This gets run at every field update.
-  // field: {"width": 1024, heigth: 1025,
-  //    "objects": [ // see FieldObject::renderInfo() in
-  //                 // physics/fieldobject.py, robot.py, bullet.py
-  //           {'type': 'robot', 'location': [23, 35], ...}
-  //        ]
-  // }
   var self = this;
   var ctx = this.jq[0].getContext('2d');
 
   ctx.clearRect(0,0,this.width,this.height);
   this.withTransform(
     function() {
-      for (var i=0,l=field.objects.length; i<l; i++) {
-        switch (field.objects[i].type) {
+      for (var i=0,l=objects.length; i<l; i++) {
+        switch (objects[i].type) {
           case 'robot':
-            self.drawRobot(field.objects[i]);
+            self.drawRobot(objects[i]);
             break;
           case 'bullet':
-            self.drawBullet(field.objects[i]);
+            self.drawBullet(objects[i]);
             break;
           case 'object':
             // default
@@ -129,11 +123,11 @@ Field.prototype.render = function(field) {
 function followField(m, jq) {
   // We'll set up our field so that when M updates, the <canvas /> in jq
   // will too.
-  var f = new Field(m.field_size[0], m.field_size[1], jq);
+  var f = new Field(m.field.width, m.field.height, jq);
   var fdat;
-  m.addListener('fieldUpdate',
-    function(match, field_dat) {
-      fdat = field_dat;
+  m.addListener('newFrame',
+    function(match, frame_dat) {
+      fdat = frame_dat.objects;
     });
   window.setInterval(
       function() {
