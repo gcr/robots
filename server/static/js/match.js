@@ -206,6 +206,7 @@ Match.prototype.processFrame = function(frame) {
   //   current_events: ... }
   // (see: views/frames.js)
   // just pass it on, but add events to robots.
+  // TODO: frame system
   for (var i=0,l=frame.current_events.length; i<l; i++) {
     if ('robot_damaged' in frame.current_events[i]) {
       this.robotDamaged(frame.current_events[i].robot_damaged,
