@@ -22,6 +22,7 @@ factor = 1
 while True:
     # Scan for a robot
     scan_results = robot.scan(biggest_arc / (2**factor))
+    # scan_results is now an array of multiple robots.
 
     if scan_results:
         # If we found them, record their distance and accuracy (will be either
