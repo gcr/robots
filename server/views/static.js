@@ -181,14 +181,13 @@ function serveFile(webroot, urlPath, req, res) {
           if (charset) {
             contentType += '; charset=' + charset;
           }
-          res.writeHeader(200, 
+          res.writeHead(200,
             {
               "Content-Type": contentType,
               "Content-Length": contents.length
             }
           );
-          res.write(contents);
-          res.close();
+          res.end(contents);
         }
       );
     }
@@ -201,9 +200,5 @@ function makeFileServer(webroot) {
   };
 }
 
-process.mixin(exports,
-  {
-    serveFile: serveFile,
-    makeFileServer: makeFileServer
-  }
-);
+exports.serveFile = serveFile;
+exports.makeFileServer = makeFileServer;

@@ -154,6 +154,7 @@ Field.prototype.unOverlap = function(a, b) {
         // Therefore, Dx/D * d = dx; likewise for dy
     if (Dx === 0 && Dy === 0) {
       // Exact same position? Arbitrarily choose to move A right
+      // TODO: Use the objects' velocities to nudge them in the right direction
       return new vec.Vector(D, 0);
     } else {
       // Move A by this vector
@@ -217,8 +218,4 @@ Field.prototype.distToWall = function(location, rotation) {
   return (new vec.Vector(wallx, wally).sub(location)).dist();
 };
 
-process.mixin(exports,
-  {
-    Field: Field
-  }
-);
+exports.Field = Field;

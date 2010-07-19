@@ -104,8 +104,4 @@ Match.prototype.removeSlot = function(slotId) {
 };
 
 
-process.mixin(exports,
-  {
-    Match: Match
-  }
-);
+exports.Match = Match;

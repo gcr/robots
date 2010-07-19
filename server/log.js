@@ -59,12 +59,8 @@ function beginLogging() {
   });
 }
 
-process.mixin(exports,
-  {
-    debug:  debug, // Green
-    info:  info, // Blue
-    warn:  warn, // Yellow
-    error:  error, // Red
-    beginLogging: beginLogging
-  }
-);
+exports.debug = debug;
+exports.info = info;
+exports.warn = warn;
+exports.error = error;
+exports.beginLogging = beginLogging;

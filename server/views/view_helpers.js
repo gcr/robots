@@ -19,11 +19,10 @@ function renderJson(req, res, obj) {
   } else {
     json = json + "\n";
   }
-  res.writeHeader(200, {"Content-Type": "text/plain; charset=utf-8",
+  res.writeHead(200, {"Content-Type": "text/plain; charset=utf-8",
                                         // todo: change to text/json
                         "Content-Length": json.length});
-  res.write(json);
-  res.close();
+  res.end(json);
 }
 
 // Want to just plug something into your switchboard and be off straightaway?
@@ -87,15 +86,11 @@ function booleanize(m) {
   }
 }
 
-process.mixin(exports,
-  {
-    renderJson: renderJson,
-    renderError: renderError,
-    makeJsonRenderer: makeJsonRenderer,
-    renderHistory: renderHistory,
-    buildUuid: buildUuid,
-    randChoice: randChoice,
-    booleanize: booleanize,
-    makeHistoryRenderer: makeHistoryRenderer
-  }
-);
+exports.renderJson = renderJson;
+exports.renderError = renderError;
+exports.makeJsonRenderer = makeJsonRenderer;
+exports.renderHistory = renderHistory;
+exports.buildUuid = buildUuid;
+exports.randChoice = randChoice;
+exports.booleanize = booleanize;
+exports.makeHistoryRenderer = makeHistoryRenderer;

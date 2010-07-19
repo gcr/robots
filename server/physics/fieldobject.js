@@ -62,9 +62,5 @@ FieldObject.prototype.collidedWith = function(other) {
   // smarter than we are and it will decide what to do.
 };
 
-process.mixin(exports,
-  {
-    FieldObject: FieldObject,
-    NORTH: new vector.Vector(0, 1)
-  }
-);
+exports.FieldObject = FieldObject;
+exports.NORTH = new vector.Vector(0, 1);

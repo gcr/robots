@@ -12,7 +12,11 @@ var
   routes        = {};
 
 function addRoutes(newRoutes) {
-  return process.mixin(routes, newRoutes);
+  for (var k in newRoutes) {
+      if (newRoutes.hasOwnProperty(k)) {
+        routes[k] = newRoutes[k];
+      }
+  }
 }
 
 
@@ -45,11 +49,7 @@ function dispatch(req, res) {
   }
 }
 
-process.mixin(exports,
-  {
-    routes: routes,
-    addRoutes: addRoutes,
-    dispatch: dispatch,
-    genMatchListSite: genMatchListSite
-  }
-);
+exports.routes = routes;
+exports.addRoutes = addRoutes;
+exports.dispatch = dispatch;
+exports.genMatchListSite = genMatchListSite;

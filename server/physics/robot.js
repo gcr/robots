@@ -311,8 +311,4 @@ Robot.prototype.hullDamage = function(damage) {
   }
 };
 
-process.mixin(exports,
-  {
-    Robot: Robot
-  }
-);
+exports.Robot = Robot;

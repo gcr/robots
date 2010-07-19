@@ -90,8 +90,4 @@ function makeMatchListViews(matches) {
 
 }
 
-process.mixin(exports,
-  {
-    makeMatchListViews: makeMatchListViews
-  }
-);
+exports.makeMatchListViews = makeMatchListViews;

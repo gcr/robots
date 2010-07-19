@@ -93,8 +93,4 @@ Bullet.prototype.hitQuality = function(other) {
 
 };
 
-process.mixin(exports,
-  {
-    Bullet: Bullet
-  }
-);
+exports.Bullet = Bullet;

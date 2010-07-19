@@ -37,8 +37,4 @@ function pickCoolName() {
   ).join(' ').replace(/_/g, ' ');
 }
 
-process.mixin(exports,
-  {
-    pickCoolName: pickCoolName
-  }
-);
+exports.pickCoolName = pickCoolName;

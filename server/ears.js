@@ -115,11 +115,7 @@ function shout(type, event) {
   }
 }
 
-process.mixin(exports,
-  {
-    //allEars: allEars,
-    listenFor: listenFor,
-    addEars: addEars,
-    shout: shout
-  }
-);
+
+exports.listenFor = listenFor;
+exports.addEars = addEars;
+exports.shout = shout;

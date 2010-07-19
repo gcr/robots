@@ -107,8 +107,5 @@ function dispatchMatchViews(req, res, match, path) {
   );
 }
 
-process.mixin(exports,
-  {
-    dispatchMatchViews: dispatchMatchViews
-  }
-);
+
+exports.dispatchMatchViews = dispatchMatchViews;

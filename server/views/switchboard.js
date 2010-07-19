@@ -144,13 +144,9 @@ function makeDispatchQueryOverloader() {
   };
 }
 
-process.mixin(exports,
-  {
-    notFound: notFound,
-    dispatch: dispatch,
-    dispatchQueryOverload: dispatchQueryOverload,
-    makeDispatchQueryOverloader: makeDispatchQueryOverloader,
-    dispatchOnePath: dispatchOnePath,
-    makeOnePathDispatcher: makeOnePathDispatcher
-  }
-);
+exports.notFound = notFound;
+exports.dispatch = dispatch;
+exports.dispatchQueryOverload = dispatchQueryOverload;
+exports.makeDispatchQueryOverloader = makeDispatchQueryOverloader;
+exports.dispatchOnePath = dispatchOnePath;
+exports.makeOnePathDispatcher = makeOnePathDispatcher;

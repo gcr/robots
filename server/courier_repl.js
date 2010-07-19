@@ -7,24 +7,22 @@ var
 function start(mlist) {
   // Help our repl out.
 
-  process.mixin(repl.scope,
-    {
-      'routes': site.routes,
-      'site': site,
-      'mlist': mlist,
-      'matches': mlist.matches,
-      'sys': require('sys')
-    }
-  );
+  /* broken in current node
+  repl.scope.routes = site.routes;
+  repl.scope.site = site;
+  repl.scope.mlist = mlist;
+  repl.scope.matches = mlist.matches;
+  repl.scope.sys = require('sys');
+  */
 
   repl.prompt = '';
   repl.start();
   repl.prompt = 'node> ';
-  process.stdio.addListener("close",
+  /*process.stdio.addListener("close",
     function() {
       log.info("Server shutting down.\nLeaving so soon?");
       process.exit(0);
-    });
+    });*/
   ears.listenFor(
     {'MatchList':
       {'newMatch':
@@ -43,8 +41,4 @@ function start(mlist) {
   );
 }
 
-process.mixin(exports,
-  {
-    'start': start
-  }
-);
+exports.start = start;

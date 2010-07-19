@@ -115,7 +115,6 @@ GameLogic.prototype.robotAction = function(robotId, action, args, callback, errb
         robot = this.robots[robotId];
 
     assert.ok(robot, "This robot doesn't exist!");
-    // list of functions we still need:
 
     // Now, actually take the actions.
     var time, method, laterFunc;
@@ -160,7 +159,7 @@ GameLogic.prototype.makeRobot = function(robotId, name) {
   // Time to actually make the robot.
   var rob = new robot.Robot(name,
     [Math.random() * this.field.width, Math.random() * this.field.height],
-  this.field);
+    this.field);
 
   for (var rid in this.robots) {
       if (this.robots.hasOwnProperty(rid) && this.robots[rid]) {
@@ -239,9 +238,6 @@ ATRobotsGame.prototype.robotBulletColission = function(bullet, robot) {
   robot.hullDamage(2 + 3*bullet.hitQuality(robot));
 };
 
-process.mixin(exports,
-  {
-    GameLogic: GameLogic,
-    ATRobotsGame: ATRobotsGame
-  }
-);
+
+exports.GameLogic = GameLogic;
+exports.ATRobotsGame = ATRobotsGame;

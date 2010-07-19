@@ -111,8 +111,4 @@ function dispatchRobotViews(req, res, robot, robotId, match) {
   );
 }
 
-process.mixin(exports,
-  { 
-    dispatchRobotViews: dispatchRobotViews
-  }
-);
+exports.dispatchRobotViews = dispatchRobotViews;

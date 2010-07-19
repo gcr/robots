@@ -75,10 +75,6 @@ function normalizeAngle(angle) {
 }
 
 
-process.mixin(exports,
-  {
-    Vector: Vector,
-    '2DVector': Vector,
-    normalizeAngle: normalizeAngle
-  }
-);
+exports.Vector = Vector;
+exports['2DVector'] = Vector;
+exports.normalizeAngle = normalizeAngle;

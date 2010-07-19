@@ -21,9 +21,6 @@
     <canvas id='field' width='500' height='500'></canvas>
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function() {
-            // this is written through template substitution on the server.
-            //             |
-            //             v
             function getMatchId(wp) {
                 if (wp.length) {
                     return wp.pop() || getMatchId(wp)

@@ -46,8 +46,4 @@ MatchList.prototype.remove = function(mid) {
   this.emit("removeMatch", this, m);
 };
 
-process.mixin(exports,
-  {
-    MatchList: MatchList
-  }
-);
+exports.MatchList = MatchList;
