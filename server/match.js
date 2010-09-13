@@ -58,8 +58,6 @@ Match.prototype.start = function(authCode) {
   }
   this.game.start();
 
-  // We must assign something to 'this' because inside the function in
-  // setTimeout, 'this' refers to the window object.
   var self = this;
   this.timer = setInterval(function() {
     self.game.pump();

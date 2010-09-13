@@ -185,7 +185,8 @@ class Match(object):
 
 class RoboLink(object):
     """
-    Handles connecting to a match and such.
+    Handles connecting to a match and such. This will feed you a Robot which
+    you can then control yourself.
     """
     @classmethod
     def ask_for_url(cls):

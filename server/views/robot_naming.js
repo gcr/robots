@@ -16,7 +16,7 @@ var middle = ("planet star chrono duck endurer bot test " +
   "hound ocelot snake raven wolf mantis ninja octopus hawk owl " +
   "bison parliament congress ambassador spy scout heavy TCP " +
   "mime medic lawyer retailer sergeant colonel " +
-  "turing babbage dijkstra gobel graham bach stroustrup sussman " +
+  "turing babbage dijkstra godel graham bach stroustrup sussman " +
   "steele air water fire penguin awesome landlord").split(' ');
 
 var suffix = ("killer crusher atomizer shooter 2 2.0 9000 1000 3000 5000 " +
