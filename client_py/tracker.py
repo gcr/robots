@@ -4,7 +4,7 @@
 """
 Tracker.
 
-We'll just sit there and track you forever.
+We'll just sit there and track you forever, halving our scan arc each step.
 """
 from courier import RoboLink
 
