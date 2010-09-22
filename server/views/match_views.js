@@ -82,11 +82,9 @@ function dispatchMatchViews(req, res, match, path) {
         ['info'],
         function(req, res) {
           // Render information on the match
-          return renderJson(req, res, process.mixin(match.toJSON(),
-            {
-              history: match.history.time()
-            }
-          ));
+          var result = match.toJSON();
+          result.history = match.history.time();
+          return renderJson(req, res, result);
         },
 
         ['start', 'auth_code'],

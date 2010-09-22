@@ -39,15 +39,11 @@ Robot.prototype.renderInfo = function() {
     speed: this.speed
   };
   if (this.scanMode !== "") {
-    process.mixin(result,
-      {
-        scan: {
+    result.scan = {
           mode: this.scanMode,
           width: this.scanMode == "walls"? undefined : this.scanWidth,
           range: this.scanRange
-        }
-      }
-    );
+        };
   }
   return result;
 };
@@ -210,12 +206,12 @@ Robot.prototype.scanRobots = function(scanWidth) {
           function (obj) {
           // Now, take the resulting list of robots and augment them with
           // distance and angle information. Return this list to the client.
-          return process.mixin(obj.toJSON(),
-            {
-              distance: Math.floor(self.distanceTo(obj.location)/20)*20,
-              bearing: Math.round(
-                self.turretBearingTo(obj.location)*2/self.scanWidth)/2
-            });
+          var result = obj.toJSON();
+          result.distance = Math.floor(self.distanceTo(obj.location)/20)*20;
+          result.bearing = Math.round(
+              self.turretBearingTo(obj.location)*2/self.scanWidth)/2;
+          return result;
+
         });
     };
 };

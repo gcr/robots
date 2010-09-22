@@ -24,13 +24,11 @@ function Match(mid, authCode, pub) {
 sys.inherits(Match, events.EventEmitter);
 
 Match.prototype.toJSON = function() {
-  return process.mixin(this.game.toJSON(),
-    {
-      init_time: this.initTime,
-      speed: this.speed,
-      'public': this.pub
-    }
-  );
+  var result = this.game.toJSON();
+  result.init_time = this.initTime;
+  result.speed = this.speed;
+  result['public'] = this.pub;
+  return result;
 };
 
 Match.prototype.start = function(authCode) {
