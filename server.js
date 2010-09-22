@@ -17,7 +17,7 @@ site.genMatchListSite(mlist);
 log.beginLogging();
 
 // Begin our repl
-repl.start(mlist);
+//repl.start(mlist); // TODO eol screwups
 
 // Add all the ears you need above this line
 ears.shout('Server', 'newMatchList', mlist);

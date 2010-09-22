@@ -9,6 +9,11 @@ var sys  = require('sys'),
 
 function makeLogger(esc_code) {
   return function(text) {
+    text = text.split('\n');
+    for (var i=0,l=text.length; i<l; i++) {
+      sys.puts((i===0? esc_code + "** " + reset_code : "   ") + text[i]);
+    }
+    /*
     var t = text.split("\n");
     sys.print('\n');
     if (t.length > 1) {
@@ -21,6 +26,7 @@ function makeLogger(esc_code) {
     } else {
       sys.puts(esc_code + single_bracket + reset_code + text);
     }
+    */
   };
 }
 

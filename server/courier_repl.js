@@ -15,9 +15,9 @@ function start(mlist) {
   repl.scope.sys = require('sys');
   */
 
-  repl.prompt = '';
+  repl.prompt = '\n';
   repl.start();
-  repl.prompt = 'node> ';
+  repl.prompt = '\nnode> ';
   /*process.stdio.addListener("close",
     function() {
       log.info("Server shutting down.\nLeaving so soon?");
